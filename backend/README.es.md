@@ -211,12 +211,37 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 - `coordinate_y`: float, requerido (latitud)
 - `circuit_communal_id`: FK a Communal Circuit, opcional (auto-asignado basado en coordenadas)
 - `quadrant_id`: FK a Quadrant, opcional (auto-asignado basado en coordenadas)
+- `organism_id`: FK a Organism, opcional
 - `creationDate`: datetime, automático
 - `updatedOn`: datetime, automático
 - `deletionDate`: datetime, nullable (eliminación suave)
-- **Relaciones**: Pertenece a Quadrant (opcional) y Communal Circuit (opcional)
+- **Relaciones**: Pertenece a Quadrant (opcional), Communal Circuit (opcional), y Organism (opcional)
 - **Lógica de Negocio**: Automáticamente asociado con Quadrant y/o Communal Circuit si las coordenadas caen dentro de sus límites
 - **Hooks**: Lógica de asociación espacial en crear/actualizar
+
+#### **Organism**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, requerido, único
+- `creationDate`: datetime, automático
+- `updatedOn`: datetime, automático
+- `deletionDate`: datetime, nullable (eliminación suave)
+- **Relaciones**: Tiene muchos Points of Interest, tiene muchos Responsibles
+- **Hooks**: Previene eliminación si hay puntos de interés o responsables asignados
+
+#### **Responsible**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, requerido
+- `phone`: string, requerido (validación de formato de número telefónico venezolano)
+- `position`: string, requerido
+- `organism_id`: FK a Organism, requerido
+- `creationDate`: datetime, automático
+- `updatedOn`: datetime, automático
+- `deletionDate`: datetime, nullable (eliminación suave)
+- **Relaciones**: Pertenece a Organism
+- **Validación**: El número de teléfono debe coincidir con el formato venezolano (regex: `^(\+58|0058|58)?[24]\d{9}$` para fijos o `^(\+58|0058|58)?4\d{9}$` para móviles)
+- **Hooks**: Registro automático de cambios en todas las operaciones
 
 ### Modelos de Unión (Muchos-a-Muchos)
 
@@ -317,6 +342,26 @@ erDiagram
         float coordinate_y
         int circuit_communal_id FK
         int quadrant_id FK
+        int organism_id FK
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    ORGANISM {
+        int id PK
+        string name UK
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    RESPONSIBLE {
+        int id PK
+        string name
+        string phone
+        string position
+        int organism_id FK
         datetime creationDate
         datetime updatedOn
         datetime deletionDate
@@ -347,6 +392,10 @@ erDiagram
     %% Relaciones de Puntos de Interés
     QUADRANT ||--o{ POINT_OF_INTEREST : "incluye"
     COMMUNAL_CIRCUIT ||--o{ POINT_OF_INTEREST : "incluye"
+    ORGANISM ||--o{ POINT_OF_INTEREST : "gestiona"
+
+    %% Relaciones de Organismo
+    ORGANISM ||--o{ RESPONSIBLE : "tiene"
 ```
 
 **Detalles de Relaciones:**
@@ -359,6 +408,8 @@ erDiagram
 - **Parish** → **Communal Circuit** (uno-a-muchos - las parroquias se organizan en múltiples circuitos comunales)
 - **Quadrant** → **Point of Interest** (uno-a-muchos, opcional - los puntos pueden estar dentro de los límites del cuadrante)
 - **Communal Circuit** → **Point of Interest** (uno-a-muchos, opcional - los puntos pueden estar dentro de los límites del circuito)
+- **Organism** → **Point of Interest** (uno-a-muchos, opcional - los organismos pueden gestionar múltiples puntos de interés)
+- **Organism** → **Responsible** (uno-a-muchos - los organismos tienen múltiples personas responsables)
 
 **Relaciones Espaciales:**
 - Los Puntos de Interés se asocian automáticamente con Cuadrantes y Circuitos Comunales basado en la inclusión de coordenadas dentro de sus geometrías de límites
@@ -377,7 +428,7 @@ erDiagram
 
 - **Permisos Auto-Generados**: 4 acciones × múltiples entidades
   - Acciones: `create`, `get`, `edit`, `delete`
-  - Entidades: `state`, `municipality`, `parish`, `quadrant`, `communal_circuit`, `point_of_interest`, `permission`, `role`, `user`
+  - Entidades: `state`, `municipality`, `parish`, `quadrant`, `communal_circuit`, `point_of_interest`, `organism`, `responsible`, `permission`, `role`, `user`
 - **Rol de Administrador**: Creado automáticamente con todos los permisos
 - **Usuario Administrador**: Credenciales por defecto (username: `admin`, password: `admin`)
 
@@ -454,6 +505,20 @@ Authorization: Bearer <your-jwt-token>
 - **`GET /api/points-of-interest/:id/geojson`** - Obtener punto específico como GeoJSON Feature
 - **`PUT /api/points-of-interest/:id`** - Actualizar un punto (re-evalúa asociaciones espaciales si cambian las coordenadas)
 - **`DELETE /api/points-of-interest/:id`** - Eliminar un punto de interés (eliminación suave)
+
+##### **Organisms**
+- **`GET /api/organisms`** - Listar todos los organismos con paginación y filtrado
+- **`POST /api/organisms`** - Crear un nuevo organismo
+- **`GET /api/organisms/:id`** - Obtener detalles específicos del organismo con puntos de interés y responsables asociados
+- **`PUT /api/organisms/:id`** - Actualizar un organismo
+- **`DELETE /api/organisms/:id`** - Eliminar un organismo (eliminación suave)
+
+##### **Responsibles**
+- **`GET /api/responsibles`** - Listar responsables con relaciones de organismo y filtrado
+- **`POST /api/responsibles`** - Crear un nuevo responsable (valida formato de número telefónico venezolano)
+- **`GET /api/responsibles/:id`** - Obtener detalles específicos del responsable
+- **`PUT /api/responsibles/:id`** - Actualizar un responsable (valida formato de número telefónico)
+- **`DELETE /api/responsibles/:id`** - Eliminar un responsable (eliminación suave)
 
 ### Características Comunes
 

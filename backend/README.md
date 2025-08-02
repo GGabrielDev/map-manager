@@ -211,12 +211,37 @@ The server will start at `http://localhost:4000` (or your configured PORT).
 - `coordinate_y`: float, required (latitude)
 - `circuit_communal_id`: FK to Communal Circuit, optional (auto-assigned based on coordinates)
 - `quadrant_id`: FK to Quadrant, optional (auto-assigned based on coordinates)
+- `organism_id`: FK to Organism, optional
 - `creationDate`: datetime, auto
 - `updatedOn`: datetime, auto
 - `deletionDate`: datetime, nullable (soft delete)
-- **Relationships**: Belongs to Quadrant (optional) and Communal Circuit (optional)
+- **Relationships**: Belongs to Quadrant (optional), Communal Circuit (optional), and Organism (optional)
 - **Business Logic**: Automatically associated with Quadrant and/or Communal Circuit if coordinates fall within their boundaries
 - **Hooks**: Spatial association logic on create/update
+
+#### **Organism**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Has many Points of Interest, has many Responsibles
+- **Hooks**: Prevents deletion if points of interest or responsibles are assigned
+
+#### **Responsible**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required
+- `phone`: string, required (Venezuelan phone number format validation)
+- `position`: string, required
+- `organism_id`: FK to Organism, required
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Belongs to Organism
+- **Validation**: Phone number must match Venezuelan format (regex: `^(\+58|0058|58)?[24]\d{9}$` for landlines or `^(\+58|0058|58)?4\d{9}$` for mobile)
+- **Hooks**: Automatic change logging on all operations
 
 ### Join Models (Many-to-Many)
 
@@ -317,6 +342,26 @@ erDiagram
         float coordinate_y
         int circuit_communal_id FK
         int quadrant_id FK
+        int organism_id FK
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    ORGANISM {
+        int id PK
+        string name UK
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    RESPONSIBLE {
+        int id PK
+        string name
+        string phone
+        string position
+        int organism_id FK
         datetime creationDate
         datetime updatedOn
         datetime deletionDate
@@ -347,6 +392,10 @@ erDiagram
     %% Points of Interest Relationships
     QUADRANT ||--o{ POINT_OF_INTEREST : "includes"
     COMMUNAL_CIRCUIT ||--o{ POINT_OF_INTEREST : "includes"
+    ORGANISM ||--o{ POINT_OF_INTEREST : "manages"
+
+    %% Organism Relationships
+    ORGANISM ||--o{ RESPONSIBLE : "has"
 ```
 
 **Relationship Details:**
@@ -359,6 +408,8 @@ erDiagram
 - **Parish** → **Communal Circuit** (one-to-many - parishes organize into multiple communal circuits)
 - **Quadrant** → **Point of Interest** (one-to-many, optional - points may be within quadrant boundaries)
 - **Communal Circuit** → **Point of Interest** (one-to-many, optional - points may be within circuit boundaries)
+- **Organism** → **Point of Interest** (one-to-many, optional - organisms can manage multiple points of interest)
+- **Organism** → **Responsible** (one-to-many - organisms have multiple responsible persons)
 
 **Spatial Relationships:**
 - Points of Interest are automatically associated with Quadrants and Communal Circuits based on coordinate inclusion within their boundary geometries
@@ -377,7 +428,7 @@ erDiagram
 
 - **Auto-Generated Permissions**: 4 actions × multiple entities
   - Actions: `create`, `get`, `edit`, `delete`
-  - Entities: `state`, `municipality`, `parish`, `quadrant`, `communal_circuit`, `point_of_interest`, `permission`, `role`, `user`
+  - Entities: `state`, `municipality`, `parish`, `quadrant`, `communal_circuit`, `point_of_interest`, `organism`, `responsible`, `permission`, `role`, `user`
 - **Admin Role**: Created automatically with all permissions
 - **Admin User**: Default credentials (username: `admin`, password: `admin`)
 
@@ -454,6 +505,20 @@ Authorization: Bearer <your-jwt-token>
 - **`GET /api/points-of-interest/:id/geojson`** - Get specific point as GeoJSON Feature
 - **`PUT /api/points-of-interest/:id`** - Update a point (re-evaluates spatial associations if coordinates change)
 - **`DELETE /api/points-of-interest/:id`** - Delete a point of interest (soft delete)
+
+##### **Organisms**
+- **`GET /api/organisms`** - List all organisms with pagination and filtering
+- **`POST /api/organisms`** - Create a new organism
+- **`GET /api/organisms/:id`** - Get specific organism details with associated points of interest and responsibles
+- **`PUT /api/organisms/:id`** - Update an organism
+- **`DELETE /api/organisms/:id`** - Delete an organism (soft delete)
+
+##### **Responsibles**
+- **`GET /api/responsibles`** - List responsibles with organism relationships and filtering
+- **`POST /api/responsibles`** - Create a new responsible (validates Venezuelan phone number format)
+- **`GET /api/responsibles/:id`** - Get specific responsible details
+- **`PUT /api/responsibles/:id`** - Update a responsible (validates phone number format)
+- **`DELETE /api/responsibles/:id`** - Delete a responsible (soft delete)
 
 ### Common Features
 
