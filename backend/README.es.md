@@ -181,26 +181,60 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 - `id`: integer, PK, auto-increment
 - `name`: string, requerido, único
 - `parish_id`: FK a Parish, requerido
+- `organism_id`: FK a Organism, requerido
 - `boundary`: geometry, requerido (datos espaciales que definen los límites del cuadrante)
 - `metadata`: JSON, opcional (información adicional del cuadrante)
+- `fleet`: JSON, requerido (datos de gestión de flota con estructura abajo)
+  - `small`: objeto con `active` (integer, por defecto 0, no negativo) e `inactive` (integer, por defecto 0, no negativo)
+  - `big`: objeto con `active` (integer, por defecto 0, no negativo) e `inactive` (integer, por defecto 0, no negativo)
+  - `bike`: objeto con `active` (integer, por defecto 0, no negativo) e `inactive` (integer, por defecto 0, no negativo)
 - `creationDate`: datetime, automático
 - `updatedOn`: datetime, automático
 - `deletionDate`: datetime, nullable (eliminación suave)
-- **Relaciones**: Pertenece a Parish, tiene muchos Points of Interest
+- **Relaciones**: Pertenece a Parish, pertenece a Organism, tiene muchos Points of Interest, tiene muchos Responsibles
 - **Índice Espacial**: Recomendado en el campo boundary para rendimiento
+- **Validación**: Los números de flota deben ser enteros no negativos
 
 #### **Communal Circuit**
 
 - `id`: integer, PK, auto-increment
 - `name`: string, requerido, único
 - `parish_id`: FK a Parish, requerido
+- `address`: string, requerido (dirección de oficina, diferente de la geometría)
+- `code`: string, requerido (código de identificación del circuito)
 - `boundary`: geometry, requerido (datos espaciales que definen los límites del circuito)
 - `metadata`: JSON, opcional (información adicional del circuito)
 - `creationDate`: datetime, automático
 - `updatedOn`: datetime, automático
 - `deletionDate`: datetime, nullable (eliminación suave)
-- **Relaciones**: Pertenece a Parish, tiene muchos Points of Interest
+- **Relaciones**: Pertenece a Parish, tiene muchos Points of Interest, tiene muchos Responsibles, tiene muchas Communes
 - **Índice Espacial**: Recomendado en el campo boundary para rendimiento
+
+#### **Commune**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, requerido, único
+- `circuit_id`: FK a Communal Circuit, requerido
+- `address`: string, requerido (dirección de oficina de la comuna)
+- `code`: string, requerido (código de identificación de la comuna)
+- `creationDate`: datetime, automático
+- `updatedOn`: datetime, automático
+- `deletionDate`: datetime, nullable (eliminación suave)
+- **Relaciones**: Pertenece a Communal Circuit, tiene muchos Responsibles, tiene muchos Communal Councils
+- **Hooks**: Previene eliminación si hay consejos comunales asignados
+
+#### **Communal Council**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, requerido, único
+- `commune_id`: FK a Commune, requerido
+- `address`: string, requerido (dirección de oficina del consejo)
+- `code`: string, requerido (código de identificación del consejo)
+- `creationDate`: datetime, automático
+- `updatedOn`: datetime, automático
+- `deletionDate`: datetime, nullable (eliminación suave)
+- **Relaciones**: Pertenece a Commune, tiene muchos Responsibles
+- **Hooks**: Previene eliminación si hay responsables asignados
 
 #### **Point of Interest**
 
@@ -232,15 +266,26 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 #### **Responsible**
 
 - `id`: integer, PK, auto-increment
-- `name`: string, requerido
+- `first_name`: string, requerido
+- `last_name`: string, requerido
+- `ci`: string, requerido (formato de cédula venezolana: letra mayúscula seguida de números)
 - `phone`: string, requerido (validación de formato de número telefónico venezolano)
+- `phone_backup`: string, opcional (validación de formato de número telefónico venezolano)
+- `email`: string, opcional (validación de formato de email)
 - `position`: string, requerido
-- `organism_id`: FK a Organism, requerido
+- `organism_id`: FK a Organism, opcional
+- `quadrant_id`: FK a Quadrant, opcional
+- `circuit_id`: FK a Communal Circuit, opcional
+- `commune_id`: FK a Commune, opcional
+- `council_id`: FK a Communal Council, opcional
 - `creationDate`: datetime, automático
 - `updatedOn`: datetime, automático
 - `deletionDate`: datetime, nullable (eliminación suave)
-- **Relaciones**: Pertenece a Organism
-- **Validación**: El número de teléfono debe coincidir con el formato venezolano (regex: `^(\+58|0058|58)?[24]\d{9}$` para fijos o `^(\+58|0058|58)?4\d{9}$` para móviles)
+- **Relaciones**: Pertenece a Organism (opcional), Quadrant (opcional), Communal Circuit (opcional), Commune (opcional), Communal Council (opcional)
+- **Validación**:
+  - Los números de teléfono deben coincidir con el formato venezolano (regex: `^0[24]\d{2}-\d{7}$` para fijos o `^04(12|14|16|22|24|26)-\d{7}$` para móviles)
+  - La cédula debe comenzar con letra mayúscula seguida de números
+  - El email debe tener formato válido si se proporciona
 - **Hooks**: Registro automático de cambios en todas las operaciones
 
 ### Modelos de Unión (Muchos-a-Muchos)
@@ -316,8 +361,10 @@ erDiagram
         int id PK
         string name UK
         int parish_id FK
+        int organism_id FK
         geometry boundary
         json metadata
+        json fleet
         datetime creationDate
         datetime updatedOn
         datetime deletionDate
@@ -327,8 +374,32 @@ erDiagram
         int id PK
         string name UK
         int parish_id FK
+        string address
+        string code
         geometry boundary
         json metadata
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    COMMUNE {
+        int id PK
+        string name UK
+        int circuit_id FK
+        string address
+        string code
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    COMMUNAL_COUNCIL {
+        int id PK
+        string name UK
+        int commune_id FK
+        string address
+        string code
         datetime creationDate
         datetime updatedOn
         datetime deletionDate
@@ -358,10 +429,18 @@ erDiagram
 
     RESPONSIBLE {
         int id PK
-        string name
+        string first_name
+        string last_name
+        string ci
         string phone
+        string phone_backup
+        string email
         string position
         int organism_id FK
+        int quadrant_id FK
+        int circuit_id FK
+        int commune_id FK
+        int council_id FK
         datetime creationDate
         datetime updatedOn
         datetime deletionDate
@@ -388,14 +467,21 @@ erDiagram
     MUNICIPALITY ||--o{ PARISH : "se ramifica en"
     PARISH ||--o{ QUADRANT : "se divide en"
     PARISH ||--o{ COMMUNAL_CIRCUIT : "se organiza en"
+    COMMUNAL_CIRCUIT ||--o{ COMMUNE : "contiene"
+    COMMUNE ||--o{ COMMUNAL_COUNCIL : "contiene"
 
     %% Relaciones de Puntos de Interés
     QUADRANT ||--o{ POINT_OF_INTEREST : "incluye"
     COMMUNAL_CIRCUIT ||--o{ POINT_OF_INTEREST : "incluye"
     ORGANISM ||--o{ POINT_OF_INTEREST : "gestiona"
 
-    %% Relaciones de Organismo
+    %% Relaciones de Organismo y Cuadrante
+    ORGANISM ||--o{ QUADRANT : "gestiona"
     ORGANISM ||--o{ RESPONSIBLE : "tiene"
+    QUADRANT ||--o{ RESPONSIBLE : "tiene"
+    COMMUNAL_CIRCUIT ||--o{ RESPONSIBLE : "tiene"
+    COMMUNE ||--o{ RESPONSIBLE : "tiene"
+    COMMUNAL_COUNCIL ||--o{ RESPONSIBLE : "tiene"
 ```
 
 **Detalles de Relaciones:**
@@ -406,12 +492,20 @@ erDiagram
 - **Municipality** → **Parish** (uno-a-muchos - los municipios se ramifican en múltiples parroquias)
 - **Parish** → **Quadrant** (uno-a-muchos - las parroquias se dividen en múltiples cuadrantes)
 - **Parish** → **Communal Circuit** (uno-a-muchos - las parroquias se organizan en múltiples circuitos comunales)
+- **Communal Circuit** → **Commune** (uno-a-muchos - los circuitos contienen múltiples comunas)
+- **Commune** → **Communal Council** (uno-a-muchos - las comunas contienen múltiples consejos)
+- **Organism** → **Quadrant** (uno-a-muchos - los organismos gestionan múltiples cuadrantes)
 - **Quadrant** → **Point of Interest** (uno-a-muchos, opcional - los puntos pueden estar dentro de los límites del cuadrante)
 - **Communal Circuit** → **Point of Interest** (uno-a-muchos, opcional - los puntos pueden estar dentro de los límites del circuito)
 - **Organism** → **Point of Interest** (uno-a-muchos, opcional - los organismos pueden gestionar múltiples puntos de interés)
-- **Organism** → **Responsible** (uno-a-muchos - los organismos tienen múltiples personas responsables)
+- **Organism** → **Responsible** (uno-a-muchos, opcional - los organismos pueden tener múltiples personas responsables)
+- **Quadrant** → **Responsible** (uno-a-muchos, opcional - los cuadrantes pueden tener múltiples personas responsables)
+- **Communal Circuit** → **Responsible** (uno-a-muchos, opcional - los circuitos pueden tener múltiples personas responsables)
+- **Commune** → **Responsible** (uno-a-muchos, opcional - las comunas pueden tener múltiples personas responsables)
+- **Communal Council** → **Responsible** (uno-a-muchos, opcional - los consejos pueden tener múltiples personas responsables)
 
 **Relaciones Espaciales:**
+
 - Los Puntos de Interés se asocian automáticamente con Cuadrantes y Circuitos Comunales basado en la inclusión de coordenadas dentro de sus geometrías de límites
 - Los índices espaciales en campos de límites optimizan el rendimiento de consultas espaciales
 
@@ -428,7 +522,7 @@ erDiagram
 
 - **Permisos Auto-Generados**: 4 acciones × múltiples entidades
   - Acciones: `create`, `get`, `edit`, `delete`
-  - Entidades: `state`, `municipality`, `parish`, `quadrant`, `communal_circuit`, `point_of_interest`, `organism`, `responsible`, `permission`, `role`, `user`
+  - Entidades: `state`, `municipality`, `parish`, `quadrant`, `communal_circuit`, `commune`, `communal_council`, `point_of_interest`, `organism`, `responsible`, `permission`, `role`, `user`
 - **Rol de Administrador**: Creado automáticamente con todos los permisos
 - **Usuario Administrador**: Credenciales por defecto (username: `admin`, password: `admin`)
 
@@ -451,6 +545,7 @@ Authorization: Bearer <your-jwt-token>
 ### Rutas Protegidas (Requieren Autenticación)
 
 #### **Gestión de Usuarios**
+
 - **`/api/users`** - Gestión de usuarios (operaciones CRUD)
 - **`/api/roles`** - Gestión de roles con asignación de permisos
 - **`/api/permissions`** - Listado y gestión de permisos
@@ -458,6 +553,7 @@ Authorization: Bearer <your-jwt-token>
 #### **Entidades Geográficas**
 
 ##### **States**
+
 - **`GET /api/states`** - Listar todos los estados con paginación y filtrado
 - **`POST /api/states`** - Crear un nuevo estado
 - **`GET /api/states/:id`** - Obtener detalles específicos del estado
@@ -465,6 +561,7 @@ Authorization: Bearer <your-jwt-token>
 - **`DELETE /api/states/:id`** - Eliminar un estado (eliminación suave)
 
 ##### **Municipalities**
+
 - **`GET /api/municipalities`** - Listar municipios con relaciones de estado
 - **`POST /api/municipalities`** - Crear un nuevo municipio
 - **`GET /api/municipalities/:id`** - Obtener detalles específicos del municipio
@@ -472,6 +569,7 @@ Authorization: Bearer <your-jwt-token>
 - **`DELETE /api/municipalities/:id`** - Eliminar un municipio (eliminación suave)
 
 ##### **Parishes**
+
 - **`GET /api/parishes`** - Listar parroquias con relaciones de municipio
 - **`POST /api/parishes`** - Crear una nueva parroquia
 - **`GET /api/parishes/:id`** - Obtener detalles específicos de la parroquia
@@ -479,6 +577,7 @@ Authorization: Bearer <your-jwt-token>
 - **`DELETE /api/parishes/:id`** - Eliminar una parroquia (eliminación suave)
 
 ##### **Quadrants**
+
 - **`GET /api/quadrants`** - Listar cuadrantes con datos de límites espaciales (formato GeoJSON para Leaflet)
 - **`GET /api/quadrants/geojson`** - Obtener todos los cuadrantes como GeoJSON FeatureCollection para consumo directo de Leaflet
 - **`POST /api/quadrants`** - Crear un nuevo cuadrante (acepta geometría GeoJSON, procesa con indexación espacial)
@@ -488,6 +587,7 @@ Authorization: Bearer <your-jwt-token>
 - **`DELETE /api/quadrants/:id`** - Eliminar un cuadrante (eliminación suave)
 
 ##### **Communal Circuits**
+
 - **`GET /api/communal-circuits`** - Listar circuitos comunales con datos de límites espaciales (formato GeoJSON para Leaflet)
 - **`GET /api/communal-circuits/geojson`** - Obtener todos los circuitos como GeoJSON FeatureCollection para consumo directo de Leaflet
 - **`POST /api/communal-circuits`** - Crear un nuevo circuito comunal (acepta geometría GeoJSON)
@@ -497,6 +597,7 @@ Authorization: Bearer <your-jwt-token>
 - **`DELETE /api/communal-circuits/:id`** - Eliminar un circuito comunal (eliminación suave)
 
 ##### **Points of Interest**
+
 - **`GET /api/points-of-interest`** - Listar puntos con opciones de filtrado espacial (por cuadrante/circuito, caja delimitadora)
 - **`GET /api/points-of-interest/geojson`** - Obtener todos los puntos como GeoJSON FeatureCollection para marcadores de Leaflet
 - **`GET /api/points-of-interest/within/:bounds`** - Obtener puntos dentro de los límites del viewport del mapa para carga dinámica
@@ -507,17 +608,35 @@ Authorization: Bearer <your-jwt-token>
 - **`DELETE /api/points-of-interest/:id`** - Eliminar un punto de interés (eliminación suave)
 
 ##### **Organisms**
+
 - **`GET /api/organisms`** - Listar todos los organismos con paginación y filtrado
 - **`POST /api/organisms`** - Crear un nuevo organismo
 - **`GET /api/organisms/:id`** - Obtener detalles específicos del organismo con puntos de interés y responsables asociados
 - **`PUT /api/organisms/:id`** - Actualizar un organismo
 - **`DELETE /api/organisms/:id`** - Eliminar un organismo (eliminación suave)
 
+##### **Communes**
+
+- **`GET /api/communes`** - Listar todas las comunas con paginación y filtrado
+- **`POST /api/communes`** - Crear una nueva comuna
+- **`GET /api/communes/:id`** - Obtener detalles específicos de la comuna con responsables y consejos asociados
+- **`PUT /api/communes/:id`** - Actualizar una comuna
+- **`DELETE /api/communes/:id`** - Eliminar una comuna (eliminación suave)
+
+##### **Communal Councils**
+
+- **`GET /api/communal-councils`** - Listar todos los consejos comunales con paginación y filtrado
+- **`POST /api/communal-councils`** - Crear un nuevo consejo comunal
+- **`GET /api/communal-councils/:id`** - Obtener detalles específicos del consejo con responsables asociados
+- **`PUT /api/communal-councils/:id`** - Actualizar un consejo comunal
+- **`DELETE /api/communal-councils/:id`** - Eliminar un consejo comunal (eliminación suave)
+
 ##### **Responsibles**
-- **`GET /api/responsibles`** - Listar responsables con relaciones de organismo y filtrado
-- **`POST /api/responsibles`** - Crear un nuevo responsable (valida formato de número telefónico venezolano)
+
+- **`GET /api/responsibles`** - Listar responsables con relaciones de entidades y filtrado
+- **`POST /api/responsibles`** - Crear un nuevo responsable (valida formato de número telefónico venezolano y cédula)
 - **`GET /api/responsibles/:id`** - Obtener detalles específicos del responsable
-- **`PUT /api/responsibles/:id`** - Actualizar un responsable (valida formato de número telefónico)
+- **`PUT /api/responsibles/:id`** - Actualizar un responsable (valida formato de número telefónico y cédula)
 - **`DELETE /api/responsibles/:id`** - Eliminar un responsable (eliminación suave)
 
 ### Características Comunes
@@ -544,7 +663,7 @@ Authorization: Bearer <your-jwt-token>
 - **Eliminaciones Suaves**: La mayoría de entidades usan `deletionDate` para eliminación suave
 - **Restricciones**: Restricciones de clave foránea con políticas CASCADE/RESTRICT
 - **Índices**: Indexación automática en claves primarias, claves foráneas y límites espaciales (índices GIST para geometría)
-- **Soporte Espacial**: 
+- **Soporte Espacial**:
   - Columnas de geometría con indexación espacial para rendimiento óptimo de consultas de mapas
   - Serialización/deserialización GeoJSON para compatibilidad con Leaflet
   - Consultas de relaciones espaciales (ST_Contains, ST_Within, ST_Intersects)

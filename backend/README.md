@@ -181,26 +181,60 @@ The server will start at `http://localhost:4000` (or your configured PORT).
 - `id`: integer, PK, auto-increment
 - `name`: string, required, unique
 - `parish_id`: FK to Parish, required
+- `organism_id`: FK to Organism, required
 - `boundary`: geometry, required (spatial data defining the quadrant boundaries)
 - `metadata`: JSON, optional (additional quadrant information)
+- `fleet`: JSON, required (fleet management data with structure below)
+  - `small`: object with `active` (integer, default 0, non-negative) and `inactive` (integer, default 0, non-negative)
+  - `big`: object with `active` (integer, default 0, non-negative) and `inactive` (integer, default 0, non-negative)
+  - `bike`: object with `active` (integer, default 0, non-negative) and `inactive` (integer, default 0, non-negative)
 - `creationDate`: datetime, auto
 - `updatedOn`: datetime, auto
 - `deletionDate`: datetime, nullable (soft delete)
-- **Relationships**: Belongs to Parish, has many Points of Interest
+- **Relationships**: Belongs to Parish, belongs to Organism, has many Points of Interest, has many Responsibles
 - **Spatial Index**: Recommended on boundary field for performance
+- **Validation**: Fleet numbers must be non-negative integers
 
 #### **Communal Circuit**
 
 - `id`: integer, PK, auto-increment
 - `name`: string, required, unique
 - `parish_id`: FK to Parish, required
+- `address`: string, required (office address, different from geometry)
+- `code`: string, required (circuit identification code)
 - `boundary`: geometry, required (spatial data defining the circuit boundaries)
 - `metadata`: JSON, optional (additional circuit information)
 - `creationDate`: datetime, auto
 - `updatedOn`: datetime, auto
 - `deletionDate`: datetime, nullable (soft delete)
-- **Relationships**: Belongs to Parish, has many Points of Interest
+- **Relationships**: Belongs to Parish, has many Points of Interest, has many Responsibles, has many Communes
 - **Spatial Index**: Recommended on boundary field for performance
+
+#### **Commune**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `circuit_id`: FK to Communal Circuit, required
+- `address`: string, required (commune office address)
+- `code`: string, required (commune identification code)
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Belongs to Communal Circuit, has many Responsibles, has many Communal Councils
+- **Hooks**: Prevents deletion if communal councils are assigned
+
+#### **Communal Council**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `commune_id`: FK to Commune, required
+- `address`: string, required (council office address)
+- `code`: string, required (council identification code)
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Belongs to Commune, has many Responsibles
+- **Hooks**: Prevents deletion if responsibles are assigned
 
 #### **Point of Interest**
 
@@ -232,15 +266,26 @@ The server will start at `http://localhost:4000` (or your configured PORT).
 #### **Responsible**
 
 - `id`: integer, PK, auto-increment
-- `name`: string, required
+- `first_name`: string, required
+- `last_name`: string, required
+- `ci`: string, required (Venezuelan ID format: uppercase letter followed by numbers)
 - `phone`: string, required (Venezuelan phone number format validation)
+- `phone_backup`: string, optional (Venezuelan phone number format validation)
+- `email`: string, optional (email format validation)
 - `position`: string, required
-- `organism_id`: FK to Organism, required
+- `organism_id`: FK to Organism, optional
+- `quadrant_id`: FK to Quadrant, optional
+- `circuit_id`: FK to Communal Circuit, optional
+- `commune_id`: FK to Commune, optional
+- `council_id`: FK to Communal Council, optional
 - `creationDate`: datetime, auto
 - `updatedOn`: datetime, auto
 - `deletionDate`: datetime, nullable (soft delete)
-- **Relationships**: Belongs to Organism
-- **Validation**: Phone number must match Venezuelan format (regex: `^(\+58|0058|58)?[24]\d{9}$` for landlines or `^(\+58|0058|58)?4\d{9}$` for mobile)
+- **Relationships**: Belongs to Organism (optional), Quadrant (optional), Communal Circuit (optional), Commune (optional), Communal Council (optional)
+- **Validation**:
+  - Phone numbers must match Venezuelan format (regex: `^0[24]\d{2}-\d{7}$` for landlines or `^04(12|14|16|22|24|26)-\d{7}$` for mobile)
+  - CI must start with uppercase letter followed by numbers
+  - Email must be valid email format if provided
 - **Hooks**: Automatic change logging on all operations
 
 ### Join Models (Many-to-Many)
@@ -316,8 +361,10 @@ erDiagram
         int id PK
         string name UK
         int parish_id FK
+        int organism_id FK
         geometry boundary
         json metadata
+        json fleet
         datetime creationDate
         datetime updatedOn
         datetime deletionDate
@@ -327,8 +374,32 @@ erDiagram
         int id PK
         string name UK
         int parish_id FK
+        string address
+        string code
         geometry boundary
         json metadata
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    COMMUNE {
+        int id PK
+        string name UK
+        int circuit_id FK
+        string address
+        string code
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    COMMUNAL_COUNCIL {
+        int id PK
+        string name UK
+        int commune_id FK
+        string address
+        string code
         datetime creationDate
         datetime updatedOn
         datetime deletionDate
@@ -358,10 +429,18 @@ erDiagram
 
     RESPONSIBLE {
         int id PK
-        string name
+        string first_name
+        string last_name
+        string ci
         string phone
+        string phone_backup
+        string email
         string position
         int organism_id FK
+        int quadrant_id FK
+        int circuit_id FK
+        int commune_id FK
+        int council_id FK
         datetime creationDate
         datetime updatedOn
         datetime deletionDate
@@ -388,14 +467,21 @@ erDiagram
     MUNICIPALITY ||--o{ PARISH : "branches into"
     PARISH ||--o{ QUADRANT : "divides into"
     PARISH ||--o{ COMMUNAL_CIRCUIT : "organized into"
+    COMMUNAL_CIRCUIT ||--o{ COMMUNE : "contains"
+    COMMUNE ||--o{ COMMUNAL_COUNCIL : "contains"
 
     %% Points of Interest Relationships
     QUADRANT ||--o{ POINT_OF_INTEREST : "includes"
     COMMUNAL_CIRCUIT ||--o{ POINT_OF_INTEREST : "includes"
     ORGANISM ||--o{ POINT_OF_INTEREST : "manages"
 
-    %% Organism Relationships
+    %% Organism and Quadrant Relationships
+    ORGANISM ||--o{ QUADRANT : "manages"
     ORGANISM ||--o{ RESPONSIBLE : "has"
+    QUADRANT ||--o{ RESPONSIBLE : "has"
+    COMMUNAL_CIRCUIT ||--o{ RESPONSIBLE : "has"
+    COMMUNE ||--o{ RESPONSIBLE : "has"
+    COMMUNAL_COUNCIL ||--o{ RESPONSIBLE : "has"
 ```
 
 **Relationship Details:**
@@ -406,12 +492,20 @@ erDiagram
 - **Municipality** → **Parish** (one-to-many - municipalities branch into multiple parishes)
 - **Parish** → **Quadrant** (one-to-many - parishes divide into multiple quadrants)
 - **Parish** → **Communal Circuit** (one-to-many - parishes organize into multiple communal circuits)
+- **Communal Circuit** → **Commune** (one-to-many - circuits contain multiple communes)
+- **Commune** → **Communal Council** (one-to-many - communes contain multiple councils)
+- **Organism** → **Quadrant** (one-to-many - organisms manage multiple quadrants)
 - **Quadrant** → **Point of Interest** (one-to-many, optional - points may be within quadrant boundaries)
 - **Communal Circuit** → **Point of Interest** (one-to-many, optional - points may be within circuit boundaries)
 - **Organism** → **Point of Interest** (one-to-many, optional - organisms can manage multiple points of interest)
-- **Organism** → **Responsible** (one-to-many - organisms have multiple responsible persons)
+- **Organism** → **Responsible** (one-to-many, optional - organisms can have multiple responsible persons)
+- **Quadrant** → **Responsible** (one-to-many, optional - quadrants can have multiple responsible persons)
+- **Communal Circuit** → **Responsible** (one-to-many, optional - circuits can have multiple responsible persons)
+- **Commune** → **Responsible** (one-to-many, optional - communes can have multiple responsible persons)
+- **Communal Council** → **Responsible** (one-to-many, optional - councils can have multiple responsible persons)
 
 **Spatial Relationships:**
+
 - Points of Interest are automatically associated with Quadrants and Communal Circuits based on coordinate inclusion within their boundary geometries
 - Spatial indices on boundary fields optimize spatial query performance
 
@@ -428,7 +522,7 @@ erDiagram
 
 - **Auto-Generated Permissions**: 4 actions × multiple entities
   - Actions: `create`, `get`, `edit`, `delete`
-  - Entities: `state`, `municipality`, `parish`, `quadrant`, `communal_circuit`, `point_of_interest`, `organism`, `responsible`, `permission`, `role`, `user`
+  - Entities: `state`, `municipality`, `parish`, `quadrant`, `communal_circuit`, `commune`, `communal_council`, `point_of_interest`, `organism`, `responsible`, `permission`, `role`, `user`
 - **Admin Role**: Created automatically with all permissions
 - **Admin User**: Default credentials (username: `admin`, password: `admin`)
 
@@ -451,6 +545,7 @@ Authorization: Bearer <your-jwt-token>
 ### Protected Routes (Require Authentication)
 
 #### **User Management**
+
 - **`/api/users`** - User management (CRUD operations)
 - **`/api/roles`** - Role management with permission assignment
 - **`/api/permissions`** - Permission listing and management
@@ -458,6 +553,7 @@ Authorization: Bearer <your-jwt-token>
 #### **Geographical Entities**
 
 ##### **States**
+
 - **`GET /api/states`** - List all states with pagination and filtering
 - **`POST /api/states`** - Create a new state
 - **`GET /api/states/:id`** - Get specific state details
@@ -465,6 +561,7 @@ Authorization: Bearer <your-jwt-token>
 - **`DELETE /api/states/:id`** - Delete a state (soft delete)
 
 ##### **Municipalities**
+
 - **`GET /api/municipalities`** - List municipalities with state relationships
 - **`POST /api/municipalities`** - Create a new municipality
 - **`GET /api/municipalities/:id`** - Get specific municipality details
@@ -472,6 +569,7 @@ Authorization: Bearer <your-jwt-token>
 - **`DELETE /api/municipalities/:id`** - Delete a municipality (soft delete)
 
 ##### **Parishes**
+
 - **`GET /api/parishes`** - List parishes with municipality relationships
 - **`POST /api/parishes`** - Create a new parish
 - **`GET /api/parishes/:id`** - Get specific parish details
@@ -479,6 +577,7 @@ Authorization: Bearer <your-jwt-token>
 - **`DELETE /api/parishes/:id`** - Delete a parish (soft delete)
 
 ##### **Quadrants**
+
 - **`GET /api/quadrants`** - List quadrants with spatial boundary data (GeoJSON format for Leaflet)
 - **`GET /api/quadrants/geojson`** - Get all quadrants as GeoJSON FeatureCollection for direct Leaflet consumption
 - **`POST /api/quadrants`** - Create a new quadrant (accepts GeoJSON geometry, processes with spatial indexing)
@@ -488,6 +587,7 @@ Authorization: Bearer <your-jwt-token>
 - **`DELETE /api/quadrants/:id`** - Delete a quadrant (soft delete)
 
 ##### **Communal Circuits**
+
 - **`GET /api/communal-circuits`** - List communal circuits with spatial boundary data (GeoJSON format for Leaflet)
 - **`GET /api/communal-circuits/geojson`** - Get all circuits as GeoJSON FeatureCollection for direct Leaflet consumption
 - **`POST /api/communal-circuits`** - Create a new communal circuit (accepts GeoJSON geometry)
@@ -497,6 +597,7 @@ Authorization: Bearer <your-jwt-token>
 - **`DELETE /api/communal-circuits/:id`** - Delete a communal circuit (soft delete)
 
 ##### **Points of Interest**
+
 - **`GET /api/points-of-interest`** - List points with spatial filtering options (by quadrant/circuit, bounding box)
 - **`GET /api/points-of-interest/geojson`** - Get all points as GeoJSON FeatureCollection for Leaflet markers
 - **`GET /api/points-of-interest/within/:bounds`** - Get points within map viewport bounds for dynamic loading
@@ -507,17 +608,35 @@ Authorization: Bearer <your-jwt-token>
 - **`DELETE /api/points-of-interest/:id`** - Delete a point of interest (soft delete)
 
 ##### **Organisms**
+
 - **`GET /api/organisms`** - List all organisms with pagination and filtering
 - **`POST /api/organisms`** - Create a new organism
 - **`GET /api/organisms/:id`** - Get specific organism details with associated points of interest and responsibles
 - **`PUT /api/organisms/:id`** - Update an organism
 - **`DELETE /api/organisms/:id`** - Delete an organism (soft delete)
 
+##### **Communes**
+
+- **`GET /api/communes`** - List all communes with pagination and filtering
+- **`POST /api/communes`** - Create a new commune
+- **`GET /api/communes/:id`** - Get specific commune details with associated responsibles and councils
+- **`PUT /api/communes/:id`** - Update a commune
+- **`DELETE /api/communes/:id`** - Delete a commune (soft delete)
+
+##### **Communal Councils**
+
+- **`GET /api/communal-councils`** - List all communal councils with pagination and filtering
+- **`POST /api/communal-councils`** - Create a new communal council
+- **`GET /api/communal-councils/:id`** - Get specific council details with associated responsibles
+- **`PUT /api/communal-councils/:id`** - Update a communal council
+- **`DELETE /api/communal-councils/:id`** - Delete a communal council (soft delete)
+
 ##### **Responsibles**
-- **`GET /api/responsibles`** - List responsibles with organism relationships and filtering
-- **`POST /api/responsibles`** - Create a new responsible (validates Venezuelan phone number format)
+
+- **`GET /api/responsibles`** - List responsibles with entity relationships and filtering
+- **`POST /api/responsibles`** - Create a new responsible (validates Venezuelan phone number and CI format)
 - **`GET /api/responsibles/:id`** - Get specific responsible details
-- **`PUT /api/responsibles/:id`** - Update a responsible (validates phone number format)
+- **`PUT /api/responsibles/:id`** - Update a responsible (validates phone number and CI format)
 - **`DELETE /api/responsibles/:id`** - Delete a responsible (soft delete)
 
 ### Common Features
@@ -544,7 +663,7 @@ Authorization: Bearer <your-jwt-token>
 - **Soft Deletes**: Most entities use `deletionDate` for soft deletion
 - **Constraints**: Foreign key constraints with CASCADE/RESTRICT policies
 - **Indexes**: Automatic indexing on primary keys, foreign keys, and spatial boundaries (GIST indexes for geometry)
-- **Spatial Support**: 
+- **Spatial Support**:
   - Geometry columns with spatial indexing for optimal map query performance
   - GeoJSON serialization/deserialization for Leaflet compatibility
   - Spatial relationship queries (ST_Contains, ST_Within, ST_Intersects)
