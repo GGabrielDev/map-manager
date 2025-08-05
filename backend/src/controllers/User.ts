@@ -87,38 +87,30 @@ export const SearchUsersById = async (req: Request<SearchUsersByIdParams>, res: 
     }
 }
 
-type CrearUsuarioBody = { nombre: string; contrasena: string; idRol: number };
+type CreateUsersBody = { name: string; password: string;};
 
-export const crearUsuario = async (req: Request<{}, {}, CrearUsuarioBody>, res: Response): Promise<void> => {
+export const CreateUsers = async (req: Request<{}, {}, CreateUsersBody>, res: Response): Promise<void> => {
     try {
-        const { nombre, contrasena} = req.body;
-        let { idRol } = req.body;
+        const { name, password } = req.body;
 
-        const existeUsuario = await usuario.findOne({ where: { nombre } });
-        if (existeUsuario) {
+        const ExistUser = await User.findOne({ where: { name } });
+        if (ExistUser) {
             res.status(400).json({ mensaje: "El usuario ya existe." });
-            ;
-        }
-
-        if (idRol === undefined || idRol === null) idRol = 3
-        const rolExistente = await rol.findByPk(idRol);
-        if (!rolExistente) {
-            res.status(400).json({ mensaje: "rol ingresado inexistente." });
-            ;
+            return;
         }
 
         const saltRounds = 10;
-        const contrasenaHasheada = await bcrypt.hash(contrasena, saltRounds);
+        const passwordHash = await bcrypt.hash(password, saltRounds);
 
-        const crearUsuarios = await usuario.create({
-            nombre,
-            contrasena: contrasenaHasheada,
-            idRol
+        const CreateUsers = await User.create({
+            name,
+            passwordHash,
         });
 
-        res.send(crearUsuarios);
+        res.send(CreateUsers);
     } catch (error) {
         res.status(404).json({ mensaje: "Error al registrar usuario, intente nuevamente." });
+        return;
     }
 }
 
