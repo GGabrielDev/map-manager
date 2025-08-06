@@ -1,15 +1,13 @@
+import jwt from 'jsonwebtoken';
+import { SECRET_KEY } from '@/utils/auth-utils';
+
 import { Request, Response } from 'express';
 import { User, Role } from "@/models/";
-import bcrypt from "bcrypt";
 
+// All Users
 export const AllUsers = async (req: Request, res: Response): Promise<void> => {
     try {
-        const AllUsers = await User.findAll({
-            include: [{
-                model: Role,
-                attributes: ['name']
-            }]
-        });
+        const AllUsers = await User.findAll({});
 
         if (!AllUsers) {
             res.status(404).json({ mensaje: 'Error de consulta, intente nuevamente.' });
@@ -22,63 +20,42 @@ export const AllUsers = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-type SearchUsersParams = { username: string; password: string };
-
-export const SearchUsers = async (req: Request<SearchUsersParams>, res: Response): Promise<void> => {
+// Login User
+type LoginUsersParams = { username: string; password: string};
+export const LoginUsers = async (req: Request<LoginUsersParams>, res: Response): Promise<void> => {
     try {
         const { username, password } = req.params;
-
-        if (!username || !password) {
-            res.status(400).json({ mensaje: 'Faltan parámetros requeridos' });
-            return;
-        }
-
-        const SearchUsers = await User.findOne({
-            where: { username },
-            include: [{
-                model: Role,
-                attributes: ['name']
-            }]
+        
+        const LoginUsers = await User.unscoped().findOne({
+            where: { username }
         });
 
-        if (!SearchUsers) {
-            res.status(401).json({ mensaje: 'Error al buscar usuario, intente nuevamente.' });
+        if (!LoginUsers || !(await LoginUsers.validatePassword(password))) {
+            res.status(404).json({ mensaje: 'Usuario o clave incorrecto.' });
             return;
         }
 
-        const passwordHash = (SearchUsers.get() as { password: string }).password;
-        const passwordValid = await bcrypt.compare(password, passwordHash);
+        // Generate a JWT token
+        const token = jwt.sign({ userId: LoginUsers.id }, SECRET_KEY, {
+            expiresIn: '1h',
+        });
 
-        if (!passwordValid) {
-            res.status(401).json({ mensaje: 'Datos incorrectos' });
-            return;
-        }
-
-        res.json(SearchUsers);
+        res.json({ token });
     } catch (error) {
         res.status(404).json({ mensaje: "Error al buscar usuario, intente nuevamente." });
         return;
     }
 }
 
-type SearchUsersByIdParams = { id: string };
-
+// Get a Users By Id
+type SearchUsersByIdParams = { id: number };
 export const SearchUsersById = async (req: Request<SearchUsersByIdParams>, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
 
         const SearchUsersById = await User.findOne({
             where: { id },
-            include: [{
-                model: Role,
-                attributes: ['name']
-            }]
         });
-
-        if (!SearchUsersById) {
-            res.status(404).json({ mensaje: 'Error al buscar usuario, intente nuevamente.' });
-            return;
-        }
 
         res.json(SearchUsersById);
     } catch (error) {
@@ -87,25 +64,27 @@ export const SearchUsersById = async (req: Request<SearchUsersByIdParams>, res: 
     }
 }
 
-type CreateUsersBody = { username: string; password: string;};
+type CreateUsersBody = { username: string; password: string; userId?: number[] };
 
 export const CreateUsers = async (req: Request<{}, {}, CreateUsersBody>, res: Response): Promise<void> => {
     try {
-        const { username, password } = req.body;
+        const { username, password, userId } = req.body;
 
-        const ExistUser = await User.findOne({ where: { name } });
+        const ExistUser = await User.findOne({ where: { username } });
         if (ExistUser) {
             res.status(400).json({ mensaje: "El usuario ya existe." });
             return;
         }
 
-        const saltRounds = 10;
-        const passwordHash = await bcrypt.hash(password, saltRounds);
-
         const CreateUsers = await User.create({
             username,
-            passwordHash,
+            passwordHash: password,
         });
+
+        if (userId && userId.length > 0) {
+            const roles = await Role.findAll({ where: { id: userId } });
+            await CreateUsers.$set(User.RELATIONS.ROLES, roles);
+        }
 
         res.send(CreateUsers);
     } catch (error) {
@@ -114,11 +93,11 @@ export const CreateUsers = async (req: Request<{}, {}, CreateUsersBody>, res: Re
     }
 }
 
-type UpdateUsersParams = { id: string };
+type UpdateUsersParams = { id: number };
 type UpdateUsersBody = {
     username?: string;
-    password?: string;
     passwordHash?: string;
+    roleId?: number[];
 };
 
 export const UpdateUsers = async (
@@ -127,7 +106,7 @@ export const UpdateUsers = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const { username, passwordHash, password } = req.body;
+        const { username, passwordHash, roleId } = req.body;
 
         const UpdateUsers = await User.findByPk(id);
         if (!UpdateUsers) {
@@ -135,25 +114,25 @@ export const UpdateUsers = async (
             return;
         }
 
-       if(password){
-            const saltRounds = 10;
-            const passwordHash = await bcrypt.hash(password, saltRounds);
-            req.body.password = passwordHash
-        } else {
-            delete req.body.password;
-        }
-        
-
         UpdateUsers.set(req.body);
         await UpdateUsers.save();
 
-        res.json(UpdateUsers);
+        if (roleId && roleId.length > 0) {
+            const roles = await Role.findAll({ where: { id: roleId } });
+            await UpdateUsers.$set(User.RELATIONS.ROLES, roles);
+        }
+
+        const UpdateUser = await User.findByPk(id, {
+            include: [User.RELATIONS.ROLES],
+        });
+
+        res.json(UpdateUser);
     } catch (error) {
         res.status(404).json({ mensaje: "Error al actualizar usuario,intente nuevamente." });
     }
 }
 
-type DeleteUserParams = { id: string };
+type DeleteUserParams = { id: number };
 
 export const DeleteUser = async (
     req: Request<DeleteUserParams>,
@@ -168,6 +147,6 @@ export const DeleteUser = async (
 
         res.sendStatus(200);
     } catch (error) {
-        res.status(404).json({ mensaje: "error al eliminar usuario" });
+        res.status(404).json({ mensaje: "Error al eliminar usuario" });
     }
 }
