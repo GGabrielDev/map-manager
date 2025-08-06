@@ -87,11 +87,11 @@ export const SearchUsersById = async (req: Request<SearchUsersByIdParams>, res: 
     }
 }
 
-type CreateUsersBody = { name: string; password: string;};
+type CreateUsersBody = { username: string; password: string;};
 
 export const CreateUsers = async (req: Request<{}, {}, CreateUsersBody>, res: Response): Promise<void> => {
     try {
-        const { name, password } = req.body;
+        const { username, password } = req.body;
 
         const ExistUser = await User.findOne({ where: { name } });
         if (ExistUser) {
@@ -103,7 +103,7 @@ export const CreateUsers = async (req: Request<{}, {}, CreateUsersBody>, res: Re
         const passwordHash = await bcrypt.hash(password, saltRounds);
 
         const CreateUsers = await User.create({
-            name,
+            username,
             passwordHash,
         });
 
@@ -114,63 +114,55 @@ export const CreateUsers = async (req: Request<{}, {}, CreateUsersBody>, res: Re
     }
 }
 
-type ActualizarUsuarioParams = { id: string };
-type ActualizarUsuarioBody = {
-    nombre?: string;
-    contrasena?: string;
-    idRol?: number;
+type UpdateUsersParams = { id: string };
+type UpdateUsersBody = {
+    username?: string;
+    password?: string;
+    passwordHash?: string;
 };
 
-export const actualizarUsuario = async (
-    req: Request<ActualizarUsuarioParams, {}, ActualizarUsuarioBody>,
+export const UpdateUsers = async (
+    req: Request<UpdateUsersParams, {}, UpdateUsersBody>,
     res: Response
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const { nombre, contrasena, idRol } = req.body;
+        const { username, passwordHash, password } = req.body;
 
-        const actualizarUsuarios = await usuario.findByPk(id);
-        if (!actualizarUsuarios) {
+        const UpdateUsers = await User.findByPk(id);
+        if (!UpdateUsers) {
             res.status(404).json({ mensaje: "Usuario no encontrado" });
             return;
         }
 
-        if (idRol) {
-            const rolExistente = await rol.findByPk(idRol);
-            if (!rolExistente) {
-                res.status(400).json({ mensaje: "rol inexistente" });
-                return;
-            }
-        }
-
-        if(contrasena){
+       if(password){
             const saltRounds = 10;
-            const contrasenaNueva = await bcrypt.hash(contrasena, saltRounds);
-            req.body.contrasena = contrasenaNueva
+            const passwordHash = await bcrypt.hash(password, saltRounds);
+            req.body.password = passwordHash
         } else {
-            delete req.body.contrasena;
+            delete req.body.password;
         }
         
 
-        actualizarUsuarios.set(req.body);
-        await actualizarUsuarios.save();
+        UpdateUsers.set(req.body);
+        await UpdateUsers.save();
 
-        res.json(actualizarUsuarios);
+        res.json(UpdateUsers);
     } catch (error) {
         res.status(404).json({ mensaje: "Error al actualizar usuario,intente nuevamente." });
     }
 }
 
-type EliminarUsuarioParams = { id: string };
+type DeleteUserParams = { id: string };
 
-export const eliminarUsuario = async (
-    req: Request<EliminarUsuarioParams>,
+export const DeleteUser = async (
+    req: Request<DeleteUserParams>,
     res: Response
 ): Promise<void> => {
     try {
         const { id } = req.params;
 
-        await usuario.destroy({
+        await User.destroy({
             where: { id },
         });
 
