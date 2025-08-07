@@ -20,4 +20,20 @@ router.get(
     }
 );
 
+router.get(
+    "/permissions/:id",
+    requirePermission("get_permission"),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(401).json({ message: error.message });
+            } else {
+                next(error);
+            }
+        }
+    }
+);
+
 export default router;
