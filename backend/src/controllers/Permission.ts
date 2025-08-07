@@ -1,40 +1,33 @@
-import { Request, Response } from 'express';
 import { Permission } from "@/models/";
 
 // All Permissions
-export const AllPermissions = async (req: Request, res: Response): Promise<void> => {
+export const allPermissions = async (): Promise<Permission[]> => {
     try {
-        const AllPermissions = await Permission.findAll({});
+        const allPermissions = await Permission.findAll({});
 
-        if (!AllPermissions) {
-            res.status(404).json({ mensaje: 'Error de consulta, intente nuevamente.' });
-            return;
+        if (!allPermissions) {
+            throw new Error('Error de consulta, intente nuevamente.');
         }
 
-        res.send(AllPermissions);
+        return allPermissions;
     } catch (error) {
-        res.status(404).json({ mensaje: "Error de consulta, intente nuevamente." });
+        throw new Error("Error de consulta, intente nuevamente.");
     }
 }
 
 // Get a Permission By Id
-type SearchPermissionByIdParams = { id: number };
-export const SearchPermissionById = async (req: Request<SearchPermissionByIdParams>, res: Response): Promise<void> => {
+export const searchPermissionById = async (id: number): Promise<Permission | null> => {
     try {
-        const { id } = req.params;
-
-        const SearchPermissionById = await Permission.findOne({
+        const searchPermissionById = await Permission.findOne({
             where: { id }
         });
 
-        if (!SearchPermissionById) {
-            res.status(404).json({ mensaje: 'Error al buscar permiso, intente nuevamente.' });
-            return;
+        if (!searchPermissionById) {
+            throw new Error('Error al buscar permiso, intente nuevamente.');
         }
 
-        res.json(SearchPermissionById);
+        return searchPermissionById;
     } catch (error) {
-        res.status(404).json({ mensaje: "Error al buscar permiso, intente nuevamente." });
-        return;
+        throw new Error("Error al buscar permiso, intente nuevamente.");
     }
 }
