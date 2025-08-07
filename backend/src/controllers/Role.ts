@@ -33,7 +33,7 @@ export const searchRoleById = async (id: number): Promise<Role | null> => {
     }
 }
 
-export const createRoles = async (name: string, description: string, permissionId: number[]): Promise<Role> => {
+export const createRole = async (name: string, description: string, permissionIds: number[]): Promise<Role> => {
     try {
         const existRole = await Role.findOne({ where: { name } });
         if (existRole) {
@@ -45,8 +45,8 @@ export const createRoles = async (name: string, description: string, permissionI
             description,
         });
 
-        if (permissionId && permissionId.length > 0) {
-            const permissions = await Permission.findAll({ where: { id: permissionId } });
+        if (permissionIds && permissionIds.length > 0) {
+            const permissions = await Permission.findAll({ where: { id: permissionIds } });
             await createRoles.$set(Role.RELATIONS.PERMISSIONS, permissions);
         }
 
@@ -58,21 +58,21 @@ export const createRoles = async (name: string, description: string, permissionI
 }
 
 // Update a Role
-export const updateRoles = async (updateRole: Partial<Role>, permissionIds: number[]): Promise<Role | null> => {
+export const updateRole = async (updates: Partial<Role>, permissionIds: number[]): Promise<Role | null> => {
     try {
-        const updateToRole = await Role.findByPk(updateRole.id);
+        const updateToRole = await Role.findByPk(updates.id);
         if (!updateToRole) {
             throw new Error("Rol no encontrado");
         }
 
-        await updateToRole.update(updateRole, {where: {id: updateRole.id}});
+        await updateToRole.update(updates, {where: {id: updates.id}});
 
         if (permissionIds.length > 0) {
             const permissions = await Permission.findAll({ where: { id: permissionIds } });
             await updateToRole.$set(Role.RELATIONS.PERMISSIONS, permissions);
         }
 
-        const updatedToRole = await Role.findByPk(updateRole.id, {
+        const updatedToRole = await Role.findByPk(updates.id, {
             include: [Role.RELATIONS.PERMISSIONS],
         });
 

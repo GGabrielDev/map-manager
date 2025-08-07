@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { NextFunction, Router, Request, Response } from "express";
 import { allUsers, searchUserById, createUser, updateUser, deleteUser} from "@/controllers/User";
 import { requirePermission } from "@/middleware/authorization";
 import { User } from "@/models/";
@@ -8,7 +8,7 @@ const router = Router();
 router.get(
     "/users",
     requirePermission("get_user"),
-    async (_, res) => {
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const users = await allUsers();
             res.json(users);
@@ -16,7 +16,7 @@ router.get(
             if (error instanceof Error) {
                 res.status(401).json({ message: error.message });
             }else{
-                res.status(500).json({ message: "Error inesperado." });
+                next(error);
             }
         }
     }
@@ -25,34 +25,38 @@ router.get(
 router.get(
     "/users/:id",
     requirePermission("get_user"),
-    async (req: Request, res: Response) => {
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const user = await searchUserById(Number(req.params.id));
             if (!user) {
-                return res.status(404).json({ message: "Usuario no encontrado." });
+                res.status(404).json({ message: "Usuario no encontrado." });
+                return;
             }
             res.json(user);
         } catch (error) {
             if (error instanceof Error) {
                 res.status(401).json({ message: error.message });
             }else{
-                res.status(500).json({ message: "Error inesperado." });
+                next(error);
             }
         }
     }
 );
+
 router.post(
     "/users",
     requirePermission("create_user"),
-    async (req: Request, res: Response) => {
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { username, password, roleIds } = req.body;
 
             if (!username) {
-                return res.status(400).json({ message: "Usuario es requerido." });
+                res.status(400).json({ message: "Usuario es requerido." });
+                return;
             }
             if (!password) {
-                return res.status(400).json({ message: "Contraseña es requerida." });
+                res.status(400).json({ message: "Contraseña es requerida." });
+                return;
             }
 
             const user = await createUser(username, password, roleIds);
@@ -61,15 +65,16 @@ router.post(
             if (error instanceof Error) {
                 res.status(401).json({ message: error.message });
             }else{
-                res.status(500).json({ message: "Error inesperado." });
+                next(error);
             }
         }
     }
 );
+
 router.put(
     "/users/:id",
     requirePermission("update_user"),
-    async (req: Request, res: Response) => {
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { username, password} = req.body;
             let roleIds = req.body.roleIds || [];
@@ -77,31 +82,33 @@ router.put(
             const Updates: Partial<User> = {}
             Updates.id = Number(req.params.id);
             if (!Updates.id) {
-                return res.status(400).json({ message: "ID de usuario es requerido." });
+                res.status(400).json({ message: "ID de usuario es requerido." });
+                return;
             }
             if (username !== undefined) Updates.username = username
             if (password !== undefined) Updates.passwordHash = password
             if (roleIds === undefined) roleIds = []
 
-
             const user = await updateUser(Updates, roleIds);
             if (!user) {
-                return res.status(404).json({ message: "Usuario no encontrado." });
+                res.status(404).json({ message: "Usuario no encontrado." });
+                return;
             }
             res.json(user);
         } catch (error) {
             if (error instanceof Error) {
                 res.status(401).json({ message: error.message });
             }else{
-                res.status(500).json({ message: "Error inesperado." });
+                next(error);
             }
         }
     }
 );
+
 router.delete(
     "/users/:id",
     requirePermission("delete_user"),
-    async (req: Request, res: Response): Promise<void> => {
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const id = Number(req.params.id);
             if (!id) {
@@ -114,7 +121,7 @@ router.delete(
             if (error instanceof Error) {
                 res.status(401).json({ message: error.message });
             } else {
-                res.status(500).json({ message: "Error inesperado." });
+                next(error);
             }
         }
     }
