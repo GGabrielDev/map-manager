@@ -1,5 +1,5 @@
 import express, { Request, Response, Router } from "express";
-import { LoginUser } from "@/controllers/User";
+import { loginUser } from "@/controllers/User";
 import { authenticateToken } from "@/middleware/authentication";
 
 const router = Router();
@@ -18,7 +18,7 @@ router.post(
         }
 
         try {
-            const token = await LoginUser(username, password);
+            const token = await loginUser(username, password);
             res.json({ token });
         } catch (error) {
             if (error instanceof Error) {
