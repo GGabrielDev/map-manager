@@ -1,151 +1,112 @@
 import jwt from 'jsonwebtoken';
 import { SECRET_KEY } from '@/utils/auth-utils';
-
-import { Request, Response } from 'express';
 import { User, Role } from "@/models/";
 
 // All Users
-export const AllUsers = async (req: Request, res: Response): Promise<void> => {
+export const AllUsers = async (): Promise<User[]> => {
     try {
         const AllUsers = await User.findAll({});
 
         if (!AllUsers) {
-            res.status(404).json({ mensaje: 'Error de consulta, intente nuevamente.' });
-            return;
+            throw new Error ('Error de consulta, intente nuevamente.');
         }
 
-        res.send(AllUsers);
+        return AllUsers;
     } catch (error) {
-        res.status(404).json({ mensaje: "Error de consulta, intente nuevamente." });
+        throw new Error("Error de consulta, intente nuevamente.");
     }
 }
 
 // Login User
-type LoginUsersParams = { username: string; password: string};
-export const LoginUsers = async (req: Request<LoginUsersParams>, res: Response): Promise<void> => {
+export const LoginUser = async (username: string, password: string): Promise<string> => {
     try {
-        const { username, password } = req.params;
-        
-        const LoginUsers = await User.unscoped().findOne({
+        const LoginUser = await User.unscoped().findOne({
             where: { username }
         });
 
-        if (!LoginUsers || !(await LoginUsers.validatePassword(password))) {
+        if (!LoginUser || !(await LoginUser.validatePassword(password))) {
            throw new Error('Usuario o clave incorrecto.')
         }
 
         // Generate a JWT token
-        const token = jwt.sign({ userId: LoginUsers.id }, SECRET_KEY, {
+        const token = jwt.sign({ userId: LoginUser.id }, SECRET_KEY, {
             expiresIn: '1h',
         });
 
-        res.json({ token });
+        return token;
     } catch (error) {
-        res.status(404).json({ mensaje: "Error al buscar usuario, intente nuevamente." });
-        return;
+        throw new Error("Error al buscar usuario, intente nuevamente.");
     }
 }
 
 // Get a Users By Id
-type SearchUsersByIdParams = { id: number };
-export const SearchUsersById = async (req: Request<SearchUsersByIdParams>, res: Response): Promise<void> => {
+export const SearchUserById = async (id: number): Promise<User | null> => {
     try {
-        const { id } = req.params;
-
-        const SearchUsersById = await User.findOne({
+        const SearchUserById = await User.findOne({
             where: { id },
         });
 
-        res.json(SearchUsersById);
+        return SearchUserById;
     } catch (error) {
-        res.status(404).json({ mensaje: "Error al buscar usuario, intente nuevamente." });
-        return;
+        return null;
     }
 }
 
-type CreateUsersBody = { username: string; password: string; userId?: number[] };
-
-export const CreateUsers = async (req: Request<{}, {}, CreateUsersBody>, res: Response): Promise<void> => {
+export const CreateUser = async (username: string, password: string, roleIds: number[]): Promise<User> => {
     try {
-        const { username, password, userId } = req.body;
-
         const ExistUser = await User.findOne({ where: { username } });
         if (ExistUser) {
-            res.status(400).json({ mensaje: "El usuario ya existe." });
-            return;
+            throw new Error("El usuario ya existe.");
         }
 
-        const CreateUsers = await User.create({
+        const UserCreate = await User.create({
             username,
             passwordHash: password,
         });
 
-        if (userId && userId.length > 0) {
-            const roles = await Role.findAll({ where: { id: userId } });
-            await CreateUsers.$set(User.RELATIONS.ROLES, roles);
+        if (roleIds && roleIds.length > 0) {
+            const roles = await Role.findAll({ where: { id: roleIds } });
+            await UserCreate.$set(User.RELATIONS.ROLES, roles);
         }
 
-        res.send(CreateUsers);
+        return UserCreate;
     } catch (error) {
-        res.status(404).json({ mensaje: "Error al registrar usuario, intente nuevamente." });
-        return;
+        throw new Error("Error al registrar usuario, intente nuevamente.");
     }
 }
 
-type UpdateUsersParams = { id: number };
-type UpdateUsersBody = {
-    username?: string;
-    passwordHash?: string;
-    roleId?: number[];
-};
-
-export const UpdateUsers = async (
-    req: Request<UpdateUsersParams, {}, UpdateUsersBody>,
-    res: Response
-): Promise<void> => {
+export const UpdateUser = async (Updates: Partial<User>, roleIds: Role['id'][] = []): Promise<User | null> => {
     try {
-        const { id } = req.params;
-        const { username, passwordHash, roleId } = req.body;
-
-        const UpdateUsers = await User.findByPk(id);
+        const UpdateUsers = await User.findByPk(Updates.id);
         if (!UpdateUsers) {
-            res.status(404).json({ mensaje: "Usuario no encontrado" });
-            return;
+            throw new Error("Usuario no encontrado");
         }
 
-        UpdateUsers.set(req.body);
-        await UpdateUsers.save();
+        await UpdateUsers.update(Updates);
 
-        if (roleId && roleId.length > 0) {
-            const roles = await Role.findAll({ where: { id: roleId } });
+        if (roleIds && roleIds.length > 0) {
+            const roles = await Role.findAll({ where: { id: roleIds } });
             await UpdateUsers.$set(User.RELATIONS.ROLES, roles);
         }
 
-        const UpdateUser = await User.findByPk(id, {
+        const UpdateUser = await User.findByPk(Updates.id, {
             include: [User.RELATIONS.ROLES],
         });
 
-        res.json(UpdateUser);
+        return UpdateUser;
     } catch (error) {
-        res.status(404).json({ mensaje: "Error al actualizar usuario,intente nuevamente." });
+        throw new Error("Error al actualizar usuario, intente nuevamente.");
     }
 }
 
-type DeleteUserParams = { id: number };
-
-export const DeleteUser = async (
-    req: Request<DeleteUserParams>,
-    res: Response
-): Promise<void> => {
+export const DeleteUser = async (id: number): Promise<void> => {
     try {
-        const { id } = req.params;
-
-        await User.destroy({
+                await User.destroy({
             where: { id },
         });
 
-        res.sendStatus(200);
+        return;
     } catch (error) {
-        res.status(404).json({ mensaje: "Error al eliminar usuario" });
+        throw new Error("Error al eliminar usuario, intente nuevamente.");
     }
 }
