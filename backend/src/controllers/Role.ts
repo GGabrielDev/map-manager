@@ -1,125 +1,100 @@
-import { Request, Response } from 'express';
 import { User, Role, Permission } from "@/models/";
 
 // All Roles
-export const AllRoles = async (req: Request, res: Response): Promise<void> => {
+export const allRoles = async (): Promise<Role[]> => {
     try {
-        const AllRoles = await Role.findAll({});
+        const allRoles = await Role.findAll({});
 
-        if (!AllRoles) {
-            res.status(404).json({ mensaje: 'Error de consulta, intente nuevamente.' });
-            return;
+        if (!allRoles) {
+            throw new Error ('Error de consulta, intente nuevamente.');
         }
 
-        res.send(AllRoles);
+        return allRoles;
     } catch (error) {
-        res.status(404).json({ mensaje: "Error de consulta, intente nuevamente." });
+        throw new Error("Error de consulta, intente nuevamente.");
     }
 }
 
 // Get a Role By Id
-type SearchRoleByIdParams = { id: number };
-export const SearchRoleById = async (req: Request<SearchRoleByIdParams>, res: Response): Promise<void> => {
+export const searchRoleById = async (id: number): Promise<Role | null> => {
     try {
-        const { id } = req.params;
-
-        const SearchRoleById = await Role.findOne({
+        const searchRoleById = await Role.findOne({
             where: { id },
             include: [Role.RELATIONS.PERMISSIONS],
         });
 
-        res.json(SearchRoleById);
+        if (!searchRoleById) {
+            throw new Error("Rol no encontrado.");
+        }
+
+        return searchRoleById;
     } catch (error) {
-        res.status(404).json({ mensaje: "Error al buscar rol, intente nuevamente." });
-        return;
+        throw new Error("Error al buscar rol, intente nuevamente.");
     }
 }
 
-type CreateRoleBody = { name: string; description: string; userId?: number[], permissionId?: number[] };
-export const CreateRoles = async (req: Request<{}, {}, CreateRoleBody>, res: Response): Promise<void> => {
+export const createRoles = async (name: string, description: string, permissionId: number[]): Promise<Role> => {
     try {
-        const { name, description, userId, permissionId } = req.body;
-
-        const ExistRole = await Role.findOne({ where: { name } });
-        if (ExistRole) {
-            res.status(400).json({ mensaje: "El rol ya existe." });
-            return;
+        const existRole = await Role.findOne({ where: { name } });
+        if (existRole) {
+            throw new Error("El rol ya existe.");
         }
 
-        const CreateRoles = await Role.create({
+        const createRoles = await Role.create({
             name,
             description,
         });
 
         if (permissionId && permissionId.length > 0) {
             const permissions = await Permission.findAll({ where: { id: permissionId } });
-            await CreateRoles.$set(Role.RELATIONS.PERMISSIONS, permissions);
+            await createRoles.$set(Role.RELATIONS.PERMISSIONS, permissions);
         }
 
-        res.send(CreateRoles);
-    
+       return createRoles;
+
     } catch (error) {
-        res.status(404).json({ mensaje: "Error al registrar rol, intente nuevamente." });
-        return;
+        throw new Error("Error al registrar rol, intente nuevamente.");
     }
 }
 
 // Update a Role
-type UpdateRolesParams = { id: number };
-type UpdateRolesBody = {
-    name?: string;
-    description?: string;
-    userId?: number[];
-    permissionId?: number[];
-};
-
-export const UpdateRoles = async (
-    req: Request<UpdateRolesParams, {}, UpdateRolesBody>,
-    res: Response
-): Promise<void> => {
+export const updateRoles = async (updateRole: Partial<Role>, permissionIds: number[]): Promise<Role | null> => {
     try {
-        const { id } = req.params;
-        const { name, description, userId, permissionId } = req.body;
-
-        const UpdateRoles = await Role.findByPk(id);
-        if (!UpdateRoles) {
-            res.status(404).json({ mensaje: "Rol no encontrado" });
-            return;
+        const updateToRole = await Role.findByPk(updateRole.id);
+        if (!updateToRole) {
+            throw new Error("Rol no encontrado");
         }
 
-        UpdateRoles.set(req.body);
-        await UpdateRoles.save();
+        await updateToRole.update(updateRole, {where: {id: updateRole.id}});
 
-        if (permissionId && permissionId.length > 0) {
-            const permissions = await Permission.findAll({ where: { id: permissionId } });
-            await UpdateRoles.$set(Role.RELATIONS.PERMISSIONS, permissions);
+        if (permissionIds.length > 0) {
+            const permissions = await Permission.findAll({ where: { id: permissionIds } });
+            await updateToRole.$set(Role.RELATIONS.PERMISSIONS, permissions);
         }
 
-        const UpdatedRoles = await Role.findByPk(id, {
+        const updatedToRole = await Role.findByPk(updateRole.id, {
             include: [Role.RELATIONS.PERMISSIONS],
         });
 
-        res.json(UpdatedRoles);
+        return updatedToRole;
     } catch (error) {
-        res.status(404).json({ mensaje: "Error al actualizar usuario,intente nuevamente." });
+        throw new Error("Error al actualizar rol, intente nuevamente.");
     }
 }
 
-type DeleteRolesParams = { id: number };
-
-export const DeleteRoles = async (
-    req: Request<DeleteRolesParams>,
-    res: Response
-): Promise<void> => {
+export const deleteRole = async (id: number): Promise<boolean> => {
     try {
-        const { id } = req.params;
+        const roleToDelete = await Role.findByPk(id);
+        if (!roleToDelete) {
+            return false;
+        }
 
         await Role.destroy({
             where: { id },
         });
 
-        res.sendStatus(200);
+        return true;
     } catch (error) {
-        res.status(404).json({ mensaje: "Error al eliminar usuario" });
+        throw new Error("Error al eliminar rol, intente nuevamente.");
     }
 }

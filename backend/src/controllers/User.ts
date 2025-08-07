@@ -46,9 +46,13 @@ export const searchUserById = async (id: number): Promise<User | null> => {
             where: { id },
         });
 
+        if (!searchUserById) {
+            throw new Error("Usuario no encontrado.");
+        }
+
         return searchUserById;
     } catch (error) {
-        return null;
+        throw new Error("Error al buscar usuario, intente nuevamente.");
     }
 }
 
@@ -75,21 +79,21 @@ export const createUser = async (username: string, password: string, roleIds: nu
     }
 }
 
-export const updateUser = async (Updates: Partial<User>, roleIds: Role['id'][] = []): Promise<User | null> => {
+export const updateUser = async (updates: Partial<User>, roleIds: Role['id'][] = []): Promise<User | null> => {
     try {
-        const userToUpdate = await User.findByPk(Updates.id);
+        const userToUpdate = await User.findByPk(updates.id);
         if (!userToUpdate) {
             throw new Error("Usuario no encontrado");
         }
 
-        await userToUpdate.update(Updates, { where: { id: Updates.id } });
+        await userToUpdate.update(updates, { where: { id: updates.id } });
 
         if (roleIds && roleIds.length > 0) {
             const roles = await Role.findAll({ where: { id: roleIds } });
             await userToUpdate.$set(User.RELATIONS.ROLES, roles);
         }
 
-        const updateUser = await User.findByPk(Updates.id, {
+        const updateUser = await User.findByPk(updates.id, {
             include: [User.RELATIONS.ROLES],
         });
 
@@ -99,13 +103,18 @@ export const updateUser = async (Updates: Partial<User>, roleIds: Role['id'][] =
     }
 }
 
-export const deleteUser = async (id: number): Promise<void> => {
+export const deleteUser = async (id: number): Promise<boolean> => {
     try {
-                await User.destroy({
+        const userToDelete = await User.findByPk(id);
+        if (!userToDelete) {
+            return false;
+        }
+
+        await User.destroy({
             where: { id },
         });
 
-        return;
+        return true;
     } catch (error) {
         throw new Error("Error al eliminar usuario, intente nuevamente.");
     }
