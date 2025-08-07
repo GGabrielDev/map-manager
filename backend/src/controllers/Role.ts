@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { Role } from "@/models/";
+import { User, Role, Permission } from "@/models/";
 
+// All Roles
 export const AllRoles = async (req: Request, res: Response): Promise<void> => {
     try {
         const AllRoles = await Role.findAll({});
@@ -16,33 +17,28 @@ export const AllRoles = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-type SearchRolesByIdParams = { id: string };
-
-export const SearchRolesById = async (req: Request<SearchRolesByIdParams>, res: Response): Promise<void> => {
+// Get a Role By Id
+type SearchRoleByIdParams = { id: number };
+export const SearchRoleById = async (req: Request<SearchRoleByIdParams>, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
 
-        const SearchRolesById = await Role.findOne({
-            where: { id }
+        const SearchRoleById = await Role.findOne({
+            where: { id },
+            include: [Role.RELATIONS.PERMISSIONS],
         });
 
-        if (!SearchRolesById) {
-            res.status(404).json({ mensaje: 'Error al buscar rol, intente nuevamente.' });
-            return;
-        }
-
-        res.json(SearchRolesById);
+        res.json(SearchRoleById);
     } catch (error) {
         res.status(404).json({ mensaje: "Error al buscar rol, intente nuevamente." });
         return;
     }
 }
 
-type CreateRolesBody = { name: string; description: string; };
-
-export const CreateRoles = async (req: Request<{}, {}, CreateRolesBody>, res: Response): Promise<void> => {
+type CreateRoleBody = { name: string; description: string; userId?: number[], permissionId?: number[] };
+export const CreateRoles = async (req: Request<{}, {}, CreateRoleBody>, res: Response): Promise<void> => {
     try {
-        const { name, description } = req.body;
+        const { name, description, userId, permissionId } = req.body;
 
         const ExistRole = await Role.findOne({ where: { name } });
         if (ExistRole) {
@@ -55,17 +51,26 @@ export const CreateRoles = async (req: Request<{}, {}, CreateRolesBody>, res: Re
             description,
         });
 
+        if (permissionId && permissionId.length > 0) {
+            const permissions = await Permission.findAll({ where: { id: permissionId } });
+            await CreateRoles.$set(Role.RELATIONS.PERMISSIONS, permissions);
+        }
+
         res.send(CreateRoles);
+    
     } catch (error) {
         res.status(404).json({ mensaje: "Error al registrar rol, intente nuevamente." });
         return;
     }
 }
 
-type UpdateRolesParams = { id: string };
+// Update a Role
+type UpdateRolesParams = { id: number };
 type UpdateRolesBody = {
     name?: string;
     description?: string;
+    userId?: number[];
+    permissionId?: number[];
 };
 
 export const UpdateRoles = async (
@@ -74,7 +79,7 @@ export const UpdateRoles = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const { name, description } = req.body;
+        const { name, description, userId, permissionId } = req.body;
 
         const UpdateRoles = await Role.findByPk(id);
         if (!UpdateRoles) {
@@ -85,16 +90,25 @@ export const UpdateRoles = async (
         UpdateRoles.set(req.body);
         await UpdateRoles.save();
 
-        res.json(UpdateRoles);
+        if (permissionId && permissionId.length > 0) {
+            const permissions = await Permission.findAll({ where: { id: permissionId } });
+            await UpdateRoles.$set(Role.RELATIONS.PERMISSIONS, permissions);
+        }
+
+        const UpdatedRoles = await Role.findByPk(id, {
+            include: [Role.RELATIONS.PERMISSIONS],
+        });
+
+        res.json(UpdatedRoles);
     } catch (error) {
-        res.status(404).json({ mensaje: "Error al actualizar rol,intente nuevamente." });
+        res.status(404).json({ mensaje: "Error al actualizar usuario,intente nuevamente." });
     }
 }
 
-type DeleteRoleParams = { id: string };
+type DeleteRolesParams = { id: number };
 
-export const DeleteRole = async (
-    req: Request<DeleteRoleParams>,
+export const DeleteRoles = async (
+    req: Request<DeleteRolesParams>,
     res: Response
 ): Promise<void> => {
     try {
@@ -106,6 +120,6 @@ export const DeleteRole = async (
 
         res.sendStatus(200);
     } catch (error) {
-        res.status(404).json({ mensaje: "error al eliminar Role" });
+        res.status(404).json({ mensaje: "Error al eliminar usuario" });
     }
 }

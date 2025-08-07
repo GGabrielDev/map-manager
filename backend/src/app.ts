@@ -2,6 +2,9 @@ import cors from 'cors'
 import express from 'express'
 
 import Users from '@/routes/User'
+import Roles from '@/routes/Role'
+
+// Initialize express app
 
 const app = express()
 
@@ -15,5 +18,6 @@ app.use(
 
 app.use(express.json())
 app.use(Users)
+app.use(Roles)
 
 export default app

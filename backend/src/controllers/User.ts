@@ -31,8 +31,7 @@ export const LoginUsers = async (req: Request<LoginUsersParams>, res: Response):
         });
 
         if (!LoginUsers || !(await LoginUsers.validatePassword(password))) {
-            res.status(404).json({ mensaje: 'Usuario o clave incorrecto.' });
-            return;
+           throw new Error('Usuario o clave incorrecto.')
         }
 
         // Generate a JWT token
