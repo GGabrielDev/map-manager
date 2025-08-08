@@ -5,21 +5,26 @@ import { PermissionController } from "@/controllers";
 const router = Router();
 
 router.get(
-    "/",
-    requirePermission("get_permission"),
-    async (_, res: Response, next: NextFunction): Promise<void> => {
-        try {
-            const permissions = await PermissionController.getAll();
-            res.json(permissions);
-        } catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({ message: error.message });
-            } else {
-                next(error);
-            }
-        }
+  '/',
+  requirePermission('get_permission'),
+  async (req: Request, res: Response) => {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1
+      const pageSize = parseInt(req.query.pageSize as string, 10) || 10
+      const result = await PermissionController.getAll({
+        page,
+        pageSize,
+      })
+      res.json(result)
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ error: error.message })
+      } else {
+        res.status(500).json({ error: 'An unexpected error occurred' })
+      }
     }
-);
+  }
+)
 
 router.get(
     "/:id",

@@ -1,7 +1,5 @@
 import { Permission } from "@/models";
 
-// TODO: Check para Jhonattan para que revise el codigo de paginación y los cambios
-
 interface PaginationOptions {
   page: number
   pageSize: number

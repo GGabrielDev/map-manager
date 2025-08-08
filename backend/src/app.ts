@@ -21,6 +21,7 @@ app.use(
 
 app.use(express.json())
 
+// TODO: Jhonnatan: Revisar applicacion de los controladores con paginacion en las rutas
 // TODO: Refactorizar router en archivos separados
 // Ruta de autenticación y autorización (sin permiso)
 app.use('/auth', AuthRouter)
