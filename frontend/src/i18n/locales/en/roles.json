@@ -1,0 +1,30 @@
+{
+  "page": {
+    "title": "Manage Roles",
+    "subtitle": "Configure roles and their permissions",
+    "createNewRole": "Create New Role",
+    "noRolesFound": "No Roles Found",
+    "getStarted": "Get started by creating your first role.",
+    "noRolesConfigured": "No roles are currently configured."
+  },
+  "components": {
+    "table": {
+      "roleName": "Role Name",
+      "description": "Description",
+      "actions": "Actions"
+    },
+    "form": {
+      "editRole": "Edit Role",
+      "createNewRole": "Create New Role",
+      "roleName": "Role Name",
+      "description": "Description",
+      "permissions": "Permissions",
+      "updateRole": "Update Role",
+      "createRole": "Create Role",
+      "missingRoleName": "Role name is required.",
+      "failedToCreateRole": "Failed to create role.",
+      "accessDenied": "Access Denied",
+      "accessDeniedRole": "You do not have permission to {{action}} roles."
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "title": "Dashboard",
+  "welcome": "Welcome back, {{username}}!",
+  "switchToDark": "Switch to dark mode",
+  "switchToLight": "Switch to light mode",
+  "logout": "Logout",
+  "manageUsers": "Manage Users",
+  "manageUsersDesc": "Create, edit, and manage user accounts",
+  "manageRoles": "Manage Roles",
+  "manageRolesDesc": "Configure roles and permissions",
+  "manageDepartments": "Manage Departments",
+  "manageDepartmentsDesc": "Organize and manage departments",
+  "manageCategories": "Manage Categories",
+  "manageCategoriesDesc": "Create and organize item categories",
+  "manageItems": "Manage Items",
+  "manageItemsDesc": "Track and manage inventory items",
+  "access": "Access",
+  "noSectionsAvailable": "No Management Sections Available",
+  "noPermissionsMessage": "You don't have permissions to manage any sections. Please contact your administrator for access.",
+  "yourPermissions": "Your Permissions",
+  "noRolesAssigned": "No roles assigned"
+}
