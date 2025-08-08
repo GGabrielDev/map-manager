@@ -89,6 +89,11 @@ export const deleteRole = async (id: number): Promise<boolean> => {
             return false;
         }
 
+        const countUsers = await User.count({ where: { roleId: id } });
+        if (countUsers > 0) {
+            throw new Error("No se puede eliminar el rol, ya que está en uso.");
+        }
+
         await Role.destroy({
             where: { id },
         });
