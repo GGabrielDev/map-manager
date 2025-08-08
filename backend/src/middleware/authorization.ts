@@ -10,7 +10,7 @@ export function requirePermission(permissionName: string) {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const userId = (req as any).userId
+      const userId = req.userId
       if (userId === undefined || userId === null) {
         res.status(401).json({ error: 'Unauthorized' })
         return

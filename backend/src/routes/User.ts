@@ -73,7 +73,7 @@ router.post(
 
 router.put(
     "/users/:id",
-    requirePermission("update_user"),
+    requirePermission("edit_user"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { username, password} = req.body;

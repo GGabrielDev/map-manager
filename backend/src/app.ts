@@ -1,8 +1,11 @@
 import cors from 'cors'
 import express from 'express'
 
-import Users from '@/routes/User'
-import Roles from '@/routes/Role'
+import Users from '@/routes/user'
+import Roles from '@/routes/role'
+import Permissions from '@/routes/permission';
+import auth from '@/routes/auth'
+import { authenticateToken } from './middleware/authentication';
 
 // Initialize express app
 
@@ -17,7 +20,14 @@ app.use(
 )
 
 app.use(express.json())
+
+// Ruta de autenticación y autorización (sin permiso)
+app.use(auth)
+
+// Rutas de usuarios, roles y permisos (con permisos)
+app.use(authenticateToken)  
 app.use(Users)
 app.use(Roles)
+app.use(Permissions)
 
 export default app

@@ -37,3 +37,5 @@ router.get(
         res.json({valid: true})
     }
 )
+
+export default router;

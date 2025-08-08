@@ -73,7 +73,7 @@ router.post(
 
 router.put(
     "/roles/:id", 
-    requirePermission("update_role"),
+    requirePermission("edit_role"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { name, description } = req.body;
