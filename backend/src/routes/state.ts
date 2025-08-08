@@ -22,7 +22,7 @@ router.get(
 });
 
 router.get(
-    "states/:id",
+    "/states/:id",
     requirePermission("get_state"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -42,7 +42,7 @@ router.get(
 });
 
 router.post(
-    "states/",
+    "/states",
     requirePermission("create_state"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -62,7 +62,7 @@ router.post(
 });
 
 router.put(
-    "states/:id",
+    "/states/:id",
     requirePermission("edit_state"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -90,7 +90,7 @@ router.put(
 });
 
 router.delete(
-    "states/:id",
+    "/states/:id",
     requirePermission("delete_state"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

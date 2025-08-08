@@ -20,7 +20,6 @@ export const searchStateById = async (id: number): Promise<State | null> => {
     try {
         const state = await State.findOne({
             where: { id },
-            include: [Municipality]
         });
 
         if (!state) {
