@@ -1,5 +1,5 @@
-import express, { Request, Response, Router } from "express";
-import { loginUser, searchUserById } from "@/controllers/User";
+import { Request, Response, Router } from "express";
+import { UserController } from "@/controllers";
 import { authenticateToken } from "@/middleware/authentication";
 
 const router = Router();
@@ -18,7 +18,7 @@ router.post(
         }
 
         try {
-            const token = await loginUser(username, password);
+            const token = await UserController.login(username, password);
             res.json({ token });
         } catch (error) {
             if (error instanceof Error) {
@@ -50,7 +50,7 @@ router.get(
                 return;
             }
 
-            const user = await searchUserById(id);
+            const user = await UserController.findById(id);
             
             if (!user) {
                 res.status(404).json({ message: "Usuario no encontrado." });

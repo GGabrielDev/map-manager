@@ -1,16 +1,9 @@
 import {
-  AfterBulkCreate,
-  AfterBulkDestroy,
-  AfterBulkUpdate,
-  AfterCreate,
-  AfterDestroy,
-  AfterUpdate,
   AutoIncrement,
   BelongsToMany,
   Column,
   DataType,
   DeletedAt,
-  HasMany,
   Model,
   PrimaryKey,
   Table,
@@ -20,6 +13,7 @@ import { Role } from '.'
 import { RolePermission } from './join'
 
 const RELATIONS = {
+  ROLES: 'roles',
 } as const satisfies Record<string, keyof Permission>
 
 @Table ({ tableName: 'Permission' })

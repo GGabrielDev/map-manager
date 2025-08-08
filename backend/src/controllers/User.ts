@@ -2,23 +2,8 @@ import jwt from 'jsonwebtoken';
 import { SECRET_KEY } from '@/utils/auth-utils';
 import { User, Role } from "@/models/";
 
-// All Users
-export const allUsers = async (): Promise<User[]> => {
-    try {
-        const allUsers = await User.findAll({});
-
-        if (!allUsers) {
-            throw new Error ('Error de consulta, intente nuevamente.');
-        }
-
-        return allUsers;
-    } catch (error) {
-        throw new Error("Error de consulta, intente nuevamente.");
-    }
-}
-
 // Login User
-export const loginUser = async (username: string, password: string): Promise<string> => {
+export const login = async (username: string, password: string): Promise<string> => {
     try {
         const loginUser = await User.unscoped().findOne({
             where: { username }
@@ -39,8 +24,23 @@ export const loginUser = async (username: string, password: string): Promise<str
     }
 }
 
+// All Users
+export const getAll = async (): Promise<User[]> => {
+    try {
+        const allUsers = await User.findAll({});
+
+        if (!allUsers) {
+            throw new Error ('Error de consulta, intente nuevamente.');
+        }
+
+        return allUsers;
+    } catch (error) {
+        throw new Error("Error de consulta, intente nuevamente.");
+    }
+}
+
 // Get a Users By Id
-export const searchUserById = async (id: number): Promise<User | null> => {
+export const getById = async (id: number): Promise<User | null> => {
     try {
         const searchUserById = await User.findOne({
             where: { id },
@@ -93,11 +93,11 @@ export const updateUser = async (updates: Partial<User>, roleIds: Role['id'][] =
             await userToUpdate.$set(User.RELATIONS.ROLES, roles);
         }
 
-        const updateUser = await User.findByPk(updates.id, {
+        const updatedUser = await User.findByPk(updates.id, {
             include: [User.RELATIONS.ROLES],
         });
 
-        return updateUser;
+        return updatedUser;
     } catch (error) {
         throw new Error("Error al actualizar usuario, intente nuevamente.");
     }

@@ -1,7 +1,7 @@
-import { User, Role, Permission } from "@/models/";
+import { Role, Permission } from "@/models/";
 
 // All Roles
-export const allRoles = async (): Promise<Role[]> => {
+export const getAll = async (): Promise<Role[]> => {
     try {
         const allRoles = await Role.findAll({});
 
@@ -16,7 +16,7 @@ export const allRoles = async (): Promise<Role[]> => {
 }
 
 // Get a Role By Id
-export const searchRoleById = async (id: number): Promise<Role | null> => {
+export const getById = async (id: number): Promise<Role | null> => {
     try {
         const searchRoleById = await Role.findOne({
             where: { id },

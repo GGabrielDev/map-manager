@@ -1,11 +1,5 @@
 import bcrypt from 'bcrypt'
 import {
-  AfterBulkCreate,
-  AfterBulkDestroy,
-  AfterBulkUpdate,
-  AfterCreate,
-  AfterDestroy,
-  AfterUpdate,
   AllowNull,
   AutoIncrement,
   BeforeCreate,
@@ -15,7 +9,6 @@ import {
   CreatedAt,
   DefaultScope,
   DeletedAt,
-  HasMany,
   Model,
   PrimaryKey,
   Table,

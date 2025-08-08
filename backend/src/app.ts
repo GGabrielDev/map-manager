@@ -1,10 +1,10 @@
 import cors from 'cors'
 import express from 'express'
 
-import Users from '@/routes/user'
-import Roles from '@/routes/role'
-import Permissions from '@/routes/permission';
-import auth from '@/routes/auth'
+import UserRouter from '@/routes/User'
+import RoleRouter from '@/routes/Role'
+import PermissionRouter from '@/routes/Permission';
+import AuthRouter from '@/routes/auth'
 import { authenticateToken } from './middleware/authentication';
 
 // Initialize express app
@@ -21,13 +21,15 @@ app.use(
 
 app.use(express.json())
 
+// TODO: Refactorizar router en archivos separados
 // Ruta de autenticación y autorización (sin permiso)
-app.use(auth)
+app.use('/auth', AuthRouter)
 
 // Rutas de usuarios, roles y permisos (con permisos)
 app.use(authenticateToken)  
-app.use(Users)
-app.use(Roles)
-app.use(Permissions)
+
+app.use('/users', UserRouter)
+app.use('/permissions', PermissionRouter)
+app.use('/roles', RoleRouter)
 
 export default app

@@ -1,7 +1,7 @@
-import { Permission } from "@/models/";
+import { Permission } from "@/models";
 
 // All Permissions
-export const allPermissions = async (): Promise<Permission[]> => {
+export const getAll = async (): Promise<Permission[]> => {
     try {
         const allPermissions = await Permission.findAll({});
 
@@ -16,7 +16,7 @@ export const allPermissions = async (): Promise<Permission[]> => {
 }
 
 // Get a Permission By Id
-export const searchPermissionById = async (id: number): Promise<Permission | null> => {
+export const getById = async (id: number): Promise<Permission | null> => {
     try {
         const searchPermissionById = await Permission.findOne({
             where: { id }
