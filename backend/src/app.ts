@@ -5,6 +5,7 @@ import Users from '@/routes/user'
 import Roles from '@/routes/role'
 import Permissions from '@/routes/permission';
 import auth from '@/routes/auth'
+import State from "@/routes/state";
 import { authenticateToken } from './middleware/authentication';
 
 // Initialize express app
@@ -29,5 +30,6 @@ app.use(authenticateToken)
 app.use(Users)
 app.use(Roles)
 app.use(Permissions)
+app.use(State)
 
 export default app

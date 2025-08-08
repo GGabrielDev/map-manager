@@ -16,7 +16,7 @@ export const allStates = async (): Promise<State[]> => {
 }
 
 // Get State by ID
-export const getStateById = async (id: number): Promise<State | null> => {
+export const searchStateById = async (id: number): Promise<State | null> => {
     try {
         const state = await State.findOne({
             where: { id },

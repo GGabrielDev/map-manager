@@ -79,17 +79,17 @@ router.put(
             const { username, password} = req.body;
             let roleIds = req.body.roleIds || [];
 
-            const Updates: Partial<User> = {}
-            Updates.id = Number(req.params.id);
-            if (!Updates.id) {
+            const updates: Partial<User> = {}
+            updates.id = Number(req.params.id);
+            if (!updates.id) {
                 res.status(400).json({ message: "ID de usuario es requerido." });
                 return;
             }
-            if (username !== undefined) Updates.username = username
-            if (password !== undefined) Updates.passwordHash = password
+            if (username !== undefined) updates.username = username
+            if (password !== undefined) updates.passwordHash = password
             if (roleIds === undefined) roleIds = []
 
-            const user = await updateUser(Updates, roleIds);
+            const user = await updateUser(updates, roleIds);
             if (!user) {
                 res.status(404).json({ message: "Usuario no encontrado." });
                 return;
