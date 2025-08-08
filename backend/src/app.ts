@@ -1,11 +1,7 @@
 import cors from 'cors'
 import express from 'express'
 
-import UserRouter from '@/routes/User'
-import RoleRouter from '@/routes/Role'
-import PermissionRouter from '@/routes/Permission';
-import AuthRouter from '@/routes/auth'
-import { authenticateToken } from './middleware/authentication';
+import mainRouter from '@/routes/'
 
 // Initialize express app
 
@@ -32,5 +28,8 @@ app.use(authenticateToken)
 app.use('/users', UserRouter)
 app.use('/permissions', PermissionRouter)
 app.use('/roles', RoleRouter)
+
+// TODO: Implementar todas las demas rutas dentro de este main router
+app.use('/api', mainRouter)
 
 export default app
