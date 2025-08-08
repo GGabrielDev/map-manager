@@ -49,7 +49,7 @@ router.get(
                 res.status(401).json({ message: "ID de usuario inválido." });
                 return;
             }
-            
+
             const user = await UserController.getById(id);
             
             if (!user) {
@@ -57,7 +57,7 @@ router.get(
                 return;
             }
 
-            res.json({ user });
+            res.json(user);
         } catch (error) {
             if (error instanceof Error) {
                 res.status(401).json({ message: error.message });

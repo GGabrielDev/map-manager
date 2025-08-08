@@ -7,28 +7,44 @@ import type { User } from "@/models";
 const router = Router();
 
 router.get(
-    "/",
-    requirePermission("get_user"),
-    async (_, res: Response, next: NextFunction): Promise<void> => {
-        try {
-            const users = await UserController.getAll();
-            res.json(users);
-        } catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({ message: error.message });
-            }else{
-                next(error);
-            }
-        }
+  '/',
+  requirePermission('get_user'),
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1
+      const pageSize = parseInt(req.query.pageSize as string, 10) || 10
+      const username = (req.query.username as User['username']) || undefined
+      const sortBy = UserController.SortByOptions.includes(req.query.sortBy as string)
+        ? (req.query.sortBy as UserController.UserFilterOptions['sortBy'])
+        : undefined
+      const sortOrder = (req.query.sortOrder as 'ASC' | 'DESC') || 'ASC'
+
+      const result = await UserController.getAll({
+        page,
+        pageSize,
+        username,
+        sortBy,
+        sortOrder,
+      })
+
+      res.json(result)
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ error: error.message })
+      } else {
+        next(error)
+      }
     }
-);
+  }
+)
 
 router.get(
     "/:id",
     requirePermission("get_user"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const user = await UserController.getById(Number(req.params.id));
+            const userId = parseInt(req.params.id, 10)
+            const user = await UserController.getById(userId);
             if (!user) {
                 res.status(404).json({ message: "Usuario no encontrado." });
                 return;

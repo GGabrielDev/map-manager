@@ -1,6 +1,28 @@
 import jwt from 'jsonwebtoken';
+import { Op, OrderItem } from 'sequelize';
 import { SECRET_KEY } from '@/utils/auth-utils';
 import { User, Role } from "@/models/";
+
+interface PaginationOptions {
+  page: number
+  pageSize: number
+}
+
+export const SortByOptions = ['username', 'creationDate', 'updatedOn']
+export const SortOrderOptions = ['ASC', 'DESC']
+
+export interface UserFilterOptions extends PaginationOptions {
+  username?: string
+  sortBy?: (typeof SortByOptions)[number]
+  sortOrder?: (typeof SortOrderOptions)[number]
+}
+
+interface PaginatedResult<T> {
+  data: T[]
+  total: number
+  totalPages: number
+  currentPage: number
+}
 
 // Login User
 export const login = async (username: string, password: string): Promise<string> => {
@@ -25,36 +47,77 @@ export const login = async (username: string, password: string): Promise<string>
 }
 
 // All Users
-export const getAll = async (): Promise<User[]> => {
-    try {
-        const allUsers = await User.findAll({});
-
-        if (!allUsers) {
-            throw new Error ('Error de consulta, intente nuevamente.');
-        }
-
-        return allUsers;
-    } catch (error) {
-        throw new Error("Error de consulta, intente nuevamente.");
+export const getAll = async ({
+    page,
+    pageSize,
+    username,
+    sortBy,
+    sortOrder = 'ASC',
+  }: UserFilterOptions): Promise<PaginatedResult<User>> => {
+    if (page < 1 || pageSize < 1) {
+      return { data: [], total: 0, totalPages: 0, currentPage: page }
     }
-}
 
+    const offset = (page - 1) * pageSize
+    const andConditions: any[] = []
+
+    // Filter by username (partial match)
+    if (username) {
+      andConditions.push({ username: { [Op.like]: `%${username}%` } })
+    }
+
+    const where = andConditions.length ? { [Op.and]: andConditions } : undefined
+
+    let order: OrderItem[] | undefined = undefined
+    if (sortBy) {
+      const column =
+        sortBy === 'creationDate'
+          ? 'creationDate'
+          : sortBy === 'updatedOn'
+            ? 'updatedOn'
+            : 'username'
+      order = [[column, sortOrder]]
+    }
+
+    const data = await User.findAll({
+      where,
+      offset,
+      limit: pageSize,
+      order,
+      include: [User.RELATIONS.ROLES],
+    })
+
+    const total = await User.count({ where })
+
+    return {
+      data,
+      total,
+      totalPages: Math.ceil(total / pageSize),
+      currentPage: page,
+    }
+  }
 // Get a Users By Id
 export const getById = async (id: number): Promise<User | null> => {
-    try {
-        const searchUserById = await User.findOne({
-            where: { id },
-        });
-
-        if (!searchUserById) {
-            throw new Error("Usuario no encontrado.");
-        }
-
-        return searchUserById;
-    } catch (error) {
-        throw new Error("Error al buscar usuario, intente nuevamente.");
+    if (typeof id !== 'number' || isNaN(id)) {
+      throw new Error('Invalid user id')
     }
-}
+
+    const user = await User.findByPk(id, {
+      include: [
+        {
+          model: Role,
+          as: User.RELATIONS.ROLES,
+          include: [Role.RELATIONS.PERMISSIONS],
+        },
+      ],
+    })
+
+    if (!user) {
+      return null
+    }
+
+    return user
+  }
 
 export const createUser = async (username: string, password: string, roleIds: number[]): Promise<User> => {
     try {
