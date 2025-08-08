@@ -38,25 +38,22 @@ async function populateAdminAndPermissions() {
       },
     })
 
-    // 2. Use adminUser.id for all subsequent creates
-    const userId = adminUser.id
-
-    // 3. Create permissions
+    // 2. Create permissions
     const createdPermissions = await Permission.bulkCreate(permissions, {
       ignoreDuplicates: true,
     })
 
-    // 4. Create admin role
+    // 3. Create admin role
     const [adminRole, roleCreated] = await Role.findOrCreate({
       where: { name: 'admin' },
       defaults: { description: 'Administrator role with full permissions' },
     })
 
-    // 5. Associate admin role and permissions (many-to-many)
+    // 4. Associate admin role and permissions (many-to-many)
     await adminRole.$set(Role.RELATIONS.PERMISSIONS, createdPermissions, {
     })
 
-    // 6. Associate admin user and admin role (many-to-many)
+    // 5. Associate admin user and admin role (many-to-many)
     await adminUser.$set(User.RELATIONS.ROLES, adminRole)
 
     if (roleCreated) {

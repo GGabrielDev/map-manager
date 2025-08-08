@@ -1,16 +1,17 @@
 import { NextFunction,Router, Request, Response } from "express";
-import { allRoles, searchRoleById, createRole, updateRole, deleteRole } from "@/controllers/Role";
+import { RoleController } from "@/controllers";
 import { requirePermission } from "@/middleware/authorization";
-import { Role } from "@/models/";
+
+import type { Role } from "@/models";
 
 const router = Router();
 
 router.get(
-    "/roles",
+    "/",
     requirePermission("get_role"),
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    async (_, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const roles = await allRoles();
+            const roles = await RoleController.getAll();
             res.json(roles);
         }catch (error) {
             if (error instanceof Error) {
@@ -23,7 +24,7 @@ router.get(
 );
 
 router.get(
-    "/roles/:id",
+    "/:id",
     requirePermission("get_role"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
@@ -32,7 +33,7 @@ router.get(
                 res.status(400).json({ message: "ID de rol requerido." });
                 return;
             }
-            const role = await searchRoleById(id);
+            const role = await RoleController.getById(id);
             if (!role) {
                 res.status(404).json({ message: "Rol no encontrado." });
                 return;
@@ -49,7 +50,7 @@ router.get(
 );
 
 router.post(
-    "/roles",
+    "/",
     requirePermission("create_role"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
@@ -58,7 +59,7 @@ router.post(
                 res.status(400).json({ message: "Nombre de rol es requerido." });
                 return;
             }
-            const role = await createRole(name, description, permissionIds);
+            const role = await RoleController.createRole(name, description, permissionIds);
             res.status(201).json(role);
         } catch (error) {
             if (error instanceof Error) {
@@ -72,7 +73,7 @@ router.post(
 );
 
 router.put(
-    "/roles/:id", 
+    "/:id", 
     requirePermission("edit_role"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
@@ -89,7 +90,7 @@ router.put(
             if (description !== undefined) updates.description = description;
             if (permissionIds === undefined) permissionIds = [];
 
-            const role = await updateRole(updates, permissionIds);
+            const role = await RoleController.updateRole(updates, permissionIds);
             if (!role) {
                 res.status(404).json({ message: "Rol no encontrado." });
                 return;
@@ -107,7 +108,7 @@ router.put(
 );
 
 router.delete(
-    "/roles/:id",
+    "/:id",
     requirePermission("delete_role"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
@@ -117,7 +118,7 @@ router.delete(
                 return;
             }
 
-            const deleted = await deleteRole(id);
+            const deleted = await RoleController.deleteRole(id);
             if (!deleted) {
                 res.status(404).json({ message: "Rol no encontrado." });
                 return;

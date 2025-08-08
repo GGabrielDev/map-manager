@@ -13,6 +13,7 @@ import { Role } from '.'
 import { RolePermission } from './join'
 
 const RELATIONS = {
+  ROLES: 'roles',
 } as const satisfies Record<string, keyof Permission>
 
 @Table ({ tableName: 'Permission' })

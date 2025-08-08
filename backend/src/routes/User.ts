@@ -1,16 +1,17 @@
 import { NextFunction, Router, Request, Response } from "express";
-import { allUsers, searchUserById, createUser, updateUser, deleteUser} from "@/controllers/User";
+import { UserController } from "@/controllers";
 import { requirePermission } from "@/middleware/authorization";
-import { User } from "@/models/";
+
+import type { User } from "@/models";
 
 const router = Router();
 
 router.get(
-    "/users",
+    "/",
     requirePermission("get_user"),
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    async (_, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const users = await allUsers();
+            const users = await UserController.getAll();
             res.json(users);
         } catch (error) {
             if (error instanceof Error) {
@@ -23,11 +24,11 @@ router.get(
 );
 
 router.get(
-    "/users/:id",
+    "/:id",
     requirePermission("get_user"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const user = await searchUserById(Number(req.params.id));
+            const user = await UserController.getById(Number(req.params.id));
             if (!user) {
                 res.status(404).json({ message: "Usuario no encontrado." });
                 return;
@@ -44,7 +45,7 @@ router.get(
 );
 
 router.post(
-    "/users",
+    "/",
     requirePermission("create_user"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
@@ -59,7 +60,7 @@ router.post(
                 return;
             }
 
-            const user = await createUser(username, password, roleIds);
+            const user = await UserController.createUser(username, password, roleIds);
             res.status(201).json(user);
         } catch (error) {
             if (error instanceof Error) {
@@ -72,7 +73,7 @@ router.post(
 );
 
 router.put(
-    "/users/:id",
+    "/:id",
     requirePermission("edit_user"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
@@ -89,7 +90,7 @@ router.put(
             if (password !== undefined) updates.passwordHash = password
             if (roleIds === undefined) roleIds = []
 
-            const user = await updateUser(updates, roleIds);
+            const user = await UserController.updateUser(updates, roleIds);
             if (!user) {
                 res.status(404).json({ message: "Usuario no encontrado." });
                 return;
@@ -106,7 +107,7 @@ router.put(
 );
 
 router.delete(
-    "/users/:id",
+    "/:id",
     requirePermission("delete_user"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
@@ -115,7 +116,7 @@ router.delete(
                 res.status(400).json({ message: "ID de usuario es requerido." });
             }
 
-            await deleteUser(id);
+            await UserController.deleteUser(id);
             res.status(204).send();
         } catch (error) {
             if (error instanceof Error) {

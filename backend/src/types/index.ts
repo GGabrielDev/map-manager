@@ -96,13 +96,3 @@ export interface JWTPayload {
   iat?: number;
   exp?: number;
 }
-
-// Request extensions
-declare global {
-  namespace Express {
-    interface Request {
-      userId?: number;
-      user?: IUser;
-    }
-  }
-}

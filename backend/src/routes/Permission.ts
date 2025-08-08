@@ -1,15 +1,15 @@
 import { Router, NextFunction, Request, Response } from "express";
-import {  requirePermission} from "@/middleware/authorization"
-import { allPermissions, searchPermissionById } from "@/controllers/Permission";
+import {  requirePermission } from "@/middleware/authorization"
+import { PermissionController } from "@/controllers";
 
 const router = Router();
 
 router.get(
-    "/permissions",
+    "/",
     requirePermission("get_permission"),
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    async (_, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const permissions = await allPermissions();
+            const permissions = await PermissionController.getAll();
             res.json(permissions);
         } catch (error) {
             if (error instanceof Error) {
@@ -22,11 +22,16 @@ router.get(
 );
 
 router.get(
-    "/permissions/:id",
+    "/:id",
     requirePermission("get_permission"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            
+            const permission = await PermissionController.getById(Number(req.params.id));
+            if (!permission) {
+                res.status(404).json({ message: "Permiso no encontrado." });
+                return;
+            }
+            res.json(permission); 
         } catch (error) {
             if (error instanceof Error) {
                 res.status(401).json({ message: error.message });
