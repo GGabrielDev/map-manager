@@ -1,17 +1,41 @@
 import { Permission } from "@/models";
 
+// TODO: Check para Jhonattan para que revise el codigo de paginación y los cambios
+
+interface PaginationOptions {
+  page: number
+  pageSize: number
+}
+
+interface PaginatedResult<T> {
+  data: T[]
+  total: number
+  totalPages: number
+  currentPage: number
+}
+
 // All Permissions
-export const getAll = async (): Promise<Permission[]> => {
-    try {
-        const allPermissions = await Permission.findAll({});
+export const getAll = async ({page, pageSize}: PaginationOptions): Promise<PaginatedResult<Permission>> => {
+    if (page < 1 || pageSize < 1) {
+      return {
+        data: [],
+        total: 0,
+        totalPages: 0,
+        currentPage: page,
+      }
+    }
 
-        if (!allPermissions) {
-            throw new Error('Error de consulta, intente nuevamente.');
-        }
+    const offset = (page - 1) * pageSize
+    const { count, rows } = await Permission.findAndCountAll({
+      offset,
+      limit: pageSize,
+    })
 
-        return allPermissions;
-    } catch (error) {
-        throw new Error("Error de consulta, intente nuevamente.");
+    return {
+      data: rows,
+      total: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: page,
     }
 }
 
