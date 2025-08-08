@@ -33,33 +33,12 @@ export const usePermissions = () => {
   const canEditRole = hasPermission('edit_role');
   const canDeleteRole = hasPermission('delete_role');
 
-  // Department-specific permission checks
-  const canCreateDepartment = hasPermission('create_department');
-  const canGetDepartment = hasPermission('get_department');
-  const canEditDepartment = hasPermission('edit_department');
-  const canDeleteDepartment = hasPermission('delete_department');
-
-  // Category-specific permission checks
-  const canCreateCategory = hasPermission('create_category');
-  const canGetCategory = hasPermission('get_category');
-  const canEditCategory = hasPermission('edit_category');
-  const canDeleteCategory = hasPermission('delete_category');
-
-  // Item-specific permission checks
-  const canCreateItem = hasPermission('create_item');
-  const canGetItem = hasPermission('get_item');
-  const canEditItem = hasPermission('edit_item');
-  const canDeleteItem = hasPermission('delete_item');
-
   // Permission-specific permission checks
   const canGetPermission = hasPermission('get_permission');
 
   // Composite permission checks
   const canManageUsers = canCreateUser || canGetUser || canEditUser || canDeleteUser;
   const canManageRoles = canCreateRole || canGetRole || canEditRole || canDeleteRole;
-  const canManageDepartments = canCreateDepartment || canGetDepartment || canEditDepartment || canDeleteDepartment;
-  const canManageCategories = canCreateCategory || canGetCategory || canEditCategory || canDeleteCategory;
-  const canManageItems = canCreateItem || canGetItem || canEditItem || canDeleteItem;
 
   return {
     hasPermission,
@@ -77,24 +56,6 @@ export const usePermissions = () => {
     canEditRole,
     canDeleteRole,
     canManageRoles,
-    // Department permissions
-    canCreateDepartment,
-    canGetDepartment,
-    canEditDepartment,
-    canDeleteDepartment,
-    canManageDepartments,
-    // Category permissions
-    canCreateCategory,
-    canGetCategory,
-    canEditCategory,
-    canDeleteCategory,
-    canManageCategories,
-    // Item permissions
-    canCreateItem,
-    canGetItem,
-    canEditItem,
-    canDeleteItem,
-    canManageItems,
     // Permission permissions
     canGetPermission,
   };

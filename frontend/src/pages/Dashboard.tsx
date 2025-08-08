@@ -16,12 +16,11 @@ const Dashboard: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const themeMode = useSelector((state: RootState) => state.theme.mode);
 
+  console.log(user); // Log user data for debugging
+
   const {
     canManageUsers,
     canManageRoles,
-    canManageDepartments,
-    canManageCategories,
-    canManageItems,
   } = usePermissions();
 
   const handleLogout = () => {
@@ -54,24 +53,6 @@ const Dashboard: React.FC = () => {
       description: t('dashboard:manageRolesDesc'), 
       route: '/roles',
       color: 'secondary' as const,
-    }] : []),
-    ...(canManageDepartments ? [{
-      title: t('dashboard:manageDepartments'), 
-      description: t('dashboard:manageDepartmentsDesc'), 
-      route: '/departments',
-      color: 'success' as const,
-    }] : []),
-    ...(canManageCategories ? [{
-      title: t('dashboard:manageCategories'), 
-      description: t('dashboard:manageCategoriesDesc'), 
-      route: '/categories',
-      color: 'info' as const,
-    }] : []),
-    ...(canManageItems ? [{
-      title: t('dashboard:manageItems'), 
-      description: t('dashboard:manageItemsDesc'), 
-      route: '/items',
-      color: 'warning' as const,
     }] : []),
   ];
 
