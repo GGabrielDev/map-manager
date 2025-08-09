@@ -76,3 +76,20 @@ export const allParish = async({
     }
 }
 
+// git parish by ID
+
+export const getById = async (id: number):Promise<Parish | null> =>{
+    try {
+        const parish = await Parish.findOne({
+            where: {id}
+        })
+
+        if (!parish) {
+            throw new Error("Parroquia no encontrada");
+        }
+
+        return parish;
+    } catch (error) {
+        throw new Error("Error al obtener parroquia, intente nuevamente.")
+    }    
+}
