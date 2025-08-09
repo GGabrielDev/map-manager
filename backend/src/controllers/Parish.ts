@@ -128,3 +128,19 @@ export const updateParish = async(updates: Partial<Parish>): Promise<Parish | nu
         throw new Error("Error al actualizar la parroquia.")
     }
 }
+
+//delete parish
+export const deleteParish = async (id:number): Promise<boolean> =>{
+    try {
+        const parish = await Parish.findOne({where: {id}})
+
+        if (!parish) {
+            return false;
+        }
+
+        await parish.destroy()
+        return true;
+    } catch (error) {
+        throw new Error("Error al eliminar la parroquia")
+    }
+}
