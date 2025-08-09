@@ -35,3 +35,52 @@ router.get(
         }
     }
 )
+
+router.get(
+    "/:id",
+    requirePermission("get_parish"),
+    async(req: Request, res: Response, next: NextFunction): Promise <void> =>{
+        try {
+            const parishId = parseInt(req.params.id, 10)
+            const parish = await ParishController.getById(parishId)
+            if (!parish) {
+                res.status(404).json({message: "Parroquia no encontrada"})
+                return;
+            }
+            res.json(parish);
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(401).json({message: error.message})
+            } else {
+                next(error)
+            }
+        }
+    }
+)
+
+router.post(
+    "/",
+    requirePermission("create_parish"),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> =>{
+        try {
+            const {name, municipalityId} = req.body
+            if (!name) {
+                res.status(400).json({message: "Nombre de la parroquia requerido"})
+                return;
+            }
+            if (!municipalityId) {
+                res.status(400).json({message: "ID del municipio requerido"})
+                return;
+            }
+
+            const newParish = await ParishController.createParish(name, municipalityId)
+            res.status(201).json(newParish)
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(401).json({message: error.message})
+            } else {
+                next(error)
+            }
+        }
+    }
+)

@@ -60,26 +60,27 @@ router.post(
     "/",
     requirePermission("create_municipality"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-        const {name, stateId}= req.body;
-        if (!name) {
-            res.status(400).json({ message: "Nombre de municipio requerido." });
-            return;
-        }
-        if (!stateId) {
-            res.status(400).json({ message: "Id de estado requerido." });
-            return;
-        }
-        const newMunicipality = await MunicipalityController.createMunicipality(name, stateId);
-        res.status(201).json(newMunicipality);
-    } catch (error) {
-        if (error instanceof Error) {
-            res.status(401).json({ message: error.message });
-        } else {
-            next(error);
+        try {
+            const {name, stateId}= req.body;
+            if (!name) {
+                res.status(400).json({ message: "Nombre de municipio requerido." });
+                return;
+            }
+            if (!stateId) {
+                res.status(400).json({ message: "Id de estado requerido." });
+                return;
+            }
+            const newMunicipality = await MunicipalityController.createMunicipality(name, stateId);
+            res.status(201).json(newMunicipality);
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(401).json({ message: error.message });
+            } else {
+                next(error);
+            }
         }
     }
-});
+);
 
 router.put(
     "/:id",
