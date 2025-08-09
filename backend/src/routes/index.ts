@@ -6,6 +6,7 @@ import PermissionRouter from '@/routes/Permission'
 import AuthRouter from '@/routes/auth'
 import StateRouter from '@/routes/State'
 import MunicipalityRouter from '@/routes/Municipality'
+import ParishRouter from '@/routes/Parish'
 import { authenticateToken } from '@/middleware/authentication'
 
 // Initialize express app
@@ -25,5 +26,6 @@ mainRouter.use('/permissions', PermissionRouter)
 mainRouter.use('/roles', RoleRouter)
 mainRouter.use('/state', StateRouter)
 mainRouter.use('/municipality', MunicipalityRouter)
+mainRouter.use('/parish', ParishRouter)
 
 export default mainRouter

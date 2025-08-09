@@ -7,7 +7,7 @@ const router = Router();
 
 router.get(
     "/",
-    requirePermission("get_Parish"),
+    requirePermission("get_parish"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> =>{
         try {
             const page = parseInt(req.body.page as string, 10) || 1
@@ -138,3 +138,5 @@ router.delete(
         }
     }
 )
+
+export default router;
