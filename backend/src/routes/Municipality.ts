@@ -1,33 +1,31 @@
 import { NextFunction, Router, Request, Response } from "express";
-import { StateController } from "@/controllers/";
+import { MunicipalityController } from "@/controllers/";
 import { requirePermission } from "@/middleware/authorization";
-import { State } from "@/models"
+import { Municipality } from "@/models"
 
 const router = Router();
 
 router.get(
     "/",
-    requirePermission("get_state"),
+    requirePermission("get_municipality"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const page = parseInt(req.query.page as string, 10) || 1
               const pageSize = parseInt(req.query.pageSize as string, 10) || 10
-              const name = (req.query.name as State['name']) || undefined
-              const sortBy = StateController.SortByOptions.includes(req.query.sortBy as string)
-                ? (req.query.sortBy as StateController.StateFilterOptions['sortBy'])
+              const name = (req.query.name as Municipality['name']) || undefined
+              const sortBy = MunicipalityController.SortByOptions.includes(req.query.sortBy as string)
+                ? (req.query.sortBy as MunicipalityController.MunicipalityFilterOptions['sortBy'])
                 : undefined
               const sortOrder = (req.query.sortOrder as 'ASC' | 'DESC') || 'ASC'
-        
 
-
-        const states = await StateController.allStates({
+        const municipalities = await MunicipalityController.allMunicipalities({
             page,
             pageSize,
             name,
             sortBy,
             sortOrder,
         });
-        res.json(states);
+        res.json(municipalities);
     } catch (error) {
         if (error instanceof Error) {
             res.status(401).json({ message: error.message });
@@ -39,16 +37,16 @@ router.get(
 
 router.get(
     "/:id",
-    requirePermission("get_state"),
+    requirePermission("get_municipality"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const stateId = parseInt(req.params.id, 10)
-        const state = await StateController.getById(stateId);
-        if (!state) {
-            res.status(404).json({ message: "Estado no encontrado." });
+        const municipalityId = parseInt(req.params.id, 10)
+        const municipality = await MunicipalityController.getById(municipalityId);
+        if (!municipality) {
+            res.status(404).json({ message: "Municipio no encontrado." });
             return;
         }
-        res.json(state);
+        res.json(municipality);
     } catch (error) {
         if (error instanceof Error) {
             res.status(401).json({ message: error.message });
@@ -60,15 +58,20 @@ router.get(
 
 router.post(
     "/",
-    requirePermission("create_state"),
+    requirePermission("create_municipality"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        if (!req.body.name) {
-            res.status(400).json({ message: "Nombre de estado requerido." });
+        const {name, stateId}= req.body;
+        if (!name) {
+            res.status(400).json({ message: "Nombre de municipio requerido." });
             return;
         }
-        const newState = await StateController.createState(req.body.name);
-        res.status(201).json(newState);
+        if (!stateId) {
+            res.status(400).json({ message: "Id de estado requerido." });
+            return;
+        }
+        const newMunicipality = await MunicipalityController.createMunicipality(name, stateId);
+        res.status(201).json(newMunicipality);
     } catch (error) {
         if (error instanceof Error) {
             res.status(401).json({ message: error.message });
@@ -80,23 +83,23 @@ router.post(
 
 router.put(
     "/:id",
-    requirePermission("edit_state"),
+    requirePermission("edit_municipality"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const updates: Partial<State> = {}
+        const updates: Partial<Municipality> = {}
         updates.id = Number(req.params.id);
         if (!updates.id){
-            res.status(400).json({ message: "ID de estado requerido." });
+            res.status(400).json({ message: "ID de municipio requerido." });
             return;
         }
         if (req.body.name !== undefined) updates.name = req.body.name;
 
-        const updatedState = await StateController.updateState(updates);
-        if (!updatedState) {
-            res.status(404).json({ message: "Estado no encontrado." });
+        const updateMunicipality = await MunicipalityController.updateMunicipality(updates);
+        if (!updateMunicipality) {
+            res.status(404).json({ message: "Municipio no encontrado." });
             return;
         }
-        res.json(updatedState);
+        res.json(updateMunicipality);
     } catch (error) {
         if (error instanceof Error) {
             res.status(401).json({ message: error.message });
@@ -108,16 +111,16 @@ router.put(
 
 router.delete(
     "/:id",
-    requirePermission("delete_state"),
+    requirePermission("delete_municipality"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const id = Number(req.params.id);
         if (!id) {
-            res.status(400).json({ message: "ID de estado requerido." });
+            res.status(400).json({ message: "ID de municipio requerido." });
             return;
         }
 
-        await StateController.deleteState(id);
+        await MunicipalityController.deleteMunicipality(id);
         res.status(204).send()
     } catch (error) {
         if (error instanceof Error) {

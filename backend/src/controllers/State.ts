@@ -1,25 +1,88 @@
 import { State, Municipality } from "@/models";
+import { Op, OrderItem } from "sequelize";
+
+interface PaginationOptions {
+  page: number
+  pageSize: number
+}
+
+export const SortByOptions = ['name', 'creationDate', 'updatedOn']
+export const SortOrderOptions = ['ASC', 'DESC']
+
+export interface StateFilterOptions extends PaginationOptions {
+  name?: string
+  sortBy?: (typeof SortByOptions)[number]
+  sortOrder?: (typeof SortOrderOptions)[number]
+}
+
+interface PaginatedResult<T> {
+  data: T[]
+  total: number
+  totalPages: number
+  currentPage: number
+}
 
 // All States
-export const allStates = async (): Promise<State[]> => {
+export const allStates = async ({
+    page,
+    pageSize,
+    name,
+    sortBy,
+    sortOrder = 'ASC'
+}:StateFilterOptions): Promise<PaginatedResult<State>> => {
     try {
-        const allStates = await State.findAll({});
-
-        if (!allStates) {
-            throw new Error("No se encontraron estados.");
+        if (page < 1 || pageSize <1) {
+            return {data: [], total: 0, totalPages: 0, currentPage: page}
         }
 
-        return allStates;
+        const offset = (page - 1) * pageSize
+        const andConditions: any[]= []
+
+        // filter by name
+        if (name) {
+            andConditions.push({ name: {[Op.like]: '%${name%'} })
+        }
+
+        const where = andConditions.length ? {[Op.and]: andConditions}: undefined
+
+        let order: OrderItem[] | undefined = undefined
+        if (sortBy) {
+            const column = 
+            sortBy === 'creationDate'
+                ? 'creationDate'
+                :sortBy === 'updatedOn'
+                    ? 'updateOn'
+                    : 'name'
+            order = [[column, sortOrder]]
+        }
+
+        const data = await State.findAll({
+            where,
+            offset,
+            limit: pageSize,
+            order,
+            include: [Municipality]
+        });
+
+        const total = await State.count({ where })
+
+        return {
+            data,
+            total,
+            totalPages: Math.ceil(total / pageSize),
+            currentPage: page
+        };
     } catch (error) {
         throw new Error("Error al obtener los estados, intente nuevamente.");
     }
 }
 
 // Get State by ID
-export const searchStateById = async (id: number): Promise<State | null> => {
+export const getById = async (id: number): Promise<State | null> => {
     try {
         const state = await State.findOne({
             where: { id },
+            include: [Municipality]
         });
 
         if (!state) {
