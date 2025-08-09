@@ -7,21 +7,24 @@ import type { Role } from "@/models";
 const router = Router();
 
 router.get(
-    "/",
-    requirePermission("get_role"),
-    async (_, res: Response, next: NextFunction): Promise<void> => {
-        try {
-            const roles = await RoleController.getAll();
-            res.json(roles);
-        }catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({ message: error.message });
-            } else {
-                next(error);
-            }
-        }
+  '/',
+  requirePermission('get_role'),
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1
+      const pageSize = parseInt(req.query.pageSize as string, 10) || 10
+      const result = await RoleController.getAll({ page, pageSize })
+
+      res.json(result)
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ error: error.message })
+      } else {
+        next(error)
+      }
     }
-);
+  }
+)
 
 router.get(
     "/:id",

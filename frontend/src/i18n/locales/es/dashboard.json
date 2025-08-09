@@ -1,0 +1,22 @@
+{
+  "title": "Tablero",
+  "welcome": "Bienvenido, {{username}}!",
+  "switchToDark": "Cambiar a modo oscuro",
+  "switchToLight": "Cambiar a modo claro",
+  "logout": "Cerrar sesión",
+  "manageUsers": "Gestionar usuarios",
+  "manageUsersDesc": "Crear, editar y gestionar cuentas de usuario",
+  "manageRoles": "Gestionar roles",
+  "manageRolesDesc": "Configurar roles y permisos",
+  "manageDepartments": "Gestionar departamentos",
+  "manageDepartmentsDesc": "Organizar y gestionar departamentos",
+  "manageCategories": "Gestionar categorías",
+  "manageCategoriesDesc": "Crear y organizar categorías de artículos",
+  "manageItems": "Gestionar artículos",
+  "manageItemsDesc": "Rastrear y gestionar artículos de inventario",
+  "access": "Acceder",
+  "noSectionsAvailable": "No hay secciones de gestión disponibles",
+  "noPermissionsMessage": "No tienes permisos para gestionar ninguna sección. Por favor, contacta a tu administrador para obtener acceso.",
+  "yourPermissions": "Tus permisos",
+  "noRolesAssigned": "No hay roles asignados"
+}
