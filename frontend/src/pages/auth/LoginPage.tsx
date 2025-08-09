@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import type { AppDispatch, RootState } from '@/store';
-import { fetchUser,login } from '@/store/authSlice';
+import { fetchUser, login } from '@/store/slices/authSlice';
 
 const LoginPage: React.FC = () => {
   const { t } = useTranslation();

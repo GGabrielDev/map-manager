@@ -1,10 +1,10 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-import ProtectedRoute from './components/ProtectedRoute';
-import Dashboard from './pages/Dashboard';
-import LoginPage from './pages/LoginPage';
-import ManageRoles from './pages/ManageRoles';
-import ManageUsers from './pages/ManageUsers';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import ManageRoles from './pages/administrative/RolesPage';
+import ManageUsers from './pages/administrative/UsersPage';
+import LoginPage from './pages/auth/LoginPage';
+import Dashboard from './pages/dashboard/MainDashboard';
 
 const App: React.FC = () => {
   return (
@@ -34,7 +34,6 @@ const App: React.FC = () => {
           </ProtectedRoute>
         }
       />
-      {/* Add additional routes for Departments, Categories as needed later */}
       <Route path="*" element={<Navigate to="/dashboard" />} />
     </Routes>
   );

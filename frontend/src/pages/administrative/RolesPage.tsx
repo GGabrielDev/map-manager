@@ -9,92 +9,94 @@ import {
   Pagination, 
   Typography} from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import UserFormDialog from '@/components/user/UserFormDialog';
-import UsersTable from '@/components/user/UsersTable';
-import { usePermissions, useUserManagement } from '@/hooks';
-import type { User } from '@/types';
+import RoleFormDialog from '@/components/forms/RoleForm';
+import RolesTable from '@/components/tables/RolesTable';
+import { usePermissions, useRoleManagement } from '@/hooks';
+import type { Role } from '@/types'
 
-const ManageUsers: React.FC = () => {
+const ManageRoles: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
   
   const {
-    canCreateUser,
-    canEditUser,
-    canDeleteUser,
-    canManageUsers,
-    canGetRole
+    canCreateRole,
+    canEditRole,
+    canDeleteRole,
+    canManageRoles,
+    canGetPermission
   } = usePermissions();
 
   const {
-    users,
+    roles,
     loading,
     error,
     page,
     totalPages,
     setPage,
     setError,
-    fetchUsers,
-    fetchUserById,
-    deleteUser,
-  } = useUserManagement();
+    fetchRoles,
+    fetchRoleById,
+    deleteRole,
+  } = useRoleManagement();
 
-  // If user doesn't have basic user viewing permission, redirect
+  // If user doesn't have basic role viewing permission, redirect
   useEffect(() => {
-    if (!canManageUsers) {
+    if (!canManageRoles) {
       navigate('/dashboard');
       return;
     }
-  }, [canManageUsers, navigate]);
+  }, [canManageRoles, navigate]);
 
   useEffect(() => {
-    if (canManageUsers) {
-      fetchUsers({ page });
+    if (canManageRoles) {
+      fetchRoles(page);
     }
-  }, [page, fetchUsers, canManageUsers]);
+  }, [page, fetchRoles, canManageRoles]);
 
-  const handleDelete = async (userId: number) => {
-    if (!canDeleteUser) return;
+  const handleDelete = async (roleId: number) => {
+    if (!canDeleteRole) return;
     
-    const success = await deleteUser(userId);
+    const success = await deleteRole(roleId);
     if (success) {
       // Refresh the list
-      fetchUsers({ page });
+      fetchRoles(page);
     }
   };
 
-  const handleEdit = async (user: User) => {
-    if (!canEditUser) return;
+  const handleEdit = async (role: Role) => {
+    if (!canEditRole) return;
     
-    const fullUser = await fetchUserById(user.id);
-    if (fullUser) {
-      setEditingUser(fullUser);
+    const fullRole = await fetchRoleById(role.id);
+    if (fullRole) {
+      setEditingRole(fullRole);
       setShowForm(true);
     }
   };
 
   const handleCreate = () => {
-    if (!canCreateUser) return;
-    setEditingUser(null);
+    if (!canCreateRole) return;
+    setEditingRole(null);
     setShowForm(true);
   };
 
   const handleFormSuccess = () => {
     setShowForm(false);
-    setEditingUser(null);
-    fetchUsers({ page });
+    setEditingRole(null);
+    fetchRoles(page);
   };
 
   const handleCloseForm = () => {
     setShowForm(false);
-    setEditingUser(null);
+    setEditingRole(null);
   };
 
   // Don't render anything if user doesn't have basic permissions
-  if (!canManageUsers) {
+  if (!canManageRoles) {
     return null;
   }
 
@@ -104,10 +106,10 @@ const ManageUsers: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box>
           <Typography variant="h4" component="h1" gutterBottom>
-            Manage Users
+            {t('roles:page.title')}
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            Create and manage user accounts
+            {t('roles:page.subtitle')}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -115,15 +117,15 @@ const ManageUsers: React.FC = () => {
             variant="outlined"
             onClick={() => navigate('/dashboard')}
           >
-            Back to Dashboard
+            {t('backToDashboard')}
           </Button>
           {/* Only show Create button if user has create permission */}
-          {canCreateUser && (
+          {canCreateRole && (
             <Button
               variant="contained"
               onClick={handleCreate}
             >
-              Create New User
+              {t('roles:page.createNewRole')}
             </Button>
           )}
         </Box>
@@ -136,30 +138,30 @@ const ManageUsers: React.FC = () => {
         </Alert>
       )}
 
-      {/* Users Content */}
+      {/* Roles Content */}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
           <CircularProgress />
         </Box>
-      ) : users.length === 0 ? (
+      ) : roles.length === 0 ? (
         <Card>
           <CardContent sx={{ textAlign: 'center', p: 4 }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
-              No Users Found
+              {t('roles:page.noRolesFound')}
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              {canCreateUser 
-                ? 'Get started by creating your first user.' 
-                : 'No users are currently configured.'
+              {canCreateRole 
+                ? t('roles:page.getStarted')
+                : t('roles:page.noRolesConfigured')
               }
             </Typography>
           </CardContent>
         </Card>
       ) : (
-        <UsersTable
-          users={users}
-          canEditUser={canEditUser}
-          canDeleteUser={canDeleteUser}
+        <RolesTable
+          roles={roles}
+          canEditRole={canEditRole}
+          canDeleteRole={canDeleteRole}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
@@ -177,20 +179,20 @@ const ManageUsers: React.FC = () => {
         </Box>
       )}
 
-      {/* User Form Dialog */}
-      {showForm && (canCreateUser || canEditUser) && (
-        <UserFormDialog
+      {/* Role Form Dialog */}
+      {showForm && (canCreateRole || canEditRole) && (
+        <RoleFormDialog
           open={showForm}
-          user={editingUser}
+          role={editingRole}
           onClose={handleCloseForm}
           onSuccess={handleFormSuccess}
-          canEdit={canEditUser}
-          canCreate={canCreateUser}
-          canGetRole={canGetRole}
+          canEdit={canEditRole}
+          canCreate={canCreateRole}
+          canGetPermission={canGetPermission}
         />
       )}
     </Container>
   );
 };
 
-export default ManageUsers;
+export default ManageRoles;

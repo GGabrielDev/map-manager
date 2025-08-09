@@ -1,26 +1,27 @@
 import { Box, Button, Card, CardContent, Container, IconButton, Tooltip, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import LanguageSelector from '@/components/LanguageSelector';
 import { usePermissions } from '@/hooks';
 import type { AppDispatch, RootState } from '@/store';
-import { logout } from '@/store/authSlice';
-import { toggleTheme } from '@/store/themeSlice';
+import { logout } from '@/store/slices/authSlice';
+import { toggleTheme } from '@/store/slices/uiSlice';
 
-const Dashboard: React.FC = () => {
+const MainDashboard: React.FC = () => {
   const { t } = useTranslation(); // Initialize translation hook
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
-  const themeMode = useSelector((state: RootState) => state.theme.mode);
+  const themeMode = useSelector((state: RootState) => state.ui.mode);
 
   console.log(user); // Log user data for debugging
 
   const {
     canManageUsers,
     canManageRoles,
+    canManageStates,
   } = usePermissions();
 
   const handleLogout = () => {
@@ -53,6 +54,12 @@ const Dashboard: React.FC = () => {
       description: t('dashboard:manageRolesDesc'), 
       route: '/roles',
       color: 'secondary' as const,
+    }] : []),
+    ...(canManageStates ? [{
+      title: 'Manage States', 
+      description: 'Configure states and their municipalities', 
+      route: '/states',
+      color: 'success' as const,
     }] : []),
   ];
 
@@ -172,4 +179,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default MainDashboard;
