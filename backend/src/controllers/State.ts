@@ -40,7 +40,7 @@ export const allStates = async ({
 
         // filter by name
         if (name) {
-            andConditions.push({ name: {[Op.like]: '%${name%'} })
+            andConditions.push({ name: {[Op.like]: `%${name}%`} })
         }
 
         const where = andConditions.length ? {[Op.and]: andConditions}: undefined
