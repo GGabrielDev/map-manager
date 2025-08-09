@@ -94,6 +94,7 @@ router.put(
             return;
         }
         if (req.body.name !== undefined) updates.name = req.body.name;
+        if (req.body.stateId !== undefined) updates.stateId = req.body.stateId
 
         const updateMunicipality = await MunicipalityController.updateMunicipality(updates);
         if (!updateMunicipality) {

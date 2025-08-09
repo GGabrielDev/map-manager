@@ -84,3 +84,57 @@ router.post(
         }
     }
 )
+
+router.put(
+    "/:id",
+    requirePermission("edit_parish"),
+    async(req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const updates: Partial<Parish> = {}
+            updates.id= Number(req.params.id)
+            if (!updates.id) {
+                res.status(400).json({ message: "ID de la parroquia requerido." })
+                return;
+            }
+            if (req.body.name !== undefined) updates.name = req.body.name;
+            if (req.body.municipalityId !== undefined) updates.municipalityId = req.body.municipalityId
+
+            const updateParish = await ParishController.updateParish(updates)
+            if (!updateParish) {
+                res.status(404).json({ message: "Parroquia no encontrada." })
+                return;
+            }
+            res.json(updateParish)
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(401).json({message: error.message})
+            } else {
+                next(error)
+            }
+        }
+    }
+)
+
+router.delete(
+    "/:id",
+    requirePermission("delete_parish"),
+    async(req: Request, res: Response, next: NextFunction): Promise<void> =>{
+        try {
+            const id = Number(req.params.id)
+            if (!id) {
+                res.status(400).json({ message: "ID de parroquia requerido" })
+                return;
+            }
+
+            await ParishController.deleteParish(id);
+            res.status(204).send()
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(401).json({ message: error.message })
+                return;
+            } else {
+                next(error)
+            }
+        }
+    }
+)

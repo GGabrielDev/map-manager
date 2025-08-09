@@ -1,4 +1,4 @@
-import { Parish } from "@/models";
+import { Parish, Municipality } from "@/models";
 import { Op, OrderItem } from "sequelize";
 
 interface PaginationOpstions{
@@ -116,6 +116,10 @@ export const createParish = async (name: string, municipalityId: number): Promis
 //update parish
 export const updateParish = async(updates: Partial<Parish>): Promise<Parish | null> =>{
     try {
+        const existMunicipality = await Municipality.findOne({where: {id: updates.municipalityId}})
+        if (!existMunicipality) {
+            throw new Error("El ID del municipio no existe.")
+        }
         const updateToParish = await Parish.findOne({where:{id: updates.id}})
         if (!updateToParish) {
             throw new Error("Parroquia no encontrada");
