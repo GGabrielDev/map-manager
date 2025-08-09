@@ -112,3 +112,19 @@ export const createParish = async (name: string, municipalityId: number): Promis
         throw new Error("Error al crear la parroquia, intente nuevamente.")
     }
 }
+
+//update parish
+export const updateParish = async(updates: Partial<Parish>): Promise<Parish | null> =>{
+    try {
+        const updateToParish = await Parish.findOne({where:{id: updates.id}})
+        if (!updateToParish) {
+            throw new Error("Parroquia no encontrada");
+        }
+
+        await updateToParish.update(updates)
+
+        return updateToParish;
+    } catch (error) {
+        throw new Error("Error al actualizar la parroquia.")
+    }
+}
