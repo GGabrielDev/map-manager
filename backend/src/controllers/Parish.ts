@@ -77,7 +77,6 @@ export const allParish = async({
 }
 
 // git parish by ID
-
 export const getById = async (id: number):Promise<Parish | null> =>{
     try {
         const parish = await Parish.findOne({
@@ -92,4 +91,24 @@ export const getById = async (id: number):Promise<Parish | null> =>{
     } catch (error) {
         throw new Error("Error al obtener parroquia, intente nuevamente.")
     }    
+}
+
+//create parish
+export const createParish = async (name: string, municipalityId: number): Promise<Parish> =>{
+    try {
+        const existParish = await Parish.findOne({where: {name, municipalityId}})
+
+        if (existParish) {
+            throw new Error("La parroquia ya existe.")
+        }
+
+        const createParish = await Parish.create({
+            name,
+            municipalityId
+        })
+
+        return createParish;
+    } catch (error) {
+        throw new Error("Error al crear la parroquia, intente nuevamente.")
+    }
 }
