@@ -1,9 +1,19 @@
-import { Permission, Role, User } from '@/models'
+import { 
+  Permission,
+  Role,
+  User,
+  State,
+  Municipality,
+  Parish
+} from '@/models'
 
 const entities = [
   'Permission',
   'Role',
   'User',
+  'State',
+  'Municipality',
+  'Parish'
 ]
 
 const actions = ['create', 'get', 'edit', 'delete']

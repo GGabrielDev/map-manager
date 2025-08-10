@@ -1,4 +1,4 @@
-import { Role, Permission } from "@/models/";
+import { Role, Permission, User } from "@/models/";
 
 interface PaginationOptions {
   page: number
@@ -108,6 +108,11 @@ export const deleteRole = async (id: number): Promise<boolean> => {
         const roleToDelete = await Role.findByPk(id);
         if (!roleToDelete) {
             return false;
+        }
+
+        const countUsers = await User.count({ where: { roleId: id } });
+        if (countUsers > 0) {
+            throw new Error("No se puede eliminar el rol, ya que está en uso.");
         }
 
         await Role.destroy({
