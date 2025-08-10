@@ -1,0 +1,34 @@
+{
+  "page": {
+    "title": "Manage States",
+    "subtitle": "Configure states and their municipalities",
+    "createNewState": "Create New State",
+    "noStatesFound": "No States Found",
+    "getStarted": "Get started by creating your first state.",
+    "noStatesConfigured": "No states are currently configured."
+  },
+  "components": {
+    "table": {
+      "stateName": "State Name",
+      "municipalitiesCount": "Municipalities",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "form": {
+      "editState": "Edit State",
+      "createNewState": "Create New State",
+      "stateName": "State Name",
+      "updateState": "Update State",
+      "createState": "Create State",
+      "missingStateName": "State name is required.",
+      "failedToCreateState": "Failed to create state.",
+      "failedToUpdateState": "Failed to update state.",
+      "failedToDeleteState": "Failed to delete state.",
+      "accessDenied": "Access Denied",
+      "accessDeniedState": "You do not have permission to {{action}} states.",
+      "confirmDelete": "Are you sure you want to delete this state?",
+      "deleteWarning": "This action cannot be undone. The state and all its associated data will be permanently removed.",
+      "cannotDeleteWithMunicipalities": "Cannot delete state with associated municipalities."
+    }
+  }
+}

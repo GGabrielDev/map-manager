@@ -5,6 +5,7 @@ import ManageRoles from './pages/administrative/RolesPage';
 import ManageUsers from './pages/administrative/UsersPage';
 import LoginPage from './pages/auth/LoginPage';
 import Dashboard from './pages/dashboard/MainDashboard';
+import ManageStates from './pages/geographical/StatesPage';
 
 const App: React.FC = () => {
   return (
@@ -31,6 +32,14 @@ const App: React.FC = () => {
         element={
           <ProtectedRoute>
             <ManageUsers />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/states" 
+        element={
+          <ProtectedRoute>
+            <ManageStates />
           </ProtectedRoute>
         }
       />

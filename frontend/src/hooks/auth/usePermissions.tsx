@@ -36,9 +36,16 @@ export const usePermissions = () => {
   // Permission-specific permission checks
   const canGetPermission = hasPermission('get_permission');
 
+  // State-specific permission checks
+  const canCreateState = hasPermission('create_state');
+  const canGetState = hasPermission('get_state');
+  const canEditState = hasPermission('edit_state');
+  const canDeleteState = hasPermission('delete_state');
+
   // Composite permission checks
   const canManageUsers = canCreateUser || canGetUser || canEditUser || canDeleteUser;
   const canManageRoles = canCreateRole || canGetRole || canEditRole || canDeleteRole;
+  const canManageStates = canCreateState || canGetState || canEditState || canDeleteState;
 
   return {
     hasPermission,
@@ -56,6 +63,12 @@ export const usePermissions = () => {
     canEditRole,
     canDeleteRole,
     canManageRoles,
+    // State permissions
+    canCreateState,
+    canGetState,
+    canEditState,
+    canDeleteState,
+    canManageStates,
     // Permission permissions
     canGetPermission,
   };
