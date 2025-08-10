@@ -82,6 +82,7 @@ export const getById = async (id: number): Promise<Municipality | null> => {
     try {
         const municipality = await Municipality.findOne({
             where: { id },
+            include: [Parish]
         });
 
         if (!municipality) {
