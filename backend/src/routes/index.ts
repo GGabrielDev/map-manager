@@ -1,11 +1,11 @@
 import express from 'express'
 
-import UserRouter from '@/routes/User'
-import RoleRouter from '@/routes/Role'
-import PermissionRouter from '@/routes/Permission'
+import UserRouter from '@/routes/user'
+import RoleRouter from '@/routes/role'
+import PermissionRouter from '@/routes/permission'
 import AuthRouter from '@/routes/auth'
-import StateRouter from '@/routes/State'
-import MunicipalityRouter from '@/routes/Municipality'
+import StateRouter from '@/routes/state'
+import MunicipalityRouter from '@/routes/municipality'
 import { authenticateToken } from '@/middleware/authentication'
 
 // Initialize express app
