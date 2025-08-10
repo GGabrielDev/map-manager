@@ -23,7 +23,7 @@ mainRouter.use(authenticateToken)
 mainRouter.use('/users', UserRouter)
 mainRouter.use('/permissions', PermissionRouter)
 mainRouter.use('/roles', RoleRouter)
-mainRouter.use('/state', StateRouter)
-mainRouter.use('/municipality', MunicipalityRouter)
+mainRouter.use('/states', StateRouter)
+mainRouter.use('/municipalities', MunicipalityRouter)
 
 export default mainRouter
