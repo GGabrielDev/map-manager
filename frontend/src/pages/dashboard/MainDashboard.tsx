@@ -56,8 +56,8 @@ const MainDashboard: React.FC = () => {
       color: 'secondary' as const,
     }] : []),
     ...(canManageStates ? [{
-      title: 'Manage States', 
-      description: 'Configure states and their municipalities', 
+      title: t('dashboard:manageStates'),
+      description: t('dashboard:manageStatesDesc'),
       route: '/states',
       color: 'success' as const,
     }] : []),

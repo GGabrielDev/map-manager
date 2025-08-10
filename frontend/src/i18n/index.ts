@@ -6,13 +6,13 @@ import enAuth from './locales/en/auth.json';
 import enCommon from './locales/en/common.json';
 import enDashboard from './locales/en/dashboard.json';
 import enRoles from './locales/en/roles.json';
-import enState from './locales/en/state.json';
+import enStates from './locales/en/states.json';
 import enUsers from './locales/en/users.json';
 import esAuth from './locales/es/auth.json';
 import esCommon from './locales/es/common.json';
 import esDashboard from './locales/es/dashboard.json';
 import esRoles from './locales/es/roles.json';
-import esState from './locales/es/state.json';
+import esStates from './locales/es/states.json';
 import esUsers from './locales/es/users.json';
 
 i18n
@@ -25,7 +25,7 @@ i18n
         common: enCommon,
         dashboard: enDashboard,
         roles: enRoles,
-        state: enState,
+        states: enStates,
         users: enUsers,
       },
       es: {
@@ -33,7 +33,7 @@ i18n
         common: esCommon,
         dashboard: esDashboard,
         roles: esRoles,
-        state: esState,
+        states: esStates,
         users: esUsers,
       },
     },
