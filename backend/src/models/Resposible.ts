@@ -5,7 +5,6 @@ import {
     UpdatedAt,
     DeletedAt, 
     PrimaryKey, 
-    Unique,
     Column,
     Table,
     Model,
@@ -55,25 +54,7 @@ export default class Resposible extends Model{
     @Column
     organismId?: string
 
-    /* TODO: aqui estan los campos de ID para las tablas que aun no estan hechas
-
-    @ForeignKey(()=> Quadrant)
-    @Column
-    quadrantId?: string
-    
-    @ForeignKey(()=> Circuit)
-    @Column
-    circuitId?: string
-    
-    @ForeignKey(()=> Commune)
-    @Column
-    communeId?: string
-    
-    @ForeignKey(()=> Council)
-    @Column
-    councilId?: string
-
-    */
+    //TODO: Faltan las relaciones con las tablas cuadrantes, circuito comunitario, comuna y consejo comunal ya que no fueron creados aun
 
     @CreatedAt
     createdAt!: Date

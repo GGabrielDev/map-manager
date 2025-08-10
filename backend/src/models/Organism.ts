@@ -13,10 +13,7 @@ import {
     HasMany
 } from "sequelize-typescript";
 
-import { 
-    Responsible,
-    //PointOfInterest
- } from ".";
+import { Responsible } from ".";
 
 @Table({tableName: 'Organism'})
 export default class Organism extends Model{
@@ -38,13 +35,6 @@ export default class Organism extends Model{
 
     @DeletedAt
     deletedAt?: Date
-
-    /*TODO aqui esta la relacion de 1 a muchos de organismos con puntos de interes, pero como he hecho la tabla aun esta comentada para evitar los errores
-
-    @HasMany(()=> PointOfInterest)
-    PointsOfInterest: PointOfInterest[]
-
-    */
 
     @HasMany(()=> Responsible)
     Responsibles: Responsible[]
