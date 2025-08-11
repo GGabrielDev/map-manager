@@ -13,7 +13,7 @@ import {
     ForeignKey
 } from "sequelize-typescript";
 
-import { Organism } from ".";
+import { Organism, Quadrant } from ".";
 
 @Table({tableName: 'Resposible'})
 export default class Resposible extends Model{
@@ -50,11 +50,15 @@ export default class Resposible extends Model{
     @Column
     position!: string
 
+    //TODO: Faltan las relaciones con las tablas cuadrantes, circuito comunitario, comuna y consejo comunal ya que no fueron creados aun
+    
     @ForeignKey(()=> Organism)
     @Column
     organismId?: number
 
-    //TODO: Faltan las relaciones con las tablas cuadrantes, circuito comunitario, comuna y consejo comunal ya que no fueron creados aun
+    @ForeignKey(()=> Quadrant)
+    @Column
+    quadrantId?: number
 
     @CreatedAt
     createdAt!: Date
@@ -67,4 +71,7 @@ export default class Resposible extends Model{
 
     @BelongsTo(()=> Organism)
     organism?: Organism
+
+    @BelongsTo(()=> Quadrant)
+    quadrant?: Quadrant
 }
