@@ -1,8 +1,10 @@
 import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import type { PaginatedStatesResponse } from '@/services/api/states';
+import { statesApi } from '@/services/api/states';
 import type { RootState } from '@/store';
-import type { PaginatedResponse, State, StateFilterOptions } from '@/types';
+import type { State, StateFilterOptions } from '@/types/entities';
 
 export const useStateManagement = () => {
   const { token } = useSelector((state: RootState) => state.auth);
@@ -14,52 +16,32 @@ export const useStateManagement = () => {
 
   // Fetch states with useCallback to prevent unnecessary re-renders
   const fetchStates = useCallback(async (currentPage = 1, filters?: Partial<StateFilterOptions>) => {
+    if (!token) return;
+
     setLoading(true);
     setError('');
     
-    const params = new URLSearchParams({
-      page: currentPage.toString(),
-      pageSize: '10',
-    });
-
-    if (filters?.name) {
-      params.append('name', filters.name);
-    }
-    if (filters?.sortBy) {
-      params.append('sortBy', filters.sortBy);
-    }
-    if (filters?.sortOrder) {
-      params.append('sortOrder', filters.sortOrder);
-    }
+    const options: StateFilterOptions = {
+      page: currentPage,
+      pageSize: 10,
+      ...filters
+    };
     
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/states?${params.toString()}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response: PaginatedStatesResponse = await statesApi.getStates(options, token);
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch users');
-      }
-      const data: PaginatedResponse<State> = await response.json();
-      
-      // Backend returns { data, total, totalPages, currentPage }
-      setStates(data.data || []);
-      setTotalPages(data.totalPages || 1);
+      setStates(response.data || []);
+      setTotalPages(response.totalPages || 1);
+      setPage(response.currentPage);
       
       // If current page is greater than total pages, reset to page 1
-      if (currentPage > data.totalPages && data.totalPages > 0) {
+      if (currentPage > response.totalPages && response.totalPages > 0) {
         setPage(1);
       }
     } catch (err) {
-      if (err instanceof Error)
-        setError(err.message);
+      console.error('Error fetching states:', err);
+      setError('Failed to fetch states');
+      setStates([]);
     } finally {
       setLoading(false);
     }
@@ -67,111 +49,72 @@ export const useStateManagement = () => {
 
   // Fetch individual state
   const fetchStateById = useCallback(async (stateId: number): Promise<State | null> => {
+    if (!token) return null;
+
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/states/${stateId}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch state details');
-      }
-      
-      return data;
+      const state = await statesApi.getStateById(stateId, token);
+      return state;
     } catch (err) {
-      if (err instanceof Error)
-        setError(err.message);
+      console.error('Error fetching state:', err);
+      setError('Failed to fetch state');
       return null;
     }
   }, [token]);
 
   // Create state
   const createState = useCallback(async (name: string): Promise<boolean> => {
+    if (!token) return false;
+
+    setLoading(true);
+    setError('');
+
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/states`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ name }),
-        }
-      );
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to create state');
-      }
-
+      await statesApi.createState({ name }, token);
       return true;
     } catch (err) {
-      if (err instanceof Error)
-        setError(err.message);
+      console.error('Error creating state:', err);
+      setError('Failed to create state');
       return false;
+    } finally {
+      setLoading(false);
     }
   }, [token]);
 
   // Update state
   const updateState = useCallback(async (stateId: number, name: string): Promise<boolean> => {
+    if (!token) return false;
+
+    setLoading(true);
+    setError('');
+
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/states/${stateId}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ name }),
-        }
-      );
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to update state');
-      }
-
+      await statesApi.updateState(stateId, { name }, token);
       return true;
     } catch (err) {
-      if (err instanceof Error)
-        setError(err.message);
+      console.error('Error updating state:', err);
+      setError('Failed to update state');
       return false;
+    } finally {
+      setLoading(false);
     }
   }, [token]);
 
   // Delete state
   const deleteState = useCallback(async (stateId: number): Promise<boolean> => {
+    if (!token) return false;
+
+    setLoading(true);
+    setError('');
+
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/states/${stateId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to delete state');
-      }
-
+      await statesApi.deleteState(stateId, token);
       return true;
     } catch (err) {
-      if (err instanceof Error)
-        setError(err.message);
+      console.error('Error deleting state:', err);
+      setError('Failed to delete state');
       return false;
+    } finally {
+      setLoading(false);
     }
   }, [token]);
 
