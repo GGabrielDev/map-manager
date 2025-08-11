@@ -1,5 +1,5 @@
 import { Op, OrderItem } from "sequelize";
-import { Municipality, Parish } from "@/models";
+import { Municipality, Parish, State } from "@/models";
 
 interface PaginationOptions {
   page: number
