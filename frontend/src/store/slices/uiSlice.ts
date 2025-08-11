@@ -1,8 +1,8 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
-import type { ThemeMode } from '@/theme';
-import { getCachedThemeMode, setCachedThemeMode } from '@/theme';
+import type { ThemeMode } from '@/styles/material-ui-theme';
+import { getCachedThemeMode, setCachedThemeMode } from '@/styles/material-ui-theme';
 
 interface ThemeState {
   mode: ThemeMode;

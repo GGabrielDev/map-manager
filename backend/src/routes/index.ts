@@ -1,14 +1,15 @@
 import express from 'express'
 
-import UserRouter from '@/routes/User'
-import RoleRouter from '@/routes/Role'
-import PermissionRouter from '@/routes/Permission'
+import UserRouter from '@/routes/user'
+import RoleRouter from '@/routes/role'
+import PermissionRouter from '@/routes/permission'
 import AuthRouter from '@/routes/auth'
-import StateRouter from '@/routes/State'
-import MunicipalityRouter from '@/routes/Municipality'
-import ParishRouter from '@/routes/Parish'
-import OrganismRouter from '@/routes/Organism'
-import ResponsibleRouter from '@/routes/Responsible'
+import ParishRouter from '@/routes/parish'
+import OrganismRouter from '@/routes/organism'
+import ResponsibleRouter from '@/routes/responsible'
+
+import StateRouter from '@/routes/state'
+import MunicipalityRouter from '@/routes/municipality'
 
 import { authenticateToken } from '@/middleware/authentication'
 
@@ -27,10 +28,11 @@ mainRouter.use(authenticateToken)
 mainRouter.use('/users', UserRouter)
 mainRouter.use('/permissions', PermissionRouter)
 mainRouter.use('/roles', RoleRouter)
-mainRouter.use('/state', StateRouter)
-mainRouter.use('/municipality', MunicipalityRouter)
-mainRouter.use('/parish', ParishRouter)
-mainRouter.use('/organism', OrganismRouter)
-mainRouter.use('/responsible', ResponsibleRouter)
+
+mainRouter.use('/states', StateRouter)
+mainRouter.use('/municipalities', MunicipalityRouter)
+mainRouter.use('/parishes', ParishRouter)
+mainRouter.use('/organisms', OrganismRouter)
+mainRouter.use('/responsibles', ResponsibleRouter)
 
 export default mainRouter
