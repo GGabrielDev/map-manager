@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 
 import type { RootState } from '@/store';
-import type { Permission, Role } from '@/types'
+import type { Permission, Role } from '@/types';
 
 export const usePermissions = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -42,10 +42,17 @@ export const usePermissions = () => {
   const canEditState = hasPermission('edit_state');
   const canDeleteState = hasPermission('delete_state');
 
+  // Municipality-specific permission checks
+  const canCreateMunicipality = hasPermission('create_municipality');
+  const canGetMunicipality = hasPermission('get_municipality');
+  const canEditMunicipality = hasPermission('edit_municipality');
+  const canDeleteMunicipality = hasPermission('delete_municipality');
+
   // Composite permission checks
   const canManageUsers = canCreateUser || canGetUser || canEditUser || canDeleteUser;
   const canManageRoles = canCreateRole || canGetRole || canEditRole || canDeleteRole;
   const canManageStates = canCreateState || canGetState || canEditState || canDeleteState;
+  const canManageMunicipalities = canCreateMunicipality || canGetMunicipality || canEditMunicipality || canDeleteMunicipality;
 
   return {
     hasPermission,
@@ -69,6 +76,12 @@ export const usePermissions = () => {
     canEditState,
     canDeleteState,
     canManageStates,
+    // Municipality permissions
+    canCreateMunicipality,
+    canGetMunicipality,
+    canEditMunicipality,
+    canDeleteMunicipality,
+    canManageMunicipalities,
     // Permission permissions
     canGetPermission,
   };
