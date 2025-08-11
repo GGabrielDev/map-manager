@@ -1,8 +1,5 @@
 import { Op, OrderItem } from "sequelize";
-import { 
-    Organism, 
-    Responsible,
- } from "@/models";
+import { Organism, Responsible } from "@/models";
 
 interface PaginationOptions {
   page: number
@@ -25,8 +22,8 @@ interface PaginatedResult<T> {
   currentPage: number
 }
 
-// All Municipalities
-export const allMunicipalities = async ({
+// All Organism
+export const allOrganism = async ({
     page,
     pageSize,
     name,

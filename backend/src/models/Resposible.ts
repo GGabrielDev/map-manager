@@ -38,11 +38,11 @@ export default class Resposible extends Model{
     @Column
     phone!: string
 
-    @AllowNull(false)
+    @AllowNull(true)
     @Column
     phoneBackup?: string
 
-    @AllowNull(false)
+    @AllowNull(true)
     @Column
     email?: string
 
@@ -52,7 +52,7 @@ export default class Resposible extends Model{
 
     @ForeignKey(()=> Organism)
     @Column
-    organismId?: string
+    organismId?: number
 
     //TODO: Faltan las relaciones con las tablas cuadrantes, circuito comunitario, comuna y consejo comunal ya que no fueron creados aun
 
