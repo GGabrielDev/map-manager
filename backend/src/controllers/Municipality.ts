@@ -40,7 +40,7 @@ export const allMunicipalities = async ({
 
         // filter by name
         if (name) {
-            andConditions.push({ name: {[Op.like]: '%${name%'} })
+            andConditions.push({ name: {[Op.like]: `%${name}%`} })
         }
 
         const where = andConditions.length ? {[Op.and]: andConditions}: undefined
@@ -137,6 +137,11 @@ export const createMunicipality = async (name: string, stateId: number): Promise
 // Update Municipality
 export const updateMunicipality = async (updates: Partial<Municipality>): Promise<Municipality | null> => {
     try {
+        const existState = await State.findOne({where: {id: updates.stateId}})
+        if (!existState) {
+            throw new Error("El ID del estado no existe")
+        }
+
         const updateToMunicipality = await Municipality.findOne({ where: { id: updates.id } });
 
         if (!updateToMunicipality) {
