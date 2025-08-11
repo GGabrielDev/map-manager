@@ -1,7 +1,8 @@
+import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import {
   Box,
-  Button,
   Chip,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -9,7 +10,10 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography} from '@mui/material';
+  Tooltip,
+  Typography
+} from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import type { UsersTableProps } from '@/types';
 
@@ -20,6 +24,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
   onEdit,
   onDelete
 }) => {
+  const { t } = useTranslation();
   const handleDelete = (userId: number) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       onDelete(userId);
@@ -72,25 +77,27 @@ const UsersTable: React.FC<UsersTableProps> = ({
                   <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                     {/* Only show Edit button if user has edit permission */}
                     {canEditUser && (
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => onEdit(user)}
-                      >
-                        Edit
-                      </Button>
+                      <Tooltip title={t('common:edit')}>
+                        <IconButton
+                          size="small"
+                          onClick={() => onEdit(user)}
+                          color="primary"
+                        > 
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     )}
                     {/* Only show Delete button if user has delete permission */}
                     {canDeleteUser && (
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="error"
-                        onClick={() => handleDelete(user.id)}
-                      >
-                        Delete
-                      </Button>
+                      <Tooltip title={t('common:delete')}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDelete(user.id)}
+                          color="error"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     )}
                   </Box>
                 </TableCell>
