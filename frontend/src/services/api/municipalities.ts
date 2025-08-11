@@ -21,7 +21,7 @@ export const municipalitiesApi = {
     if (options.sortBy) params.append('sortBy', options.sortBy);
     if (options.sortOrder) params.append('sortOrder', options.sortOrder);
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/municipalities?${params}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/municipalities?${params}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ export const municipalitiesApi = {
 
   // Get municipality by ID
   getMunicipalityById: async (id: number, token: string): Promise<Municipality> => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/municipalities/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/municipalities/${id}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ export const municipalitiesApi = {
     municipalityData: { name: string; stateId: number },
     token: string
   ): Promise<Municipality> => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/municipalities`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/municipalities`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -79,7 +79,7 @@ export const municipalitiesApi = {
     municipalityData: { name: string },
     token: string
   ): Promise<Municipality> => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/municipalities/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/municipalities/${id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -98,7 +98,7 @@ export const municipalitiesApi = {
 
   // Delete municipality
   deleteMunicipality: async (id: number, token: string): Promise<void> => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/municipalities/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/municipalities/${id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,

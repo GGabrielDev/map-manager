@@ -16,12 +16,11 @@ const MainDashboard: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const themeMode = useSelector((state: RootState) => state.ui.mode);
 
-  console.log(user); // Log user data for debugging
-
   const {
     canManageUsers,
     canManageRoles,
     canManageStates,
+    canManageMunicipalities,
   } = usePermissions();
 
   const handleLogout = () => {
@@ -60,6 +59,12 @@ const MainDashboard: React.FC = () => {
       description: t('dashboard:manageStatesDesc'),
       route: '/states',
       color: 'success' as const,
+    }] : []),
+    ...(canManageMunicipalities ? [{
+      title: t('dashboard:manageMunicipalities'),
+      description: t('dashboard:manageMunicipalitiesDesc'),
+      route: '/municipalities',
+      color: 'info' as const,
     }] : []),
   ];
 

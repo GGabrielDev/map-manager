@@ -10,6 +10,8 @@
   "manageRolesDesc": "Configure roles and permissions",
   "manageStates": "Manage States",
   "manageStatesDesc": "Create and manage States for maps and data",
+  "manageMunicipalities": "Manage Municipalities",
+  "manageMunicipalitiesDesc": "Create and manage Municipalities within States",
   "access": "Access",
   "noSectionsAvailable": "No Management Sections Available",
   "noPermissionsMessage": "You don't have permissions to manage any sections. Please contact your administrator for access.",
