@@ -21,6 +21,7 @@
       "name": "Nombre del Municipio",
       "state": "Estado",
       "selectState": "Seleccionar un Estado",
+      "stateCannotBeChanged": "El estado no se puede cambiar después de la creación",
       "updateMunicipality": "Actualizar Municipio",
       "createMunicipality": "Crear Municipio",
       "missingName": "El nombre del municipio es obligatorio.",

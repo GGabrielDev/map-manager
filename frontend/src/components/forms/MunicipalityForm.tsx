@@ -1,5 +1,6 @@
 import { 
   Alert,
+  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -59,7 +60,7 @@ const MunicipalityFormDialog: React.FC<MunicipalityFormDialogProps> = ({
     
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/states?page=1&pageSize=100`,
+        `${import.meta.env.VITE_API_URL}/states?page=1&pageSize=100`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -104,7 +105,8 @@ const MunicipalityFormDialog: React.FC<MunicipalityFormDialogProps> = ({
       return;
     }
 
-    if (!formData.stateId) {
+    // Only require stateId for new municipalities
+    if (!municipality && !formData.stateId) {
       setError(t('municipalities:components.form.missingState'));
       return;
     }
@@ -114,8 +116,8 @@ const MunicipalityFormDialog: React.FC<MunicipalityFormDialogProps> = ({
 
     try {
       const url = municipality 
-        ? `${import.meta.env.VITE_API_URL}/api/municipalities/${municipality.id}`
-        : `${import.meta.env.VITE_API_URL}/api/municipalities`;
+        ? `${import.meta.env.VITE_API_URL}/municipalities/${municipality.id}`
+        : `${import.meta.env.VITE_API_URL}/municipalities`;
       
       const method = municipality ? 'PUT' : 'POST';
 
@@ -189,28 +191,48 @@ const MunicipalityFormDialog: React.FC<MunicipalityFormDialogProps> = ({
             sx={{ mb: 2 }}
           />
 
-          {/* Only show state selector for new municipalities */}
-          {!municipality && canGetState && availableStates.length > 0 && (
-            <FormControl fullWidth margin="dense" sx={{ mb: 2 }}>
-              <InputLabel id="state-select-label">{t('municipalities:components.form.state')}</InputLabel>
-              <Select
-                labelId="state-select-label"
-                value={formData.stateId || ''}
-                label={t('municipalities:components.form.state')}
-                onChange={handleStateChange}
-                required
-                disabled={loading}
-              >
-                <MenuItem value="">
-                  <em>{t('municipalities:components.form.selectState')}</em>
-                </MenuItem>
-                {availableStates.map(state => (
-                  <MenuItem key={state.id} value={state.id}>
-                    {state.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+          {/* State selector for new municipalities, or display current state for editing */}
+          {canGetState && (
+            <>
+              {!municipality ? (
+                // State selector for new municipalities
+                availableStates.length > 0 && (
+                  <FormControl fullWidth margin="dense" sx={{ mb: 2 }}>
+                    <InputLabel id="state-select-label">{t('municipalities:components.form.state')}</InputLabel>
+                    <Select
+                      labelId="state-select-label"
+                      value={formData.stateId || ''}
+                      label={t('municipalities:components.form.state')}
+                      onChange={handleStateChange}
+                      required
+                      disabled={loading}
+                    >
+                      <MenuItem value="">
+                        <em>{t('municipalities:components.form.selectState')}</em>
+                      </MenuItem>
+                      {availableStates.map(state => (
+                        <MenuItem key={state.id} value={state.id}>
+                          {state.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )
+              ) : (
+                // Display current state for editing (read-only)
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    {t('municipalities:components.form.state')}
+                  </Typography>
+                  <Typography variant="body1" sx={{ p: 1, bgcolor: 'grey.100', borderRadius: 1 }}>
+                    {municipality.state?.name || `State ID: ${municipality.stateId}`}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {t('municipalities:components.form.stateCannotBeChanged')}
+                  </Typography>
+                </Box>
+              )}
+            </>
           )}
         </DialogContent>
         <DialogActions>

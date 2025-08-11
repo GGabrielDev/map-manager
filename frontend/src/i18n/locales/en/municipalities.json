@@ -21,6 +21,7 @@
       "name": "Municipality Name",
       "state": "State",
       "selectState": "Select a State",
+      "stateCannotBeChanged": "State cannot be changed after creation",
       "updateMunicipality": "Update Municipality",
       "createMunicipality": "Create Municipality",
       "missingName": "Municipality name is required.",

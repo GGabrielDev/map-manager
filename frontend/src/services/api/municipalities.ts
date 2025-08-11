@@ -29,7 +29,8 @@ export const municipalitiesApi = {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch municipalities');
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to fetch municipalities');
     }
 
     return response.json();
@@ -45,7 +46,8 @@ export const municipalitiesApi = {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch municipality');
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to fetch municipality');
     }
 
     return response.json();

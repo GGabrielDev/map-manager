@@ -21,7 +21,7 @@ export const statesApi = {
     if (options.sortBy) params.append('sortBy', options.sortBy);
     if (options.sortOrder) params.append('sortOrder', options.sortOrder);
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/states?${params}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/states?${params}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ export const statesApi = {
 
   // Get state by ID
   getStateById: async (id: number, token: string): Promise<State> => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/states/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/states/${id}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export const statesApi = {
     stateData: { name: string },
     token: string
   ): Promise<State> => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/states`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/states`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -81,7 +81,7 @@ export const statesApi = {
     stateData: { name: string },
     token: string
   ): Promise<State> => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/states/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/states/${id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -100,7 +100,7 @@ export const statesApi = {
 
   // Delete state
   deleteState: async (id: number, token: string): Promise<void> => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/states/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/states/${id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
