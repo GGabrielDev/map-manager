@@ -6,9 +6,9 @@ import { Provider} from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
 import App from './App.tsx'
+import ThemeWrapper from './components/common/ThemeWrapper.tsx';
 import { AuthProvider } from './context/auth';
 import { store } from './store'
-import ThemeWrapper from './theme/ThemeWrapper';
 
 const root = document.getElementById('root');
 

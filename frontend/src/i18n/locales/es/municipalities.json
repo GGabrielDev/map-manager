@@ -1,0 +1,38 @@
+{
+  "page": {
+    "title": "Gestionar Municipios",
+    "subtitle": "Crear y gestionar municipios dentro de los estados",
+    "createNewMunicipality": "Crear Nuevo Municipio",
+    "noMunicipalitiesFound": "No se Encontraron Municipios",
+    "getStarted": "Comienza creando tu primer municipio.",
+    "noMunicipalitiesConfigured": "No hay municipios configurados actualmente."
+  },
+  "components": {
+    "table": {
+      "name": "Nombre del Municipio",
+      "state": "Estado",
+      "parishesCount": "Parroquias",
+      "createdAt": "Fecha de Creación",
+      "actions": "Acciones"
+    },
+    "form": {
+      "editMunicipality": "Editar Municipio",
+      "createNewMunicipality": "Crear Nuevo Municipio",
+      "name": "Nombre del Municipio",
+      "state": "Estado",
+      "selectState": "Seleccionar un Estado",
+      "stateCannotBeChanged": "El estado no se puede cambiar después de la creación",
+      "updateMunicipality": "Actualizar Municipio",
+      "createMunicipality": "Crear Municipio",
+      "missingName": "El nombre del municipio es obligatorio.",
+      "missingState": "La selección del estado es obligatoria.",
+      "failedToCreateMunicipality": "Error al crear el municipio.",
+      "failedToUpdateMunicipality": "Error al actualizar el municipio.",
+      "failedToDeleteMunicipality": "Error al eliminar el municipio.",
+      "accessDenied": "Acceso Denegado",
+      "accessDeniedMunicipality": "No tienes permiso para {{action}} municipios.",
+      "confirmDelete": "¿Estás seguro de que quieres eliminar este municipio?",
+      "deleteWarning": "Esta acción no se puede deshacer. El municipio y todas las parroquias asociadas serán eliminados permanentemente."
+    }
+  }
+}

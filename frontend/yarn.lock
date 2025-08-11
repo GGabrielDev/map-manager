@@ -286,7 +286,7 @@
     pirates "^4.0.6"
     source-map-support "^0.5.16"
 
-"@babel/runtime@^7.12.5", "@babel/runtime@^7.18.3", "@babel/runtime@^7.23.2", "@babel/runtime@^7.27.6", "@babel/runtime@^7.5.5", "@babel/runtime@^7.8.7":
+"@babel/runtime@^7.12.5", "@babel/runtime@^7.18.3", "@babel/runtime@^7.23.2", "@babel/runtime@^7.27.6", "@babel/runtime@^7.28.2", "@babel/runtime@^7.5.5", "@babel/runtime@^7.8.7":
   version "7.28.2"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.28.2.tgz#2ae5a9d51cc583bd1f5673b3bb70d6d819682473"
   integrity sha512-KHp2IflsnGywDjBWDkR9iEqiWSpc8GIi0lgTT3mOElT0PP1tG26P4tmFI2YvAdzgq9RGyoHZQEIEdZy6Ec5xCA==
@@ -704,6 +704,13 @@
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/@mui/core-downloads-tracker/-/core-downloads-tracker-7.2.0.tgz#af74715885a7686cbf50806ad36691e710b10dbc"
   integrity sha512-d49s7kEgI5iX40xb2YPazANvo7Bx0BLg/MNRwv+7BVpZUzXj1DaVCKlQTDex3gy/0jsCb4w7AY2uH4t4AJvSog==
+
+"@mui/icons-material@^7.3.1":
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@mui/icons-material/-/icons-material-7.3.1.tgz#91083e6bc28980ad62f7f276bdf576d394440cc9"
+  integrity sha512-upzCtG6awpL6noEZlJ5Z01khZ9VnLNLaj7tb6iPbN6G97eYfUTs8e9OyPKy3rEms3VQWmVBfri7jzeaRxdFIzA==
+  dependencies:
+    "@babel/runtime" "^7.28.2"
 
 "@mui/material@^7.2.0":
   version "7.2.0"

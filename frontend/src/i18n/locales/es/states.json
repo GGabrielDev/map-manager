@@ -1,0 +1,34 @@
+{
+  "page": {
+    "title": "Manejar Estados",
+    "subtitle": "Configurar estados y sus municipios",
+    "createNewState": "Crear Nuevo Estado",
+    "noStatesFound": "No se Encontraron Estados",
+    "getStarted": "Comienza creando tu primer estado.",
+    "noStatesConfigured": "No hay estados configurados actualmente."
+  },
+  "components": {
+    "table": {
+      "stateName": "Nombre del Estado",
+      "municipalitiesCount": "Municipios",
+      "createdAt": "Fecha de Creación",
+      "actions": "Acciones"
+    },
+    "form": {
+      "editState": "Editar Estado",
+      "createNewState": "Crear Nuevo Estado",
+      "stateName": "Nombre del Estado",
+      "updateState": "Actualizar Estado",
+      "createState": "Crear Estado",
+      "missingStateName": "El nombre del estado es obligatorio.",
+      "failedToCreateState": "Error al crear el estado.",
+      "failedToUpdateState": "Error al actualizar el estado.",
+      "failedToDeleteState": "Error al eliminar el estado.",
+      "accessDenied": "Acceso Denegado",
+      "accessDeniedState": "No tienes permiso para {{action}} estados.",
+      "confirmDelete": "¿Estás seguro de que quieres eliminar este estado?",
+      "deleteWarning": "Esta acción no se puede deshacer. El estado y todos sus datos asociados serán eliminados permanentemente.",
+      "cannotDeleteWithMunicipalities": "No se puede eliminar el estado con municipios asociados."
+    }
+  }
+}

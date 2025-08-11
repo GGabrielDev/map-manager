@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import type { AppDispatch,RootState } from '@/store';
-import { fetchUser, logout } from '@/store/authSlice';
+import { AuthContext } from '@/hooks/auth/useAuth';
+import type { AppDispatch, RootState } from '@/store';
+import { fetchUser, logout } from '@/store/slices/authSlice';
 
-import { AuthContext } from '.';
-
-export { AuthContext } from './useAuth';
+export { AuthContext } from '@/hooks/auth/useAuth';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
