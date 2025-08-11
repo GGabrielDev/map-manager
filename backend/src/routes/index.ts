@@ -4,8 +4,13 @@ import UserRouter from '@/routes/user'
 import RoleRouter from '@/routes/role'
 import PermissionRouter from '@/routes/permission'
 import AuthRouter from '@/routes/auth'
+import ParishRouter from '@/routes/parish'
+import OrganismRouter from '@/routes/organism'
+import ResponsibleRouter from '@/routes/responsible'
+
 import StateRouter from '@/routes/state'
 import MunicipalityRouter from '@/routes/municipality'
+
 import { authenticateToken } from '@/middleware/authentication'
 
 // Initialize express app
@@ -23,7 +28,11 @@ mainRouter.use(authenticateToken)
 mainRouter.use('/users', UserRouter)
 mainRouter.use('/permissions', PermissionRouter)
 mainRouter.use('/roles', RoleRouter)
+
 mainRouter.use('/states', StateRouter)
 mainRouter.use('/municipalities', MunicipalityRouter)
+mainRouter.use('/parishes', ParishRouter)
+mainRouter.use('/organisms', OrganismRouter)
+mainRouter.use('/responsibles', ResponsibleRouter)
 
 export default mainRouter
