@@ -11,10 +11,11 @@ import {
     PrimaryKey,
     Table,
     Unique,
-    UpdatedAt
+    UpdatedAt,
+    HasMany
  } from "sequelize-typescript";
 
- import { Municipality } from ".";
+ import { Municipality, Quadrant } from ".";
 
  @Table({ tableName: 'Parish' })
  export default class Parish extends Model {
@@ -40,6 +41,9 @@ import {
 
    @DeletedAt
    deletionDate?: Date
+
+   @HasMany(()=>Quadrant)
+   quadrant!: Quadrant[]
 
    @BelongsTo(() => Municipality)
    municipality!: Municipality
