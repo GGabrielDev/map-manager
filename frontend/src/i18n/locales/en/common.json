@@ -4,6 +4,7 @@
   "delete": "Delete",
   "edit": "Edit",
   "create": "Create",
+  "confirm": "Confirm",
   "loading": "Loading...",
   "error": "Error",
   "success": "Success",

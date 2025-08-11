@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import type { AppDispatch, RootState } from '@/store';
-import { fetchUser,login } from '@/store/authSlice';
+import { fetchUser, login } from '@/store/slices/authSlice';
 
 const LoginPage: React.FC = () => {
   const { t } = useTranslation();
@@ -47,8 +47,11 @@ const LoginPage: React.FC = () => {
         <Typography variant="h4" component="h1" gutterBottom>
           {t('auth:title')}
         </Typography>
-        <Typography variant="h5" component="h2" gutterBottom>
-          {t('auth:login')}
+        <Typography variant="overline" component="p" gutterBottom>
+          {t('auth:subtitle')}
+        </Typography>
+        <Typography variant="h6" component="h2" gutterBottom>
+          - {t('auth:login')} -
         </Typography>
         {authState.error && (
           <Alert severity="error" sx={{ width: '100%', mb: 2 }}>

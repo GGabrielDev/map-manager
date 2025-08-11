@@ -1,1 +1,35 @@
-{}
+{
+  "page": {
+    "title": "Manejar Usuarios",
+    "subtitle": "Crear y gestionar cuentas de usuario",
+    "createNewUser": "Crear Nuevo Usuario",
+    "noUsersFound": "No se Encontraron Usuarios",
+    "getStarted": "Comienza creando tu primer usuario.",
+    "noUsersConfigured": "No hay usuarios configurados actualmente."
+  },
+  "components": {
+    "table": {
+      "username": "Nombre de Usuario",
+      "roles": "Roles",
+      "actions": "Acciones"
+    },
+    "form": {
+      "editUser": "Editar Usuario",
+      "createNewUser": "Crear Nuevo Usuario",
+      "username": "Nombre de Usuario",
+      "password": "Contraseña",
+      "roles": "Roles",
+      "updateUser": "Actualizar Usuario",
+      "createUser": "Crear Usuario",
+      "missingUsername": "El nombre de usuario es obligatorio.",
+      "missingPassword": "La contraseña es obligatoria.",
+      "failedToCreateUser": "Error al crear el usuario.",
+      "failedToUpdateUser": "Error al actualizar el usuario.",
+      "failedToDeleteUser": "Error al eliminar el usuario.",
+      "accessDenied": "Acceso Denegado",
+      "accessDeniedUser": "No tienes permiso para {{action}} usuarios.",
+      "confirmDelete": "¿Estás seguro de que quieres eliminar este usuario?",
+      "deleteWarning": "Esta acción no se puede deshacer. El usuario y todos sus datos asociados serán eliminados permanentemente."
+    }
+  }
+}
