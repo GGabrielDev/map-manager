@@ -7,8 +7,10 @@ import {
   CircularProgress, 
   Container, 
   Pagination, 
-  Typography} from '@mui/material';
+  Typography
+} from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import UserFormDialog from '@/components/forms/UserForm';
@@ -17,6 +19,7 @@ import { usePermissions, useUserManagement } from '@/hooks';
 import type { User } from '@/types';
 
 const ManageUsers: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -104,10 +107,10 @@ const ManageUsers: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box>
           <Typography variant="h4" component="h1" gutterBottom>
-            Manage Users
+            {t('users:page.title')}
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            Create and manage user accounts
+            {t('users:page.subtitle')}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -115,7 +118,7 @@ const ManageUsers: React.FC = () => {
             variant="outlined"
             onClick={() => navigate('/dashboard')}
           >
-            Back to Dashboard
+            {t('common:backToDashboard')}
           </Button>
           {/* Only show Create button if user has create permission */}
           {canCreateUser && (
@@ -123,7 +126,7 @@ const ManageUsers: React.FC = () => {
               variant="contained"
               onClick={handleCreate}
             >
-              Create New User
+              {t('users:page.createNewUser')}
             </Button>
           )}
         </Box>
@@ -145,12 +148,12 @@ const ManageUsers: React.FC = () => {
         <Card>
           <CardContent sx={{ textAlign: 'center', p: 4 }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
-              No Users Found
+              {t('users:page.noUsersFound')}
             </Typography>
             <Typography variant="body1" color="text.secondary">
               {canCreateUser 
-                ? 'Get started by creating your first user.' 
-                : 'No users are currently configured.'
+                ? t('users:page.getStarted')
+                : t('users:page.noUsersConfigured')
               }
             </Typography>
           </CardContent>

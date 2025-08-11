@@ -15,7 +15,8 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { useCallback, useEffect, useMemo,useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
 import type { RootState } from '@/store';
@@ -30,6 +31,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
   canCreate,
   canGetRole
 }) => {
+  const { t } = useTranslation();
   const { token } = useSelector((state: RootState) => state.auth);
   const [formData, setFormData] = useState<UserFormData>({
     username: '',
@@ -106,17 +108,17 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
     e.preventDefault();
     
     if (!canPerformAction) {
-      setError('You do not have permission to perform this action');
+      setError(t('users:components.form.accessDeniedUser', { action: user ? 'edit' : 'create' }));
       return;
     }
 
     if (!formData.username.trim()) {
-      setError('Username is required');
+      setError(t('users:components.form.missingUsername'));
       return;
     }
 
     if (!user && !formData.password.trim()) {
-      setError('Password is required for new users');
+      setError(t('users:components.form.missingPassword'));
       return;
     }
 
@@ -156,7 +158,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to save user');
+        throw new Error(data.error || (user ? t('users:components.form.failedToUpdateUser') : t('users:components.form.failedToCreateUser')));
       }
 
       onSuccess();
@@ -166,7 +168,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [canPerformAction, formData, user, token, onSuccess]);
+  }, [canPerformAction, formData, user, token, onSuccess, t]);
 
   // Memoize role checkboxes to prevent unnecessary re-renders
   const roleCheckboxes = useMemo(() => {
@@ -199,14 +201,14 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
   if (!canPerformAction) {
     return (
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Access Denied</DialogTitle>
+        <DialogTitle>{t('users:components.form.accessDenied')}</DialogTitle>
         <DialogContent>
           <Typography color="error">
-            You do not have permission to {user ? 'edit' : 'create'} users.
+            {t('users:components.form.accessDeniedUser', { action: user ? 'edit' : 'create' })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Close</Button>
+          <Button onClick={onClose}>{t('common:close')}</Button>
         </DialogActions>
       </Dialog>
     );
@@ -216,7 +218,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <form onSubmit={handleSubmit}>
         <DialogTitle>
-          {user ? 'Edit User' : 'Create New User'}
+          {user ? t('users:components.form.editUser') : t('users:components.form.createNewUser')}
         </DialogTitle>
         <DialogContent>
           {error && (
@@ -228,7 +230,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
           <TextField
             autoFocus
             margin="dense"
-            label="Username"
+            label={t('users:components.form.username')}
             fullWidth
             variant="outlined"
             value={formData.username}
@@ -240,7 +242,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
 
           <TextField
             margin="dense"
-            label={user ? 'New Password (leave empty to keep current)' : 'Password'}
+            label={user ? t('users:components.form.password') : t('users:components.form.password')}
             fullWidth
             variant="outlined"
             type="password"
@@ -254,7 +256,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
           {/* Only show roles if user can view them */}
           {canGetRole && availableRoles.length > 0 && (
             <FormControl component="fieldset" sx={{ mt: 2 }}>
-              <FormLabel component="legend">Roles</FormLabel>
+              <FormLabel component="legend">{t('users:components.form.roles')}</FormLabel>
               <FormGroup>
                 <Box sx={{ maxHeight: 300, overflowY: 'auto', mt: 1 }}>
                   {roleCheckboxes}
@@ -265,14 +267,14 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} disabled={loading}>
-            Cancel
+            {t('common:cancel')}
           </Button>
           <Button 
             type="submit" 
             variant="contained" 
             disabled={loading}
           >
-            {loading ? <CircularProgress size={20} /> : (user ? 'Update User' : 'Create User')}
+            {loading ? <CircularProgress size={20} /> : (user ? t('users:components.form.updateUser') : t('users:components.form.createUser'))}
           </Button>
         </DialogActions>
       </form>

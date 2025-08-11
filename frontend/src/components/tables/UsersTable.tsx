@@ -36,11 +36,11 @@ const UsersTable: React.FC<UsersTableProps> = ({
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Username</TableCell>
-            <TableCell>Roles</TableCell>
+            <TableCell>{t('users:components.table.username')}</TableCell>
+            <TableCell>{t('users:components.table.roles')}</TableCell>
             {/* Only show Actions column if user has edit or delete permissions */}
             {(canEditUser || canDeleteUser) && (
-              <TableCell align="center">Actions</TableCell>
+              <TableCell align="center">{t('users:components.table.actions')}</TableCell>
             )}
           </TableRow>
         </TableHead>
@@ -64,9 +64,9 @@ const UsersTable: React.FC<UsersTableProps> = ({
                         color="primary"
                       />
                     ))
-                  ) : (
+                    ) : (
                     <Typography variant="body2" color="text.secondary">
-                      No roles assigned
+                      {t('users:components.table.noRolesAssigned')}
                     </Typography>
                   )}
                 </Box>
