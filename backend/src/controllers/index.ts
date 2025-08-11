@@ -4,5 +4,6 @@ export * as UserController from './User';
 export * as StateController from './State';
 export * as MunicipalityController from './Municipality';
 export * as ParishController from './Parish';
+export * as OrganismController from './Organism'
 
 // TODO: Jhonnatan: Revisar la aplicacion de los controladores con paginacion

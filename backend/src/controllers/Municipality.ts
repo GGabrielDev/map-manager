@@ -61,7 +61,16 @@ export const allMunicipalities = async ({
             offset,
             limit: pageSize,
             order,
-            include: [Parish]
+            include: [
+                {
+                    model: State,
+                    as: 'state'
+                },
+                {
+                    model: Parish,
+                    as: 'parishes'
+                }
+            ]
         });
 
         const total = await Municipality.count({ where })
@@ -82,7 +91,16 @@ export const getById = async (id: number): Promise<Municipality | null> => {
     try {
         const municipality = await Municipality.findOne({
             where: { id },
-            include: [Parish]
+            include: [
+                {
+                    model: State,
+                    as: 'state'
+                },
+                {
+                    model: Parish,
+                    as: 'parishes'
+                }
+            ]
         });
 
         if (!municipality) {
