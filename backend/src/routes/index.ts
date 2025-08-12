@@ -9,6 +9,7 @@ import MunicipalityRouter from '@/routes/municipality'
 import ParishRouter from '@/routes/parish'
 import OrganismRouter from '@/routes/organism'
 import ResponsibleRouter from '@/routes/responsible'
+import QuadrantRouter from "@/routes/quadrant";
 
 import { authenticateToken } from '@/middleware/authentication'
 
@@ -32,5 +33,6 @@ mainRouter.use('/municipalities', MunicipalityRouter)
 mainRouter.use('/parishes', ParishRouter)
 mainRouter.use('/organisms', OrganismRouter)
 mainRouter.use('/responsibles', ResponsibleRouter)
+mainRouter.use('/quadrants', QuadrantRouter)
 
 export default mainRouter
