@@ -45,7 +45,6 @@ import {
    metadata?: object;
 
    @AllowNull(false)
-   @Column(DataType.JSON)
    @Validate({
     fleetNegative(value: any){
       ['small', 'big', 'bike'].forEach(type => {
@@ -57,7 +56,8 @@ import {
         })
       });
     }
-   })
+  })
+  @Column(DataType.JSON)
    fleet!: {
      small: { active: number, inactive: number },
      big: { active: number, inactive: number },
