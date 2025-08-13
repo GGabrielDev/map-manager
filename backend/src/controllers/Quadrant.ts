@@ -143,7 +143,7 @@ export const createQuadrant = async (
         const existQudarant = await Quadrant.findOne({where: {name, parishId, organismId,}})
 
         if (existQudarant) {
-            throw new Error("La parroquia ya existe.")
+            throw new Error("El cuadrante ya existe.")
         }
 
         const createQuadrant = await Quadrant.create({
@@ -157,7 +157,7 @@ export const createQuadrant = async (
 
         return createQuadrant;
     } catch (error) {
-        throw new Error("Error al crear la parroquia, intente nuevamente.")
+        throw new Error("Error al crear el cuadrante, intente nuevamente.")
     }
 }
 
@@ -181,7 +181,7 @@ export const updateQuadrant = async(updates: Partial<Quadrant>): Promise<Quadran
 
         return updateToQuadrant;
     } catch (error) {
-        throw new Error("Error al actualizar la cuadrante.")
+        throw new Error("Error al actualizar el cuadrante.")
     }
 }
 
