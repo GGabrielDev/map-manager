@@ -4,12 +4,12 @@ import UserRouter from '@/routes/user'
 import RoleRouter from '@/routes/role'
 import PermissionRouter from '@/routes/permission'
 import AuthRouter from '@/routes/auth'
+import StateRouter from '@/routes/state'
+import MunicipalityRouter from '@/routes/municipality'
 import ParishRouter from '@/routes/parish'
 import OrganismRouter from '@/routes/organism'
 import ResponsibleRouter from '@/routes/responsible'
-
-import StateRouter from '@/routes/state'
-import MunicipalityRouter from '@/routes/municipality'
+import QuadrantRouter from "@/routes/quadrant";
 
 import { authenticateToken } from '@/middleware/authentication'
 
@@ -28,11 +28,11 @@ mainRouter.use(authenticateToken)
 mainRouter.use('/users', UserRouter)
 mainRouter.use('/permissions', PermissionRouter)
 mainRouter.use('/roles', RoleRouter)
-
 mainRouter.use('/states', StateRouter)
 mainRouter.use('/municipalities', MunicipalityRouter)
 mainRouter.use('/parishes', ParishRouter)
 mainRouter.use('/organisms', OrganismRouter)
 mainRouter.use('/responsibles', ResponsibleRouter)
+mainRouter.use('/quadrants', QuadrantRouter)
 
 export default mainRouter

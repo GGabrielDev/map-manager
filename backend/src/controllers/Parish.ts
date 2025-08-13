@@ -1,4 +1,4 @@
-import { Parish, Municipality } from "@/models";
+import { Parish, Municipality, Quadrant } from "@/models";
 import { Op, OrderItem } from "sequelize";
 
 interface PaginationOpstions{
@@ -140,6 +140,11 @@ export const deleteParish = async (id:number): Promise<boolean> =>{
 
         if (!parish) {
             return false;
+        }
+
+        const countQuadrant = await Quadrant.count({where: {parishId: id}})
+        if ( countQuadrant > 0 ){
+            throw new Error("No se puede eliminar la parroquia, tiene cuadrantes asignados")
         }
 
         await parish.destroy()

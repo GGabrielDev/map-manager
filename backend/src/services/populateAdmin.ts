@@ -12,7 +12,8 @@ const entities = [
   'Municipality',
   'Parish',
   'Organism',
-  'Responsible'
+  'Responsible',
+  'Quadrant'
 ]
 
 const actions = ['create', 'get', 'edit', 'delete']
