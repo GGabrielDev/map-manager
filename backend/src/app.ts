@@ -17,7 +17,6 @@ app.use(
 
 app.use(express.json())
 
-// TODO: Jhonnatan: Revisar applicacion de los controladores con paginacion en las rutas
 app.use('/api', mainRouter)
 
 export default app

@@ -1,6 +1,7 @@
+import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import {
   Box,
-  Button,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -8,7 +9,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography} from '@mui/material';
+  Tooltip,
+  Typography
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 import type { RolesTableProps } from '@/types';
@@ -60,25 +63,27 @@ const RolesTable: React.FC<RolesTableProps> = ({
                   <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                     {/* Only show Edit button if user has edit permission */}
                     {canEditRole && (
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => onEdit(role)}
-                      >
-                        {t('edit')}
-                      </Button>
+                      <Tooltip title={t('common:edit')}>
+                        <IconButton
+                          size="small"
+                          onClick={() => onEdit(role)}
+                          color="primary"
+                        > 
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     )}
                     {/* Only show Delete button if user has delete permission */}
                     {canDeleteRole && (
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="error"
-                        onClick={() => handleDelete(role.id)}
-                      >
-                        {t('delete')}
-                      </Button>
+                      <Tooltip title={t('common:delete')}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDelete(role.id)}
+                          color="error"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     )}
                   </Box>
                 </TableCell>

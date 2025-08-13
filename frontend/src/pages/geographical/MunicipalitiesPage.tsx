@@ -9,92 +9,95 @@ import {
   Pagination, 
   Typography} from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import UserFormDialog from '@/components/user/UserFormDialog';
-import UsersTable from '@/components/user/UsersTable';
-import { usePermissions, useUserManagement } from '@/hooks';
-import type { User } from '@/types';
+import MunicipalityFormDialog from '@/components/forms/MunicipalityForm';
+import MunicipalitiesTable from '@/components/tables/MunicipalitiesTable';
+import { usePermissions } from '@/hooks';
+import { useMunicipalityManagement } from '@/hooks/entities/useMunicipalities';
+import type { Municipality } from '@/types';
 
-const ManageUsers: React.FC = () => {
+const ManageMunicipalities: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editingMunicipality, setEditingMunicipality] = useState<Municipality | null>(null);
   
   const {
-    canCreateUser,
-    canEditUser,
-    canDeleteUser,
-    canManageUsers,
-    canGetRole
+    canCreateMunicipality,
+    canEditMunicipality,
+    canDeleteMunicipality,
+    canManageMunicipalities,
+    canGetState
   } = usePermissions();
 
   const {
-    users,
+    municipalities,
     loading,
     error,
     page,
     totalPages,
     setPage,
     setError,
-    fetchUsers,
-    fetchUserById,
-    deleteUser,
-  } = useUserManagement();
+    fetchMunicipalities,
+    fetchMunicipalityById,
+    deleteMunicipality,
+  } = useMunicipalityManagement();
 
-  // If user doesn't have basic user viewing permission, redirect
+  // If user doesn't have basic municipality viewing permission, redirect
   useEffect(() => {
-    if (!canManageUsers) {
+    if (!canManageMunicipalities) {
       navigate('/dashboard');
       return;
     }
-  }, [canManageUsers, navigate]);
+  }, [canManageMunicipalities, navigate]);
 
   useEffect(() => {
-    if (canManageUsers) {
-      fetchUsers({ page });
+    if (canManageMunicipalities) {
+      fetchMunicipalities({ page, pageSize: 10 });
     }
-  }, [page, fetchUsers, canManageUsers]);
+  }, [page, fetchMunicipalities, canManageMunicipalities]);
 
-  const handleDelete = async (userId: number) => {
-    if (!canDeleteUser) return;
+  const handleDelete = async (municipalityId: number) => {
+    if (!canDeleteMunicipality) return;
     
-    const success = await deleteUser(userId);
+    const success = await deleteMunicipality(municipalityId);
     if (success) {
       // Refresh the list
-      fetchUsers({ page });
+      fetchMunicipalities({ page, pageSize: 10 });
     }
   };
 
-  const handleEdit = async (user: User) => {
-    if (!canEditUser) return;
+  const handleEdit = async (municipality: Municipality) => {
+    if (!canEditMunicipality) return;
     
-    const fullUser = await fetchUserById(user.id);
-    if (fullUser) {
-      setEditingUser(fullUser);
+    const fullMunicipality = await fetchMunicipalityById(municipality.id);
+    if (fullMunicipality) {
+      setEditingMunicipality(fullMunicipality);
       setShowForm(true);
     }
   };
 
   const handleCreate = () => {
-    if (!canCreateUser) return;
-    setEditingUser(null);
+    if (!canCreateMunicipality) return;
+    setEditingMunicipality(null);
     setShowForm(true);
   };
 
   const handleFormSuccess = () => {
     setShowForm(false);
-    setEditingUser(null);
-    fetchUsers({ page });
+    setEditingMunicipality(null);
+    fetchMunicipalities({ page, pageSize: 10 });
   };
 
   const handleCloseForm = () => {
     setShowForm(false);
-    setEditingUser(null);
+    setEditingMunicipality(null);
   };
 
   // Don't render anything if user doesn't have basic permissions
-  if (!canManageUsers) {
+  if (!canManageMunicipalities) {
     return null;
   }
 
@@ -104,10 +107,10 @@ const ManageUsers: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box>
           <Typography variant="h4" component="h1" gutterBottom>
-            Manage Users
+            {t('municipalities:page.title')}
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            Create and manage user accounts
+            {t('municipalities:page.subtitle')}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -115,15 +118,15 @@ const ManageUsers: React.FC = () => {
             variant="outlined"
             onClick={() => navigate('/dashboard')}
           >
-            Back to Dashboard
+            {t('common:backToDashboard')}
           </Button>
           {/* Only show Create button if user has create permission */}
-          {canCreateUser && (
+          {canCreateMunicipality && (
             <Button
               variant="contained"
               onClick={handleCreate}
             >
-              Create New User
+              {t('municipalities:page.createNewMunicipality')}
             </Button>
           )}
         </Box>
@@ -136,30 +139,30 @@ const ManageUsers: React.FC = () => {
         </Alert>
       )}
 
-      {/* Users Content */}
+      {/* Municipalities Content */}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
           <CircularProgress />
         </Box>
-      ) : users.length === 0 ? (
+      ) : municipalities.length === 0 ? (
         <Card>
           <CardContent sx={{ textAlign: 'center', p: 4 }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
-              No Users Found
+              {t('municipalities:page.noMunicipalitiesFound')}
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              {canCreateUser 
-                ? 'Get started by creating your first user.' 
-                : 'No users are currently configured.'
+              {canCreateMunicipality 
+                ? t('municipalities:page.getStarted')
+                : t('municipalities:page.noMunicipalitiesConfigured')
               }
             </Typography>
           </CardContent>
         </Card>
       ) : (
-        <UsersTable
-          users={users}
-          canEditUser={canEditUser}
-          canDeleteUser={canDeleteUser}
+        <MunicipalitiesTable
+          municipalities={municipalities}
+          canEditMunicipality={canEditMunicipality}
+          canDeleteMunicipality={canDeleteMunicipality}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
@@ -177,20 +180,20 @@ const ManageUsers: React.FC = () => {
         </Box>
       )}
 
-      {/* User Form Dialog */}
-      {showForm && (canCreateUser || canEditUser) && (
-        <UserFormDialog
+      {/* Municipality Form Dialog */}
+      {showForm && (canCreateMunicipality || canEditMunicipality) && (
+        <MunicipalityFormDialog
           open={showForm}
-          user={editingUser}
+          municipality={editingMunicipality}
           onClose={handleCloseForm}
           onSuccess={handleFormSuccess}
-          canEdit={canEditUser}
-          canCreate={canCreateUser}
-          canGetRole={canGetRole}
+          canEdit={canEditMunicipality}
+          canCreate={canCreateMunicipality}
+          canGetState={canGetState}
         />
       )}
     </Container>
   );
 };
 
-export default ManageUsers;
+export default ManageMunicipalities;

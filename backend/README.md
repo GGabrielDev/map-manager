@@ -1,62 +1,46 @@
-# Geospatial Administration System – Frontend
+# Geospatial Administration System – Backend
 
 ## Overview
 
-This frontend is a comprehensive geospatial administration system built with **React**, **TypeScript**, **Vite**, and **Leaflet**. It provides an interactive web interface for managing hierarchical geographical administrative divisions (States → Municipalities → Parishes) and their spatial subdivisions (Quadrants and Communal Circuits), along with Points of Interest that can be spatially associated with these entities. The system is designed to work seamlessly with **Leaflet** for interactive map visualization and the backend API for geospatial data management, authentication, and role-based access control. It features comprehensive map-based data interaction, spatial boundary visualization, and real-time geospatial data management.
+This backend is a comprehensive geospatial administration system built with **Node.js**, **Express**, **TypeScript**, and **Sequelize ORM**. It manages hierarchical geographical administrative divisions (States → Municipalities → Parishes) and their spatial subdivisions (Quadrants and Communal Circuits), along with Points of Interest that can be spatially associated with these entities. The system is designed to work seamlessly with **Leaflet** for interactive map visualization and geospatial data interaction. It features role-based access control (RBAC), JWT authentication, and comprehensive audit logging.
 
 ### Key Features
 
-- **Interactive Map Interface** with Leaflet for visualizing and managing geographical boundaries, quadrants, communal circuits, and points of interest
-- **Complete CRUD Operations** via intuitive UI for geographical entities (states, municipalities, parishes, quadrants, communal circuits, points of interest), users, roles, and permissions
-- **Spatial Data Visualization** with GeoJSON rendering, boundary editing, and spatial relationship display
-- **Real-time Map Interaction** for creating, editing, and managing spatial boundaries directly on the map
-- **Automatic Spatial Association** UI for Points of Interest with visual feedback when they fall within Quadrants or Communal Circuits
-- **Role-Based Access Control Interface** with permission-based UI rendering and feature access
-- **JWT Authentication** with secure token management and session handling
-- **Comprehensive Dashboard** with spatial analytics, fleet management, and administrative oversight
-- **Leaflet Integration** with custom controls, drawing tools, and spatial query interfaces
-- **Responsive Design** optimized for desktop map interaction and mobile field use
+- **Complete CRUD Operations** for geographical entities (states, municipalities, parishes, quadrants, communal circuits, points of interest), users, roles, and permissions
+- **Spatial Data Management** with geometry boundaries and spatial indexing optimized for Leaflet integration
+- **Leaflet-Compatible GeoJSON Output** for seamless map visualization
+- **Automatic Spatial Association** of Points of Interest with Quadrants and Communal Circuits based on coordinates
+- **Role-Based Access Control (RBAC)** with auto-generated permissions
+- **JWT Authentication** with bcrypt password hashing
+- **Comprehensive Audit Logging** with field-level change tracking
+- **Multi-Database Support** (PostgreSQL/SQLite)
+- **RESTful API** with pagination, filtering, and sorting
 - **TypeScript** for type safety and better development experience
 
 ### Technology Stack
 
 **Core Dependencies:**
 
-- **React** with **TypeScript** for component-based UI development
-- **Vite** for fast development server and optimized production builds
-- **Leaflet** for interactive map visualization and geospatial data interaction
-- **React-Leaflet** for React integration with Leaflet maps
-- **Redux Toolkit** for predictable state management
-- **React Router Dom** for client-side routing and navigation
+- **Node.js** with **Express** framework
+- **TypeScript** for type safety
+- **Sequelize** with **sequelize-typescript** for ORM
+- **PostgreSQL** with **PostGIS** (production) / **SQLite** (testing)
+- **JWT** for authentication
+- **bcrypt** for password hashing
+- **CORS** for cross-origin resource sharing
 
 **Geospatial Integration:**
 
-- **Leaflet** for interactive map rendering and user interaction
-- **Leaflet Draw** for creating and editing spatial boundaries
-- **GeoJSON** processing for spatial data visualization
-- **Turf.js** for spatial analysis and geometric operations
-- **Proj4js** for coordinate system transformations
-
-**UI/UX & Styling:**
-
-- **Material UI** with custom theming optimized for map interfaces
-- **Leaflet CSS** for map styling and controls
-- **Responsive Design** with map-first mobile considerations
-- **Custom Map Controls** for spatial data management
-
-**Data Management:**
-
-- **Axios** for API communication with spatial data endpoints
-- **React Query** for efficient geospatial data caching and synchronization
-- **GeoJSON Validation** for spatial data integrity
-- **Real-time Updates** for collaborative spatial editing
+- **PostGIS** for spatial database operations
+- **GeoJSON** format support for Leaflet compatibility
+- **Spatial indexing** for optimized map data queries
 
 **Development Tools:**
 
-- **ESLint** with TypeScript and React-Leaflet specific rules
-- **Prettier** for consistent code formatting
-- **TypeScript** strict mode for spatial data type safety
-- **Leaflet TypeScript Definitions** for map interaction typing
+- **ESLint** with TypeScript support
+- **Prettier** for code formatting
+- **ts-node-dev** for development hot reload
+- **Supertest** for API testing
 
 ## Installation & Setup
 
@@ -64,615 +48,693 @@ This frontend is a comprehensive geospatial administration system built with **R
 
 - **Node.js** (v16 or higher)
 - **Yarn** package manager
-- **Backend API** running with PostGIS support (see backend documentation for setup)
-- **Modern Web Browser** with WebGL support for optimal map rendering
+- **PostgreSQL** (for production) or **SQLite** (for testing)
 
-### Environment Configuration
+### Environment Variables
 
-Create a `.env` file in the frontend directory with the following variables:
+Create a `.env` file in the backend directory with the following variables:
 
 ```env
-# Backend API Configuration
-VITE_API_BASE_URL=http://localhost:4000
-VITE_API_TIMEOUT=30000
+# Database Configuration
+DB_DIALECT=postgres          # or 'sqlite' for testing
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=geospatial_admin
+DB_USER=your_username
+DB_PASSWORD=your_password
+DB_STORAGE=:memory:          # Only for SQLite testing
 
-# Map Configuration
-VITE_DEFAULT_MAP_CENTER_LAT=10.4806
-VITE_DEFAULT_MAP_CENTER_LNG=-66.9036
-VITE_DEFAULT_MAP_ZOOM=7
-VITE_MAX_MAP_ZOOM=18
-VITE_MIN_MAP_ZOOM=5
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key
+JWT_EXPIRE_TIME=1h           # Token expiration time
 
-# Tile Server Configuration
-VITE_TILE_SERVER_URL=https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
-VITE_TILE_SERVER_ATTRIBUTION=© OpenStreetMap contributors
-
-# Feature Flags
-VITE_ENABLE_SPATIAL_EDITING=true
-VITE_ENABLE_REAL_TIME_UPDATES=true
-VITE_ENABLE_OFFLINE_MODE=false
+# Server Configuration
+PORT=4000
+BASE_URL=localhost
+CORS_ORIGIN=http://localhost:3000
 
 # Environment
-NODE_ENV=development
+NODE_ENV=development         # or 'production' or 'test'
 ```
 
 ### Installation Steps
 
-1. **Navigate to the frontend directory:**
-
-   ```bash
-   cd frontend
-   ```
-
-2. **Install dependencies:**
+1. **Install dependencies:**
 
    ```bash
    yarn install
    ```
 
-3. **Install additional geospatial dependencies:**
+2. **Set up your database** (PostgreSQL for production)
+
+3. **Populate the database with admin user and permissions:**
 
    ```bash
-   yarn add leaflet react-leaflet @types/leaflet leaflet-draw @turf/turf proj4
+   yarn db:populate
    ```
 
 4. **Start the development server:**
-
    ```bash
    yarn dev
    ```
 
-5. **Build for production:**
-   ```bash
-   yarn build
-   ```
-
-The development server will start at `http://localhost:5173` with the interactive map interface.
+The server will start at `http://localhost:4000` (or your configured PORT).
 
 ## Available Scripts
 
-- **`yarn dev`** - Start development server with hot module replacement using Vite
-- **`yarn build`** - Build the application for production (TypeScript compilation + Vite build)
-- **`yarn lint`** - Run ESLint with auto-fix for JavaScript, JSX, TypeScript, and TSX files
-- **`yarn preview`** - Preview the production build locally
+- **`yarn dev`** - Start development server with hot reload using ts-node-dev
+- **`yarn start`** - Start production server
+- **`yarn db:populate`** - Seed database with admin user and all permissions
+- **`yarn db:clear`** - Clear all data from the database
+- **`yarn test`** - Run Jest test suite with verbose output
+- **`yarn lint`** - Run ESLint with auto-fix for TypeScript files
 
-## Project Structure
+## Database Models & Schema
 
+### Main Models
+
+#### **User**
+
+- `id`: integer, PK, auto-increment
+- `username`: string, required, unique
+- `passwordHash`: string, required (bcrypt hashed, excluded from queries by default)
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Many-to-many with Role via UserRole
+- **Hooks**: Password hashing before save
+
+#### **Role**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `description`: string, optional
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Many-to-many with User and Permission
+- **Hooks**: Prevents deletion if users are assigned
+
+#### **Permission**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `description`: string, required
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Many-to-many with Role via RolePermission
+- **Auto-Generated**: Permissions for entities (create/get/edit/delete for each entity)
+
+#### **State**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Has many Municipalities
+- **Hooks**: Prevents deletion if municipalities are assigned
+
+#### **Municipality**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `state_id`: FK to State, required
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Belongs to State, has many Parishes
+- **Hooks**: Prevents deletion if parishes are assigned
+
+#### **Parish**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `municipality_id`: FK to Municipality, required
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Belongs to Municipality, has many Quadrants and Communal Circuits
+- **Hooks**: Prevents deletion if quadrants or circuits are assigned
+
+#### **Quadrant**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `parish_id`: FK to Parish, required
+- `organism_id`: FK to Organism, required
+- `boundary`: geometry, required (spatial data defining the quadrant boundaries)
+- `metadata`: JSON, optional (additional quadrant information)
+- `fleet`: JSON, required (fleet management data with structure below)
+  - `small`: object with `active` (integer, default 0, non-negative) and `inactive` (integer, default 0, non-negative)
+  - `big`: object with `active` (integer, default 0, non-negative) and `inactive` (integer, default 0, non-negative)
+  - `bike`: object with `active` (integer, default 0, non-negative) and `inactive` (integer, default 0, non-negative)
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Belongs to Parish, belongs to Organism, has many Points of Interest, has many Responsibles
+- **Spatial Index**: Recommended on boundary field for performance
+- **Validation**: Fleet numbers must be non-negative integers
+
+#### **Communal Circuit**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `parish_id`: FK to Parish, required
+- `address`: string, required (office address, different from geometry)
+- `code`: string, required (circuit identification code)
+- `boundary`: geometry, required (spatial data defining the circuit boundaries)
+- `metadata`: JSON, optional (additional circuit information)
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Belongs to Parish, has many Points of Interest, has many Responsibles, has many Communes
+- **Spatial Index**: Recommended on boundary field for performance
+
+#### **Commune**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `circuit_id`: FK to Communal Circuit, required
+- `address`: string, required (commune office address)
+- `code`: string, required (commune identification code)
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Belongs to Communal Circuit, has many Responsibles, has many Communal Councils
+- **Hooks**: Prevents deletion if communal councils are assigned
+
+#### **Communal Council**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `commune_id`: FK to Commune, required
+- `address`: string, required (council office address)
+- `code`: string, required (council identification code)
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Belongs to Commune, has many Responsibles
+- **Hooks**: Prevents deletion if responsibles are assigned
+
+#### **Point of Interest**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required
+- `description`: string, optional
+- `coordinate_x`: float, required (longitude)
+- `coordinate_y`: float, required (latitude)
+- `circuit_communal_id`: FK to Communal Circuit, optional (auto-assigned based on coordinates)
+- `quadrant_id`: FK to Quadrant, optional (auto-assigned based on coordinates)
+- `organism_id`: FK to Organism, optional
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Belongs to Quadrant (optional), Communal Circuit (optional), and Organism (optional)
+- **Business Logic**: Automatically associated with Quadrant and/or Communal Circuit if coordinates fall within their boundaries
+- **Hooks**: Spatial association logic on create/update
+
+#### **Organism**
+
+- `id`: integer, PK, auto-increment
+- `name`: string, required, unique
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Has many Points of Interest, has many Responsibles
+- **Hooks**: Prevents deletion if points of interest or responsibles are assigned
+
+#### **Responsible**
+
+- `id`: integer, PK, auto-increment
+- `first_name`: string, required
+- `last_name`: string, required
+- `ci`: string, required (Venezuelan ID format: uppercase letter followed by numbers)
+- `phone`: string, required (Venezuelan phone number format validation)
+- `phone_backup`: string, optional (Venezuelan phone number format validation)
+- `email`: string, optional (email format validation)
+- `position`: string, required
+- `organism_id`: FK to Organism, optional
+- `quadrant_id`: FK to Quadrant, optional
+- `circuit_id`: FK to Communal Circuit, optional
+- `commune_id`: FK to Commune, optional
+- `council_id`: FK to Communal Council, optional
+- `creationDate`: datetime, auto
+- `updatedOn`: datetime, auto
+- `deletionDate`: datetime, nullable (soft delete)
+- **Relationships**: Belongs to Organism (optional), Quadrant (optional), Communal Circuit (optional), Commune (optional), Communal Council (optional)
+- **Validation**:
+  - Phone numbers must match Venezuelan format (regex: `^0[24]\d{2}-\d{7}$` for landlines or `^04(12|14|16|22|24|26)-\d{7}$` for mobile)
+  - CI must start with uppercase letter followed by numbers
+  - Email must be valid email format if provided
+- **Hooks**: Automatic change logging on all operations
+
+### Join Models (Many-to-Many)
+
+#### **UserRole**
+
+- `userId`: FK to User
+- `roleId`: FK to Role
+- **Hooks**: Automatic link/unlink logging for audit trail
+
+#### **RolePermission**
+
+- `roleId`: FK to Role
+- `permissionId`: FK to Permission
+- **Hooks**: Automatic link/unlink logging for audit trail
+
+### Entity Relationships
+
+```mermaid
+erDiagram
+    USER {
+        int id PK
+        string username UK
+        string passwordHash
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    ROLE {
+        int id PK
+        string name UK
+        string description
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    PERMISSION {
+        int id PK
+        string name UK
+        string description
+        datetime deletionDate
+    }
+
+    STATE {
+        int id PK
+        string name UK
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    MUNICIPALITY {
+        int id PK
+        string name UK
+        int state_id FK
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    PARISH {
+        int id PK
+        string name UK
+        int municipality_id FK
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    QUADRANT {
+        int id PK
+        string name UK
+        int parish_id FK
+        int organism_id FK
+        geometry boundary
+        json metadata
+        json fleet
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    COMMUNAL_CIRCUIT {
+        int id PK
+        string name UK
+        int parish_id FK
+        string address
+        string code
+        geometry boundary
+        json metadata
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    COMMUNE {
+        int id PK
+        string name UK
+        int circuit_id FK
+        string address
+        string code
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    COMMUNAL_COUNCIL {
+        int id PK
+        string name UK
+        int commune_id FK
+        string address
+        string code
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    POINT_OF_INTEREST {
+        int id PK
+        string name
+        string description
+        float coordinate_x
+        float coordinate_y
+        int circuit_communal_id FK
+        int quadrant_id FK
+        int organism_id FK
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    ORGANISM {
+        int id PK
+        string name UK
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    RESPONSIBLE {
+        int id PK
+        string first_name
+        string last_name
+        string ci
+        string phone
+        string phone_backup
+        string email
+        string position
+        int organism_id FK
+        int quadrant_id FK
+        int circuit_id FK
+        int commune_id FK
+        int council_id FK
+        datetime creationDate
+        datetime updatedOn
+        datetime deletionDate
+    }
+
+    USERROLE {
+        int userId FK
+        int roleId FK
+    }
+
+    ROLEPERMISSION {
+        int roleId FK
+        int permissionId FK
+    }
+
+    %% Many-to-Many Relationships
+    USER ||--o{ USERROLE : "has roles"
+    ROLE ||--o{ USERROLE : "assigned to users"
+    ROLE ||--o{ ROLEPERMISSION : "has permissions"
+    PERMISSION ||--o{ ROLEPERMISSION : "granted to roles"
+
+    %% Geographical Hierarchy
+    STATE ||--o{ MUNICIPALITY : "contains"
+    MUNICIPALITY ||--o{ PARISH : "branches into"
+    PARISH ||--o{ QUADRANT : "divides into"
+    PARISH ||--o{ COMMUNAL_CIRCUIT : "organized into"
+    COMMUNAL_CIRCUIT ||--o{ COMMUNE : "contains"
+    COMMUNE ||--o{ COMMUNAL_COUNCIL : "contains"
+
+    %% Points of Interest Relationships
+    QUADRANT ||--o{ POINT_OF_INTEREST : "includes"
+    COMMUNAL_CIRCUIT ||--o{ POINT_OF_INTEREST : "includes"
+    ORGANISM ||--o{ POINT_OF_INTEREST : "manages"
+
+    %% Organism and Quadrant Relationships
+    ORGANISM ||--o{ QUADRANT : "manages"
+    ORGANISM ||--o{ RESPONSIBLE : "has"
+    QUADRANT ||--o{ RESPONSIBLE : "has"
+    COMMUNAL_CIRCUIT ||--o{ RESPONSIBLE : "has"
+    COMMUNE ||--o{ RESPONSIBLE : "has"
+    COMMUNAL_COUNCIL ||--o{ RESPONSIBLE : "has"
 ```
-frontend/
-├── public/                          # Static assets and map resources
-│   ├── map-icons/                   # Custom map markers and icons
-│   ├── tile-cache/                  # Offline map tile storage
-│   └── favicon.ico                  # Application favicon
-├── src/
-│   ├── assets/                      # Static assets and spatial resources
-│   │   ├── map-styles/              # Custom Leaflet CSS and themes
-│   │   ├── spatial-icons/           # Icons for different entity types
-│   │   └── default-boundaries/      # Default GeoJSON boundary files
-│   ├── components/                  # Reusable UI and map components
-│   │   ├── map/                     # Map-specific components
-│   │   │   ├── LeafletMap.tsx       # Main interactive map component
-│   │   │   ├── MapControls.tsx      # Custom map control buttons
-│   │   │   ├── DrawingTools.tsx     # Spatial boundary drawing tools
-│   │   │   ├── LayerManager.tsx     # Map layer visibility controls
-│   │   │   ├── SpatialSearch.tsx    # Spatial query interface
-│   │   │   └── CoordinateDisplay.tsx # Mouse coordinate display
-│   │   ├── spatial/                 # Spatial data components
-│   │   │   ├── BoundaryEditor.tsx   # GeoJSON boundary editing
-│   │   │   ├── PointOfInterestMarker.tsx # POI map markers
-│   │   │   ├── QuadrantLayer.tsx    # Quadrant boundary visualization
-│   │   │   ├── CircuitLayer.tsx     # Communal circuit visualization
-│   │   │   └── SpatialAssociation.tsx # Automatic spatial relationship UI
-│   │   ├── forms/                   # Entity management forms
-│   │   │   ├── StateForm.tsx        # State creation/editing
-│   │   │   ├── MunicipalityForm.tsx # Municipality management
-│   │   │   ├── ParishForm.tsx       # Parish management
-│   │   │   ├── QuadrantForm.tsx     # Quadrant with spatial editing
-│   │   │   ├── CircuitForm.tsx      # Communal circuit management
-│   │   │   ├── CommuneForm.tsx      # Commune management
-│   │   │   ├── CouncilForm.tsx      # Communal council management
-│   │   │   ├── POIForm.tsx          # Point of interest with map picker
-│   │   │   ├── OrganismForm.tsx     # Organism management
-│   │   │   ├── ResponsibleForm.tsx  # Responsible person management
-│   │   │   ├── UserForm.tsx         # User management
-│   │   │   └── RoleForm.tsx         # Role and permission management
-│   │   ├── tables/                  # Data listing components
-│   │   │   ├── StatesTable.tsx      # States listing with map preview
-│   │   │   ├── MunicipalitiesTable.tsx # Municipalities with hierarchy
-│   │   │   ├── ParishesTable.tsx    # Parishes with spatial info
-│   │   │   ├── QuadrantsTable.tsx   # Quadrants with fleet data
-│   │   │   ├── CircuitsTable.tsx    # Communal circuits listing
-│   │   │   ├── CommunesTable.tsx    # Communes listing
-│   │   │   ├── CouncilsTable.tsx    # Communal councils listing
-│   │   │   ├── POITable.tsx         # Points of interest with coordinates
-│   │   │   ├── OrganismsTable.tsx   # Organisms listing
-│   │   │   ├── ResponsiblesTable.tsx # Responsible persons
-│   │   │   ├── UsersTable.tsx       # User management table
-│   │   │   └── RolesTable.tsx       # Roles and permissions table
-│   │   ├── dashboard/               # Dashboard components
-│   │   │   ├── SpatialOverview.tsx  # Map-based dashboard overview
-│   │   │   ├── FleetManagement.tsx  # Fleet statistics and management
-│   │   │   ├── EntityStats.tsx      # Geographical entity statistics
-│   │   │   └── RecentActivity.tsx   # Recent spatial data changes
-│   │   └── common/                  # Shared UI components
-│   │       ├── ProtectedRoute.tsx   # Route protection wrapper
-│   │       ├── LoadingSpinner.tsx   # Loading states
-│   │       ├── ErrorBoundary.tsx    # Error handling
-│   │       └── ConfirmDialog.tsx    # Confirmation dialogs
-│   ├── hooks/                       # Custom React hooks
-│   │   ├── spatial/                 # Spatial data hooks
-│   │   │   ├── useMapData.tsx       # Map data fetching and caching
-│   │   │   ├── useSpatialQuery.tsx  # Spatial query operations
-│   │   │   ├── useBoundaryEditor.tsx # Boundary editing logic
-│   │   │   └── useGeoLocation.tsx   # User location services
-│   │   ├── entities/                # Entity management hooks
-│   │   │   ├── useStates.tsx        # States CRUD operations
-│   │   │   ├── useMunicipalities.tsx # Municipalities management
-│   │   │   ├── useParishes.tsx      # Parishes management
-│   │   │   ├── useQuadrants.tsx     # Quadrants with spatial data
-│   │   │   ├── useCircuits.tsx      # Communal circuits management
-│   │   │   ├── useCommunes.tsx      # Communes management
-│   │   │   ├── useCouncils.tsx      # Communal councils management
-│   │   │   ├── usePOI.tsx           # Points of interest management
-│   │   │   ├── useOrganisms.tsx     # Organisms management
-│   │   │   └── useResponsibles.tsx  # Responsible persons management
-│   │   ├── auth/                    # Authentication hooks
-│   │   │   ├── useAuth.tsx          # Authentication state
-│   │   │   ├── usePermissions.tsx   # Permission checking
-│   │   │   └── useRoles.tsx         # Role management
-│   │   └── ui/                      # UI-specific hooks
-│   │       ├── useNotifications.tsx # Toast notifications
-│   │       ├── useModal.tsx         # Modal management
-│   │       └── useTheme.tsx         # Theme switching
-│   ├── pages/                       # Application pages/views
-│   │   ├── auth/                    # Authentication pages
-│   │   │   └── LoginPage.tsx        # User authentication
-│   │   ├── dashboard/               # Dashboard pages
-│   │   │   ├── MainDashboard.tsx    # Main dashboard with map overview
-│   │   │   ├── SpatialDashboard.tsx # Spatial analytics dashboard
-│   │   │   └── FleetDashboard.tsx   # Fleet management dashboard
-│   │   ├── geographical/            # Geographical entity pages
-│   │   │   ├── StatesPage.tsx       # States management
-│   │   │   ├── MunicipalitiesPage.tsx # Municipalities management
-│   │   │   ├── ParishesPage.tsx     # Parishes management
-│   │   │   ├── QuadrantsPage.tsx    # Quadrants with map interface
-│   │   │   ├── CircuitsPage.tsx     # Communal circuits management
-│   │   │   ├── CommunesPage.tsx     # Communes management
-│   │   │   ├── CouncilsPage.tsx     # Communal councils management
-│   │   │   └── POIPage.tsx          # Points of interest with map
-│   │   ├── administrative/          # Administrative pages
-│   │   │   ├── OrganismsPage.tsx    # Organisms management
-│   │   │   ├── ResponsiblesPage.tsx # Responsible persons management
-│   │   │   ├── UsersPage.tsx        # User management
-│   │   │   └── RolesPage.tsx        # Roles and permissions
-│   │   └── spatial/                 # Spatial-specific pages
-│   │       ├── MapEditor.tsx        # Full-screen map editing interface
-│   │       ├── BoundaryManager.tsx  # Boundary management interface
-│   │       └── SpatialAnalytics.tsx # Spatial analysis and reporting
-│   ├── services/                    # API and external services
-│   │   ├── api/                     # Backend API integration
-│   │   │   ├── auth.ts              # Authentication endpoints
-│   │   │   ├── states.ts            # States API calls
-│   │   │   ├── municipalities.ts    # Municipalities API calls
-│   │   │   ├── parishes.ts          # Parishes API calls
-│   │   │   ├── quadrants.ts         # Quadrants with GeoJSON support
-│   │   │   ├── circuits.ts          # Communal circuits API calls
-│   │   │   ├── communes.ts          # Communes API calls
-│   │   │   ├── councils.ts          # Communal councils API calls
-│   │   │   ├── poi.ts               # Points of interest API calls
-│   │   │   ├── organisms.ts         # Organisms API calls
-│   │   │   ├── responsibles.ts      # Responsible persons API calls
-│   │   │   ├── users.ts             # Users API calls
-│   │   │   └── roles.ts             # Roles and permissions API calls
-│   │   ├── spatial/                 # Spatial processing services
-│   │   │   ├── geoJsonProcessor.ts  # GeoJSON validation and processing
-│   │   │   ├── spatialQueries.ts    # Spatial relationship queries
-│   │   │   ├── coordinateUtils.ts   # Coordinate system utilities
-│   │   │   └── boundaryValidator.ts # Spatial boundary validation
-│   │   └── map/                     # Map-specific services
-│   │       ├── tileManager.ts       # Map tile management
-│   │       ├── layerManager.ts      # Map layer management
-│   │       └── mapUtils.ts          # Map utility functions
-│   ├── store/                       # Redux store configuration
-│   │   ├── index.ts                 # Store setup and configuration
-│   │   ├── slices/                  # Redux slices
-│   │   │   ├── authSlice.ts         # Authentication state
-│   │   │   ├── mapSlice.ts          # Map state and settings
-│   │   │   ├── entitiesSlice.ts     # Geographical entities state
-│   │   │   ├── spatialSlice.ts      # Spatial data and operations
-│   │   │   └── uiSlice.ts           # UI state (modals, notifications)
-│   │   └── middleware/              # Custom Redux middleware
-│   │       ├── spatialMiddleware.ts # Spatial data processing
-│   │       └── apiMiddleware.ts     # API request handling
-│   ├── types/                       # TypeScript type definitions
-│   │   ├── api.ts                   # API response types
-│   │   ├── spatial.ts               # Spatial data types (GeoJSON, coordinates)
-│   │   ├── entities.ts              # Entity type definitions
-│   │   ├── auth.ts                  # Authentication types
-│   │   └── map.ts                   # Map-specific types
-│   ├── utils/                       # Utility functions
-│   │   ├── spatial/                 # Spatial utility functions
-│   │   │   ├── geoJsonUtils.ts      # GeoJSON manipulation utilities
-│   │   │   ├── coordinateUtils.ts   # Coordinate conversion utilities
-│   │   │   └── spatialValidation.ts # Spatial data validation
-│   │   ├── api/                     # API utility functions
-│   │   │   ├── errorHandling.ts     # API error handling
-│   │   │   ├── requestUtils.ts      # Request formatting utilities
-│   │   │   └── responseUtils.ts     # Response processing utilities
-│   │   └── common/                  # Common utility functions
-│   │       ├── dateUtils.ts         # Date formatting utilities
-│   │       ├── validationUtils.ts   # Form validation utilities
-│   │       └── formatUtils.ts       # Data formatting utilities
-│   ├── styles/                      # Global styles and themes
-│   │   ├── globals.css              # Global CSS styles
-│   │   ├── leaflet-custom.css       # Custom Leaflet styles
-│   │   └── material-ui-theme.ts     # Material UI theme configuration
-│   ├── App.tsx                      # Main application component with routing
-│   ├── main.tsx                     # Application entry point
-│   └── vite-env.d.ts                # Vite environment type definitions
-├── .env.example                     # Environment variables template
-├── .gitignore                       # Git ignore rules
-├── eslint.config.js                 # ESLint configuration
-├── index.html                       # HTML template with map meta tags
-├── package.json                     # Dependencies and scripts
-├── tsconfig.app.json                # TypeScript config for app
-├── tsconfig.json                    # Main TypeScript configuration
-├── tsconfig.node.json               # TypeScript config for Node.js
-├── vite.config.ts                   # Vite configuration with spatial optimizations
-└── yarn.lock                        # Yarn lock file
-```
+
+**Relationship Details:**
+
+- **User** ↔ **Role** (many-to-many via UserRole join table)
+- **Role** ↔ **Permission** (many-to-many via RolePermission join table)
+- **State** → **Municipality** (one-to-many - states contain multiple municipalities)
+- **Municipality** → **Parish** (one-to-many - municipalities branch into multiple parishes)
+- **Parish** → **Quadrant** (one-to-many - parishes divide into multiple quadrants)
+- **Parish** → **Communal Circuit** (one-to-many - parishes organize into multiple communal circuits)
+- **Communal Circuit** → **Commune** (one-to-many - circuits contain multiple communes)
+- **Commune** → **Communal Council** (one-to-many - communes contain multiple councils)
+- **Organism** → **Quadrant** (one-to-many - organisms manage multiple quadrants)
+- **Quadrant** → **Point of Interest** (one-to-many, optional - points may be within quadrant boundaries)
+- **Communal Circuit** → **Point of Interest** (one-to-many, optional - points may be within circuit boundaries)
+- **Organism** → **Point of Interest** (one-to-many, optional - organisms can manage multiple points of interest)
+- **Organism** → **Responsible** (one-to-many, optional - organisms can have multiple responsible persons)
+- **Quadrant** → **Responsible** (one-to-many, optional - quadrants can have multiple responsible persons)
+- **Communal Circuit** → **Responsible** (one-to-many, optional - circuits can have multiple responsible persons)
+- **Commune** → **Responsible** (one-to-many, optional - communes can have multiple responsible persons)
+- **Communal Council** → **Responsible** (one-to-many, optional - councils can have multiple responsible persons)
+
+**Spatial Relationships:**
+
+- Points of Interest are automatically associated with Quadrants and Communal Circuits based on coordinate inclusion within their boundary geometries
+- Spatial indices on boundary fields optimize spatial query performance
 
 ## Authentication & Authorization
 
-### JWT Token Management
+### JWT Authentication
 
-- **Token Storage**: Secure token storage with automatic refresh handling
-- **Authentication Context**: Global authentication state management via React Context
-- **Protected Routes**: Route-level protection with automatic redirects for unauthenticated users
-- **Permission Checking**: Component-level permission validation using custom hooks
-- **Spatial Access Control**: Map feature access based on user permissions and geographical assignments
+- **Token Generation**: JWT tokens with configurable expiration (default: 1h)
+- **Password Security**: bcrypt hashing with salt rounds (default: 10)
+- **Token Validation**: Middleware validates tokens on protected routes
+- **User Context**: Authenticated user ID available in `req.userId`
 
 ### Role-Based Access Control (RBAC)
 
-- **Permission-Based UI**: Dynamic UI rendering based on user permissions for geographical entities
-- **Spatial Permissions**: Access control for specific quadrants, circuits, and geographical areas
-- **Route Protection**: Access control for different application sections and map editing features
-- **User Context**: Current user information, permissions, and assigned geographical areas
-- **Automatic Logout**: Token expiration handling with graceful logout and map state cleanup
+- **Auto-Generated Permissions**: 4 actions × multiple entities
+  - Actions: `create`, `get`, `edit`, `delete`
+  - Entities: `state`, `municipality`, `parish`, `quadrant`, `communal_circuit`, `commune`, `communal_council`, `point_of_interest`, `organism`, `responsible`, `permission`, `role`, `user`
+- **Admin Role**: Created automatically with all permissions
+- **Admin User**: Default credentials (username: `admin`, password: `admin`)
 
-### Authentication Flow
+### Protected Routes
 
-1. **Login Process**: User credentials sent to backend `/api/auth/login`
-2. **Token Management**: JWT token stored and included in API requests
-3. **Route Protection**: `ProtectedRoute` component validates authentication and spatial permissions
-4. **Permission Validation**: `usePermissions` hook checks user capabilities for geographical operations
-5. **Spatial Authorization**: Map editing permissions based on user's assigned geographical areas
+All routes except `/api/auth/*` require valid JWT token in Authorization header:
 
-## Geospatial Features & Map Integration
-
-### Interactive Map Interface
-
-- **Leaflet Integration**: Full-featured interactive map with zoom, pan, and layer controls
-- **Custom Map Controls**: Specialized controls for spatial data management and editing
-- **Drawing Tools**: Integrated drawing tools for creating and editing geographical boundaries
-- **Layer Management**: Toggle visibility of different geographical layers (states, municipalities, parishes, quadrants, circuits)
-- **Coordinate Display**: Real-time coordinate display for precise spatial data entry
-
-### Spatial Data Visualization
-
-- **GeoJSON Rendering**: Dynamic rendering of geographical boundaries from backend GeoJSON data
-- **Boundary Editing**: Interactive editing of quadrant and communal circuit boundaries
-- **Point of Interest Markers**: Custom markers for different types of points of interest
-- **Spatial Relationships**: Visual representation of spatial associations between entities
-- **Fleet Visualization**: Color-coded visualization of fleet data within quadrants
-
-### Map-Based CRUD Operations
-
-- **Click-to-Create**: Create new points of interest by clicking on the map
-- **Drag-to-Edit**: Move points of interest by dragging markers
-- **Boundary Drawing**: Draw new boundaries for quadrants and communal circuits
-- **Spatial Validation**: Real-time validation of spatial relationships and overlaps
-- **Automatic Association**: Automatic assignment of points to quadrants/circuits based on coordinates
-
-## API Integration
-
-### Backend Communication
-
-- **Spatial Endpoints**: Integration with backend GeoJSON endpoints for spatial data
-- **Real-time Updates**: WebSocket integration for real-time spatial data updates
-- **Batch Operations**: Efficient handling of bulk spatial data operations
-- **Caching Strategy**: Intelligent caching of map tiles and spatial data for performance
-
-### Spatial API Endpoints
-
-- **GeoJSON Endpoints**: Direct integration with `/api/quadrants/geojson` and `/api/communal-circuits/geojson`
-- **Spatial Queries**: Bounding box queries for efficient map viewport loading
-- **Coordinate Validation**: Server-side validation of spatial coordinates and boundaries
-- **Spatial Association**: Automatic spatial relationship detection and updates
-
-### Error Handling
-
-- **Spatial Validation Errors**: Handling of boundary overlap and invalid geometry errors
-- **Network Errors**: Graceful handling of map tile loading failures
-- **Authentication Errors**: Token expiration handling with map state preservation
-- **Spatial Conflict Resolution**: User-friendly resolution of spatial data conflicts
-
-### API Response Format
-
-```typescript
-// Spatial Data Response
-{
-  type: "FeatureCollection",
-  features: [
-    {
-      type: "Feature",
-      geometry: {
-        type: "Polygon",
-        coordinates: [[[lng, lat], ...]]
-      },
-      properties: {
-        id: number,
-        name: string,
-        entityType: "quadrant" | "circuit",
-        metadata: object
-      }
-    }
-  ]
-}
-
-// Error Response
-{
-  error: string,
-  code: "SPATIAL_VALIDATION_ERROR" | "BOUNDARY_OVERLAP" | "INVALID_GEOMETRY",
-  details: {
-    field: string,
-    coordinates?: [number, number]
-  }
-}
+```
+Authorization: Bearer <your-jwt-token>
 ```
 
-## UI/UX Design Principles
+## API Endpoints
 
-### Map-First Design
+### Authentication Routes (`/api/auth`)
 
-- **Interactive Map Interface**: Primary interface centered around Leaflet map with intuitive controls
-- **Spatial Context**: All data management operations provide spatial context and visualization
-- **Mobile-Responsive Maps**: Optimized map interactions for both desktop and mobile devices
-- **Accessibility**: WCAG compliance with keyboard navigation for map controls and screen reader support
+- **`POST /api/auth/login`** - User login with username/password
+- **`GET /api/auth/validate`** - Validate JWT token
+- **`GET /api/auth/me`** - Get current user information with roles and permissions
 
-### Material UI Integration
+### Protected Routes (Require Authentication)
 
-- **Map-Optimized Components**: Material UI components customized for geospatial data interfaces
-- **Spatial Data Tables**: Enhanced tables with coordinate display and map preview integration
-- **Custom Map Controls**: Material UI styled controls integrated with Leaflet map interface
-- **Responsive Layouts**: Adaptive layouts that prioritize map visibility across screen sizes
+#### **User Management**
 
-### Geospatial UX Features
+- **`/api/users`** - User management (CRUD operations)
+- **`/api/roles`** - Role management with permission assignment
+- **`/api/permissions`** - Permission listing and management
 
-- **Visual Feedback**: Real-time visual feedback for spatial operations and boundary editing
-- **Contextual Information**: Hover tooltips and info panels for geographical entities
-- **Spatial Validation**: Visual indicators for spatial relationship validation and conflicts
-- **Progressive Disclosure**: Hierarchical data display from states down to specific coordinates
+#### **Geographical Entities**
 
-## Fleet Management Interface
+##### **States**
 
-### Fleet Visualization
+- **`GET /api/states`** - List all states with pagination and filtering
+- **`POST /api/states`** - Create a new state
+- **`GET /api/states/:id`** - Get specific state details
+- **`PUT /api/states/:id`** - Update a state
+- **`DELETE /api/states/:id`** - Delete a state (soft delete)
 
-- **Quadrant Fleet Display**: Visual representation of fleet data (small, big, bike vehicles) within quadrants
-- **Status Indicators**: Color-coded indicators for active/inactive fleet status
-- **Fleet Statistics**: Dashboard widgets showing fleet distribution and utilization
-- **Real-time Updates**: Live updates of fleet status changes across the map interface
+##### **Municipalities**
 
-### Fleet Management Features
+- **`GET /api/municipalities`** - List municipalities with state relationships
+- **`POST /api/municipalities`** - Create a new municipality
+- **`GET /api/municipalities/:id`** - Get specific municipality details
+- **`PUT /api/municipalities/:id`** - Update a municipality
+- **`DELETE /api/municipalities/:id`** - Delete a municipality (soft delete)
 
-- **Interactive Fleet Editing**: Direct editing of fleet numbers through map interface
-- **Fleet Analytics**: Statistical analysis and reporting of fleet distribution
-- **Fleet Optimization**: Visual tools for optimizing fleet distribution across quadrants
-- **Historical Fleet Data**: Timeline view of fleet changes and trends
+##### **Parishes**
 
-## Spatial Data Management
+- **`GET /api/parishes`** - List parishes with municipality relationships
+- **`POST /api/parishes`** - Create a new parish
+- **`GET /api/parishes/:id`** - Get specific parish details
+- **`PUT /api/parishes/:id`** - Update a parish
+- **`DELETE /api/parishes/:id`** - Delete a parish (soft delete)
 
-### Boundary Management
+##### **Quadrants**
 
-- **Interactive Boundary Editing**: Draw, edit, and validate geographical boundaries directly on the map
-- **Boundary Validation**: Real-time validation of boundary overlaps and spatial relationships
-- **Multi-Layer Editing**: Simultaneous editing of multiple geographical layers
-- **Boundary Import/Export**: Support for importing and exporting boundary data in various formats
+- **`GET /api/quadrants`** - List quadrants with spatial boundary data (GeoJSON format for Leaflet)
+- **`GET /api/quadrants/geojson`** - Get all quadrants as GeoJSON FeatureCollection for direct Leaflet consumption
+- **`POST /api/quadrants`** - Create a new quadrant (accepts GeoJSON geometry, processes with spatial indexing)
+- **`GET /api/quadrants/:id`** - Get specific quadrant details including boundary as GeoJSON
+- **`GET /api/quadrants/:id/geojson`** - Get specific quadrant as GeoJSON Feature
+- **`PUT /api/quadrants/:id`** - Update a quadrant (accepts GeoJSON geometry for boundary modifications)
+- **`DELETE /api/quadrants/:id`** - Delete a quadrant (soft delete)
 
-### Point of Interest Management
+##### **Communal Circuits**
 
-- **Map-Based POI Creation**: Click-to-create points of interest directly on the map
-- **Automatic Spatial Association**: Automatic assignment of POIs to quadrants and circuits based on coordinates
-- **POI Categorization**: Visual categorization of different types of points of interest
-- **Bulk POI Operations**: Batch operations for managing multiple points of interest
+- **`GET /api/communal-circuits`** - List communal circuits with spatial boundary data (GeoJSON format for Leaflet)
+- **`GET /api/communal-circuits/geojson`** - Get all circuits as GeoJSON FeatureCollection for direct Leaflet consumption
+- **`POST /api/communal-circuits`** - Create a new communal circuit (accepts GeoJSON geometry)
+- **`GET /api/communal-circuits/:id`** - Get specific circuit details including boundary as GeoJSON
+- **`GET /api/communal-circuits/:id/geojson`** - Get specific circuit as GeoJSON Feature
+- **`PUT /api/communal-circuits/:id`** - Update a communal circuit (accepts GeoJSON geometry for boundary modifications)
+- **`DELETE /api/communal-circuits/:id`** - Delete a communal circuit (soft delete)
 
-## State Management
+##### **Points of Interest**
 
-### Redux Toolkit Integration
+- **`GET /api/points-of-interest`** - List points with spatial filtering options (by quadrant/circuit, bounding box)
+- **`GET /api/points-of-interest/geojson`** - Get all points as GeoJSON FeatureCollection for Leaflet markers
+- **`GET /api/points-of-interest/within/:bounds`** - Get points within map viewport bounds for dynamic loading
+- **`POST /api/points-of-interest`** - Create a new point (accepts lat/lng, automatically assigns to quadrant/circuit)
+- **`GET /api/points-of-interest/:id`** - Get specific point details with spatial associations
+- **`GET /api/points-of-interest/:id/geojson`** - Get specific point as GeoJSON Feature
+- **`PUT /api/points-of-interest/:id`** - Update a point (re-evaluates spatial associations if coordinates change)
+- **`DELETE /api/points-of-interest/:id`** - Delete a point of interest (soft delete)
 
-- **Spatial State Management**: Centralized state management for map data, boundaries, and spatial relationships
-- **Real-time Synchronization**: State synchronization with backend spatial data updates
-- **Optimistic Updates**: Immediate UI updates with rollback capability for spatial operations
-- **Spatial Caching**: Intelligent caching of spatial data for improved performance
+##### **Organisms**
 
-### State Structure
+- **`GET /api/organisms`** - List all organisms with pagination and filtering
+- **`POST /api/organisms`** - Create a new organism
+- **`GET /api/organisms/:id`** - Get specific organism details with associated points of interest and responsibles
+- **`PUT /api/organisms/:id`** - Update an organism
+- **`DELETE /api/organisms/:id`** - Delete an organism (soft delete)
 
-```typescript
-interface RootState {
-  auth: {
-    user: User | null;
-    token: string | null;
-    isAuthenticated: boolean;
-    permissions: string[];
-    spatialPermissions: SpatialPermission[];
-  };
-  map: {
-    center: [number, number];
-    zoom: number;
-    bounds: LatLngBounds;
-    activeLayer: string;
-    drawingMode: boolean;
-  };
-  spatial: {
-    quadrants: GeoJSONFeatureCollection;
-    circuits: GeoJSONFeatureCollection;
-    pointsOfInterest: PointOfInterest[];
-    selectedEntity: SpatialEntity | null;
-  };
-  entities: {
-    states: State[];
-    municipalities: Municipality[];
-    parishes: Parish[];
-    organisms: Organism[];
-    responsibles: Responsible[];
-  };
-  ui: {
-    activeModal: string | null;
-    notifications: Notification[];
-    loading: LoadingState;
-  };
-}
-```
+##### **Communes**
+
+- **`GET /api/communes`** - List all communes with pagination and filtering
+- **`POST /api/communes`** - Create a new commune
+- **`GET /api/communes/:id`** - Get specific commune details with associated responsibles and councils
+- **`PUT /api/communes/:id`** - Update a commune
+- **`DELETE /api/communes/:id`** - Delete a commune (soft delete)
+
+##### **Communal Councils**
+
+- **`GET /api/communal-councils`** - List all communal councils with pagination and filtering
+- **`POST /api/communal-councils`** - Create a new communal council
+- **`GET /api/communal-councils/:id`** - Get specific council details with associated responsibles
+- **`PUT /api/communal-councils/:id`** - Update a communal council
+- **`DELETE /api/communal-councils/:id`** - Delete a communal council (soft delete)
+
+##### **Responsibles**
+
+- **`GET /api/responsibles`** - List responsibles with entity relationships and filtering
+- **`POST /api/responsibles`** - Create a new responsible (validates Venezuelan phone number and CI format)
+- **`GET /api/responsibles/:id`** - Get specific responsible details
+- **`PUT /api/responsibles/:id`** - Update a responsible (validates phone number and CI format)
+- **`DELETE /api/responsibles/:id`** - Delete a responsible (soft delete)
+
+### Common Features
+
+- **Pagination**: `?page=1&pageSize=10`
+- **Filtering**: Entity-specific filters (e.g., `?name=search&parish=downtown`)
+- **Spatial Filtering**: Bounding box queries (`?bbox=minLng,minLat,maxLng,maxLat`) for map viewport optimization
+- **Sorting**: `?sortBy=name&sortOrder=ASC`
+- **GeoJSON Output**: All spatial endpoints support GeoJSON format for direct Leaflet integration
+- **Error Handling**: Consistent JSON error responses
+- **Validation**: Request body validation with detailed error messages including spatial data validation
+
+## Database Configuration
+
+### Multi-Database Support
+
+- **PostgreSQL with PostGIS**: Production database with JSONB and spatial data support (PostGIS extension required)
+- **SQLite**: Testing database with in-memory option
+- **Environment-Based**: Automatic configuration via environment variables
+
+### Database Operations
+
+- **Auto-Sync**: Sequelize automatically creates/updates tables with spatial columns
+- **Soft Deletes**: Most entities use `deletionDate` for soft deletion
+- **Constraints**: Foreign key constraints with CASCADE/RESTRICT policies
+- **Indexes**: Automatic indexing on primary keys, foreign keys, and spatial boundaries (GIST indexes for geometry)
+- **Spatial Support**:
+  - Geometry columns with spatial indexing for optimal map query performance
+  - GeoJSON serialization/deserialization for Leaflet compatibility
+  - Spatial relationship queries (ST_Contains, ST_Within, ST_Intersects)
+  - Bounding box queries optimized for map viewport loading
 
 ## Development Tools
 
 ### Code Quality
 
-- **TypeScript**: Strict type checking with comprehensive spatial data type definitions
-- **ESLint**: Advanced linting rules with React-Leaflet and geospatial-specific rules
-- **Prettier**: Consistent code formatting across the project
-- **Spatial Type Safety**: Custom TypeScript definitions for GeoJSON and coordinate systems
+- **TypeScript**: Strict type checking with custom type definitions
+- **ESLint**: Linting with TypeScript rules and auto-fix
+- **Prettier**: Code formatting with consistent style
+- **Import Sorting**: Automatic import organization
 
 ### Development Experience
 
-- **Hot Module Replacement**: Instant updates during development with map state preservation
-- **Fast Refresh**: React Fast Refresh for component state preservation during map interactions
-- **Path Aliases**: Clean import paths with TypeScript path mapping for spatial utilities
-- **Map Development Tools**: Leaflet debugging tools and coordinate inspection utilities
-
-## Performance Optimization
-
-### Map Performance
-
-- **Tile Caching**: Intelligent caching of map tiles for offline capability
-- **Spatial Data Optimization**: Efficient loading and rendering of large GeoJSON datasets
-- **Viewport-Based Loading**: Dynamic loading of spatial data based on map viewport
-- **Layer Management**: Optimized rendering of multiple geographical layers
-
-### Build Optimization
-
-- **Code Splitting**: Route-based and feature-based code splitting for map components
-- **Tree Shaking**: Elimination of unused Leaflet plugins and spatial utilities
-- **Asset Optimization**: Optimization of map icons, markers, and spatial assets
-- **Bundle Analysis**: Analysis of spatial library bundle sizes and optimization
-
-### Runtime Performance
-
-- **Spatial Indexing**: Client-side spatial indexing for fast point-in-polygon queries
-- **Debounced Map Events**: Optimized handling of map pan, zoom, and draw events
-- **Virtual Rendering**: Efficient rendering of large numbers of map markers
-- **Memory Management**: Proper cleanup of map instances and spatial data
+- **Hot Reload**: ts-node-dev for instant server restart on changes
+- **Path Mapping**: TypeScript path aliases for clean imports
+- **Type Definitions**: Custom types for Express, Sequelize extensions
+- **Error Handling**: Comprehensive error types and messages
 
 ## Security Features
 
-### Spatial Security
+### Authentication Security
 
-- **Boundary Validation**: Server-side validation of spatial boundaries and coordinates
-- **Spatial Access Control**: Permission-based access to geographical areas and editing capabilities
-- **Coordinate Sanitization**: Validation and sanitization of coordinate inputs
-- **Spatial Data Integrity**: Protection against malicious GeoJSON and spatial data injection
+- **bcrypt Hashing**: Secure password storage with configurable salt rounds
+- **JWT Tokens**: Stateless authentication with configurable expiration
+- **Token Validation**: Middleware validates tokens on every protected request
 
-### Client-Side Security
+### Data Security
 
-- **XSS Protection**: Input sanitization for spatial data and coordinate inputs
-- **CSRF Protection**: Token-based validation for spatial data modifications
-- **Secure Map Tiles**: HTTPS-only map tile loading and secure tile server configuration
-- **Spatial Permission Validation**: Client-side validation of spatial editing permissions
+- **Input Validation**: Sequelize model validation and custom validators
+- **SQL Injection Protection**: Parameterized queries via Sequelize ORM
+- **CORS Configuration**: Configurable cross-origin resource sharing
+- **Environment Variables**: Sensitive data stored in environment variables
 
-## Testing Strategy
+### Access Control
 
-### Spatial Testing
+- **Role-Based Permissions**: Granular permission system
+- **Route Protection**: Authentication middleware on all protected routes
+- **User Context**: Authenticated user available throughout request lifecycle
 
-- **Map Component Testing**: Testing of Leaflet map components and interactions
-- **Spatial Data Testing**: Validation of GeoJSON processing and spatial calculations
-- **Coordinate System Testing**: Testing of coordinate transformations and projections
-- **Boundary Validation Testing**: Testing of spatial relationship validation
+## Error Handling
 
-### Testing Tools
+### Validation Errors
 
-- **Jest**: Unit testing with spatial utility function testing
-- **React Testing Library**: Component testing with map interaction simulation
-- **Leaflet Testing Utilities**: Custom utilities for testing map components
-- **Spatial Data Mocking**: Mock GeoJSON data for isolated testing
+- **Model-Level**: Sequelize decorators for field validation
+- **Controller-Level**: Business logic validation with detailed messages
+- **Request-Level**: Input validation for API endpoints
 
-## Deployment
+### Error Response Format
 
-### Production Build
-
-```bash
-# Build for production with spatial optimizations
-yarn build
-
-# Preview production build with map functionality
-yarn preview
+```json
+{
+  "error": "Detailed error message",
+  "code": "ERROR_CODE",
+  "details": {
+    "field": "Additional context"
+  }
+}
 ```
 
-### Spatial Configuration
+### Transaction Support
 
-- **Map Tile Configuration**: Production tile server configuration and API keys
-- **Coordinate System Setup**: Production coordinate system and projection configuration
-- **Spatial Data CDN**: Configuration for serving large spatial datasets via CDN
-- **Map Performance Tuning**: Production-optimized map rendering settings
-
-### Deployment Considerations
-
-- **Map Tile Servers**: Configuration of production map tile servers and fallbacks
-- **Spatial Data Storage**: CDN configuration for large GeoJSON files and spatial assets
-- **HTTPS Requirements**: Secure connections required for geolocation and map tiles
-- **Performance Monitoring**: Monitoring of map loading times and spatial query performance
-
-## Troubleshooting
-
-### Map-Specific Issues
-
-- **Map Not Loading**: Check tile server configuration and network connectivity
-- **Coordinate Issues**: Verify coordinate system and projection settings
-- **Boundary Rendering**: Check GeoJSON validity and coordinate order
-- **Performance Issues**: Monitor spatial data size and rendering complexity
-
-### Spatial Data Issues
-
-- **GeoJSON Validation**: Use online GeoJSON validators for boundary data
-- **Coordinate Precision**: Ensure appropriate coordinate precision for performance
-- **Spatial Relationships**: Verify spatial association logic and boundary overlaps
-- **Memory Usage**: Monitor memory usage with large spatial datasets
-
-## Contributing
-
-### Spatial Development Guidelines
-
-1. **Spatial Data Standards**: Follow GeoJSON standards and coordinate system conventions
-2. **Map Component Patterns**: Use established patterns for Leaflet React integration
-3. **Performance Considerations**: Consider performance impact of spatial operations
-4. **Coordinate System Awareness**: Understand coordinate systems and projections used
-
-### Code Standards
-
-- **Spatial TypeScript**: Use proper typing for GeoJSON and coordinate data
-- **Map Component Structure**: Follow established patterns for map component organization
-- **Spatial Utility Functions**: Create reusable utilities for common spatial operations
-- **Testing**: Include tests for spatial calculations and map interactions
-
-### Pull Request Guidelines
-
-- **Spatial Feature Documentation**: Document new spatial features and map interactions
-- **Map Screenshots**: Include screenshots of map-based features and changes
-- **Performance Impact**: Document performance impact of spatial data changes
-- **Coordinate System Compatibility**: Ensure compatibility with existing coordinate systems
+- **Data Integrity**: Critical operations wrapped in database transactions
+- **Rollback**: Automatic rollback on errors
+- **Audit Consistency**: Change logs created within same transaction
 
 ## Default Admin Account
 
-After setting up the backend and running `yarn db:populate`, you can log in with:
+After running `yarn db:populate`, you can log in with:
 
 - **Username**: `admin`
 - **Password**: `admin`
@@ -690,11 +752,7 @@ MIT License - see package.json for details.
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes with tests
-4. Run `yarn lint` and `yarn build`
+4. Run `yarn lint` and `yarn test`
 5. Submit a pull request
 
 For questions or issues, please create an issue in the repository.
-
----
-
-**⚠️ Important**: Ensure the backend API with PostGIS support is running before starting the frontend development server. The frontend requires the backend for authentication, spatial data management, and GeoJSON processing functionality.

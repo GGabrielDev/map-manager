@@ -1,8 +1,7 @@
 import { createAsyncThunk,createSlice } from '@reduxjs/toolkit';
 
+import type { RootState } from '@/store';
 import type { AuthState, LoginCredentials,User } from '@/types';
-
-import type { RootState } from '.';
 
 // Token cache key
 const TOKEN_CACHE_KEY = 'inventory-app-auth-token';
