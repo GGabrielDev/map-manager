@@ -18,14 +18,14 @@ import {
  import { Parish, Responsible } from ".";
 
  @Table({ 
-    tableName: "ComunalCircuit",
+    tableName: "CommunalCircuit",
     indexes: [{
         name: 'boundaryIndex',
         fields: ['boundary'],
         using: 'gits'
     }]
 })
- export default class ComunalCircuit extends Model{
+ export default class CommunalCircuit extends Model{
     @PrimaryKey
     @AutoIncrement
     @Column(DataType.INTEGER)
