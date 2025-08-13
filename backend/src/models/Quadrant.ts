@@ -7,6 +7,7 @@ import {
     DataType,
     DeletedAt,
     ForeignKey,
+    HasMany,
     Model,
     PrimaryKey,
     Table,
@@ -15,9 +16,16 @@ import {
     Validate
  } from "sequelize-typescript";
 
- import { Parish, Organism } from ".";
+ import { Parish, Organism, Responsible } from ".";
 
- @Table({ tableName: 'Quadrant' })
+ @Table({ 
+  tableName: 'Quadrant',
+  indexes: [{
+    name: 'boundaryIndex',
+    fields: ['boundary'],
+    using: 'gits'
+  }]
+  })
  export default class Quadrant extends Model {
    @PrimaryKey
    @AutoIncrement
@@ -72,6 +80,9 @@ import {
 
    @DeletedAt
    deletionDate?: Date
+
+   @HasMany(()=> Responsible)
+   responsible!: Responsible
 
    @BelongsTo(() => Parish)
    parish!: Parish
