@@ -7,7 +7,6 @@ import {
     DataType,
     DeletedAt,
     ForeignKey,
-    HasMany,
     Model,
     PrimaryKey,
     Table,
