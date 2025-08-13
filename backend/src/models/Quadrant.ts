@@ -21,9 +21,9 @@ import {
  @Table({ 
   tableName: 'Quadrant',
   indexes: [{
-    name: 'boundaryIndex',
+    name: 'boundaryQuadrantIndex',
     fields: ['boundary'],
-    using: 'gits'
+    using: 'gist'
   }]
   })
  export default class Quadrant extends Model {

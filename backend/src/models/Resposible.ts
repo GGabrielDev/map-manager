@@ -13,7 +13,7 @@ import {
     ForeignKey
 } from "sequelize-typescript";
 
-import { Organism, Quadrant } from ".";
+import { Organism, Quadrant, CommunalCircuit } from ".";
 
 @Table({tableName: 'Resposible'})
 export default class Resposible extends Model{
@@ -60,6 +60,10 @@ export default class Resposible extends Model{
     @Column
     quadrantId?: number
 
+    @ForeignKey(()=> CommunalCircuit)
+    @Column
+    communalCircuitId?: number
+
     @CreatedAt
     createdAt!: Date
 
@@ -74,4 +78,7 @@ export default class Resposible extends Model{
 
     @BelongsTo(()=> Quadrant)
     quadrant?: Quadrant
+
+    @BelongsTo(()=> CommunalCircuit)
+    communalCircuit?: CommunalCircuit
 }

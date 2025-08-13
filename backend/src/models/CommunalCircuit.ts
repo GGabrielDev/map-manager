@@ -20,9 +20,9 @@ import {
  @Table({ 
     tableName: "CommunalCircuit",
     indexes: [{
-        name: 'boundaryIndex',
+        name: 'boundaryCommunalCircuitIndex',
         fields: ['boundary'],
-        using: 'gits'
+        using: 'gist'
     }]
 })
  export default class CommunalCircuit extends Model{

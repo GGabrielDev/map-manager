@@ -1,5 +1,5 @@
 import { Quadrant, Parish, Organism } from "@/models";
-import { Op, OrderItem, QueryError } from "sequelize";
+import { Op, OrderItem, Sequelize } from "sequelize";
 
 interface PaginationOpstions{
     page: number
@@ -93,10 +93,16 @@ export const allQuadrant = async({
             include: [
                 includeOptionsOrganism,
                 includeOptionsParish
-            ]
+            ],
+            attributes: {
+                include: [[
+                    Sequelize.literal(`ST_AsGeoJSON("boundary")::json`),
+                    'boundary'
+                ]]
+            }
         })
 
-        const total = await Parish.count({where})
+        const total = await Quadrant.count({where})
 
         return {
             data,
@@ -107,6 +113,89 @@ export const allQuadrant = async({
     } catch (error) {
         throw new Error("Error al obtener los cuadrantes, intente nuevamente.");
     }
+}
+
+//All QuadrantGeoJson
+export const allQuadrantsGeoJSON = async ({
+  name,
+  organismName,
+  parishName,
+  sortBy,
+  sortOrder = 'ASC'
+}: Partial<QuadrantFilterOptions>) => {
+  try {
+    const andConditions: any[] = [];
+
+    if (name) {
+      andConditions.push({ name: { [Op.iLike]: `%${name}%` } });
+    }
+
+    const includeOptionsOrganism: any = {
+      model: Organism,
+      as: 'organism',
+      required: false,
+    };
+    if (organismName) {
+      includeOptionsOrganism.where = { name: { [Op.iLike]: `%${organismName}%` } };
+      includeOptionsOrganism.required = true;
+    }
+
+    const includeOptionsParish: any = {
+      model: Parish,
+      as: 'parish',
+      required: false,
+    };
+    if (parishName) {
+      includeOptionsParish.where = { name: { [Op.iLike]: `%${parishName}%` } };
+      includeOptionsParish.required = true;
+    }
+
+    const where = andConditions.length ? { [Op.and]: andConditions } : undefined;
+
+    let order: OrderItem[] | undefined = undefined;
+    if (sortBy) {
+      const column =
+        sortBy === 'creationDate' ? 'creationDate' :
+        sortBy === 'updateDate' ? 'updatedOn' :
+        'name';
+      order = [[column, sortOrder]];
+    }
+
+    const data = await Quadrant.findAll({
+      where,
+      order,
+      include: [includeOptionsOrganism, includeOptionsParish],
+      attributes: {
+        include: [[Sequelize.literal(`ST_AsGeoJSON("boundary")::json`), 'boundary']]
+      }
+    });
+
+    const features = data.map(quadrant => ({
+      type: "Feature",
+      geometry: quadrant.get('boundary'),
+      properties: {
+        id: quadrant.id,
+        name: quadrant.name,
+        parishId: quadrant.parishId,
+        organismId: quadrant.organismId,
+        metadata: quadrant.metadata,
+        fleet: quadrant.fleet,
+        createdAt: quadrant.createdAt,
+        updatedAt: quadrant.updatedAt,
+        deletionDate: quadrant.deletionDate,
+        organism: quadrant.organism,
+        parish: quadrant.parish
+      }
+    }));
+
+    return {
+      type: "FeatureCollection",
+      features
+    };
+
+  } catch (error) {
+    throw new Error("Error al obtener los cuadrantes en formato GeoJSON.");
+  }
 }
 
 // get Quedrant by ID
@@ -121,6 +210,48 @@ export const getById = async (id: number):Promise<Quadrant | null> =>{
         }
 
         return quadrant;
+    } catch (error) {
+        throw new Error("Error al obtener cuadrante, intente nuevamente.")
+    }    
+}
+
+// get Quedrant GeoJson by ID
+export const getByIdGeoJson = async (id: number)=>{
+    try {
+        const quadrant = await Quadrant.findOne({
+            where: {id},
+             include: [
+                { model: Organism, as: 'organism', required: false },
+                { model: Parish, as: 'parish', required: false }
+            ],
+            attributes: {
+                include: [
+                    [Sequelize.literal(`ST_AsGeoJSON("boundary")::json`), 'boundary']
+                ]
+            }
+        })
+
+        if (!quadrant) {
+            throw new Error("Cuandrante no encontrado");
+        }
+
+        return {
+            type: "Feature",
+            geometry: quadrant.get('boundary'),  // GeoJSON puro
+            properties: {
+                id: quadrant.id,
+                name: quadrant.name,
+                parishId: quadrant.parishId,
+                organismId: quadrant.organismId,
+                metadata: quadrant.metadata,
+                fleet: quadrant.fleet,
+                createdAt: quadrant.createdAt,
+                updatedAt: quadrant.updatedAt,
+                deletionDate: quadrant.deletionDate,
+                organism: quadrant.organism,
+                parish: quadrant.parish,
+            }
+        };
     } catch (error) {
         throw new Error("Error al obtener cuadrante, intente nuevamente.")
     }    
