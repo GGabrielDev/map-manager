@@ -10,11 +10,13 @@ const GeographicalDashboard: React.FC = () => {
   const { 
     canManageStates, 
     canManageMunicipalities,
+    canManageParishes,
   } = usePermissions();
 
   const navigationItems = [
     { label: t('dashboard:geographical.navigation.states'), route: '/states' },
     { label: t('dashboard:geographical.navigation.municipalities'), route: '/municipalities' },
+    { label: t('dashboard:geographical.navigation.parishes'), route: '/parishes' },
   ];
 
   const managementSections = [
@@ -31,6 +33,13 @@ const GeographicalDashboard: React.FC = () => {
       route: '/municipalities',
       color: 'info' as const,
       icon: '🏘️'
+    }] : []),
+    ...(canManageParishes ? [{
+      title: t('dashboard:management.parishes.title'),
+      description: t('dashboard:management.parishes.description'),
+      route: '/parishes',
+      color: 'primary' as const,
+      icon: '🏛️'
     }] : []),
   ];
 

@@ -5,42 +5,39 @@ import DashboardCard from '@/components/dashboard/DashboardCard';
 import NavigationMenu from '@/components/dashboard/NavigationMenu';
 import { usePermissions } from '@/hooks';
 
-const GeographicalDashboard: React.FC = () => {
+const AdministrativeDashboard: React.FC = () => {
   const { t } = useTranslation();
-  const { 
-    canManageStates, 
-    canManageMunicipalities,
-  } = usePermissions();
+  const { canManageUsers, canManageRoles } = usePermissions();
 
   const navigationItems = [
-    { label: t('dashboard:geographical.navigation.states'), route: '/states' },
-    { label: t('dashboard:geographical.navigation.municipalities'), route: '/municipalities' },
+    { label: t('dashboard:administrative.navigation.users'), route: '/users' },
+    { label: t('dashboard:administrative.navigation.roles'), route: '/roles' },
   ];
 
   const managementSections = [
-    ...(canManageStates ? [{
-      title: t('dashboard:management.states.title'),
-      description: t('dashboard:management.states.description'),
-      route: '/states',
-      color: 'success' as const,
-      icon: '🏛️'
+    ...(canManageUsers ? [{
+      title: t('dashboard:management.users.title'),
+      description: t('dashboard:management.users.description'),
+      route: '/users',
+      color: 'primary' as const,
+      icon: '👥'
     }] : []),
-    ...(canManageMunicipalities ? [{
-      title: t('dashboard:management.municipalities.title'),
-      description: t('dashboard:management.municipalities.description'),
-      route: '/municipalities',
-      color: 'info' as const,
-      icon: '🏘️'
+    ...(canManageRoles ? [{
+      title: t('dashboard:management.roles.title'),
+      description: t('dashboard:management.roles.description'),
+      route: '/roles',
+      color: 'secondary' as const,
+      icon: '🔐'
     }] : []),
   ];
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <NavigationMenu
-        title={t('dashboard:geographical.title')}
+        title={t('dashboard:administrative.title')}
         items={navigationItems}
         backRoute="/dashboard"
-        backLabel={t('dashboard:geographical.backToMain')}
+        backLabel={t('dashboard:administrative.backToMain')}
       />
 
       {managementSections.length > 0 ? (
@@ -63,10 +60,10 @@ const GeographicalDashboard: React.FC = () => {
       ) : (
         <Box sx={{ textAlign: 'center', mt: 8 }}>
           <Typography variant="h6" color="text.secondary" gutterBottom>
-            {t('dashboard:geographical.noSections')}
+            {t('dashboard:administrative.noSections')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            {t('dashboard:geographical.noPermissions')}
+            {t('dashboard:administrative.noPermissions')}
           </Typography>
         </Box>
       )}
@@ -74,4 +71,4 @@ const GeographicalDashboard: React.FC = () => {
   );
 };
 
-export default GeographicalDashboard;
+export default AdministrativeDashboard;

@@ -10,8 +10,7 @@
 
   "quickActions": {
     "title": "Quick Actions",
-    "createUser": "Create User",
-    "manageStates": "Manage States",
+    "createUser": "Manage Users",
     "manageRoles": "Manage Roles"
   },
 
@@ -50,7 +49,8 @@
     "backToMain": "Back to Main Dashboard",
     "navigation": {
       "states": "States",
-      "municipalities": "Municipalities"
+      "municipalities": "Municipalities",
+      "parishes": "Parishes"
     },
     "noSections": "No Geographical Sections Available",
     "noPermissions": "You don't have permissions to access geographical management features."
@@ -72,6 +72,10 @@
     "municipalities": {
       "title": "Manage Municipalities",
       "description": "Create and manage Municipalities within States"
+    },
+    "parishes": {
+      "title": "Manage Parishes",
+      "description": "Create and manage Parishes within Municipalities"
     }
   }
 }

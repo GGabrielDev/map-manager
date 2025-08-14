@@ -48,11 +48,18 @@ export const usePermissions = () => {
   const canEditMunicipality = hasPermission('edit_municipality');
   const canDeleteMunicipality = hasPermission('delete_municipality');
 
+  // Parish-specific permission checks
+  const canCreateParish = hasPermission('create_parish');
+  const canGetParish = hasPermission('get_parish');
+  const canEditParish = hasPermission('edit_parish');
+  const canDeleteParish = hasPermission('delete_parish');
+
   // Composite permission checks
   const canManageUsers = canCreateUser || canGetUser || canEditUser || canDeleteUser;
   const canManageRoles = canCreateRole || canGetRole || canEditRole || canDeleteRole;
   const canManageStates = canCreateState || canGetState || canEditState || canDeleteState;
   const canManageMunicipalities = canCreateMunicipality || canGetMunicipality || canEditMunicipality || canDeleteMunicipality;
+  const canManageParishes = canCreateParish || canGetParish || canEditParish || canDeleteParish;
 
   return {
     hasPermission,
@@ -82,6 +89,12 @@ export const usePermissions = () => {
     canEditMunicipality,
     canDeleteMunicipality,
     canManageMunicipalities,
+    // Parish permissions
+    canCreateParish,
+    canGetParish,
+    canEditParish,
+    canDeleteParish,
+    canManageParishes,
     // Permission permissions
     canGetPermission,
   };

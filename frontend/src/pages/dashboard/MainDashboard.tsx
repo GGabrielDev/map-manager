@@ -21,7 +21,6 @@ const MainDashboard: React.FC = () => {
   const {
     canManageUsers,
     canManageRoles,
-    canManageStates,
   } = usePermissions();
 
   const handleLogout = () => {
@@ -48,13 +47,6 @@ const MainDashboard: React.FC = () => {
       color: 'secondary' as const,
       icon: '🔐',
       disabled: !canManageRoles
-    },
-    {
-      label: t('dashboard:quickActions.manageStates'),
-      onClick: () => navigate('/states'),
-      color: 'success' as const,
-      icon: '🏛️',
-      disabled: !canManageStates
     },
   ];
 

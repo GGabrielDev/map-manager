@@ -8,6 +8,7 @@ import AdministrativeDashboard from './pages/dashboard/AdministrativeDashboard';
 import GeographicalDashboard from './pages/dashboard/GeographicalDashboard';
 import MainDashboard from './pages/dashboard/MainDashboard';
 import ManageMunicipalities from './pages/geographical/MunicipalitiesPage';
+import ManageParishes from './pages/geographical/ParishesPage';
 import ManageStates from './pages/geographical/StatesPage';
 
 const App: React.FC = () => {
@@ -75,6 +76,14 @@ const App: React.FC = () => {
         element={
           <ProtectedRoute>
             <ManageMunicipalities />
+          </ProtectedRoute>
+        }
+      />
+      <Route 
+        path="/parishes" 
+        element={
+          <ProtectedRoute>
+            <ManageParishes />
           </ProtectedRoute>
         }
       />
