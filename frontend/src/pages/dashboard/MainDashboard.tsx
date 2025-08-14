@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { DashboardCard } from '@/components/dashboard';
+import DashboardCard from '@/components/dashboard/DashboardCard';
 import QuickActions from '@/components/dashboard/QuickActions';
 import LanguageSelector from '@/components/LanguageSelector';
 import { usePermissions } from '@/hooks';
@@ -22,7 +22,6 @@ const MainDashboard: React.FC = () => {
     canManageUsers,
     canManageRoles,
     canManageStates,
-    // canManageMunicipalities,
   } = usePermissions();
 
   const handleLogout = () => {
@@ -37,40 +36,40 @@ const MainDashboard: React.FC = () => {
   // Quick actions for common tasks
   const quickActions = [
     {
-      label: 'Create User',
+      label: t('dashboard:quickActions.createUser'),
       onClick: () => navigate('/users'),
       color: 'primary' as const,
       icon: '👤',
       disabled: !canManageUsers
     },
     {
-      label: 'Manage States',
-      onClick: () => navigate('/states'),
-      color: 'success' as const,
-      icon: '🏛️',
-      disabled: !canManageStates
-    },
-    {
-      label: 'Manage Roles',
+      label: t('dashboard:quickActions.manageRoles'),
       onClick: () => navigate('/roles'),
       color: 'secondary' as const,
       icon: '🔐',
       disabled: !canManageRoles
+    },
+    {
+      label: t('dashboard:quickActions.manageStates'),
+      onClick: () => navigate('/states'),
+      color: 'success' as const,
+      icon: '🏛️',
+      disabled: !canManageStates
     },
   ];
 
   // Main dashboard categories
   const dashboardSections = [
     {
-      title: 'Administrative Dashboard',
-      description: 'Manage users, roles, and system administration',
+      title: t('dashboard:categories.administrative.title'),
+      description: t('dashboard:categories.administrative.description'),
       route: '/dashboard/administrative',
       color: 'primary' as const,
       icon: '⚙️'
     },
     {
-      title: 'Geographical Dashboard',
-      description: 'Manage states, municipalities, and other geographical entities',
+      title: t('dashboard:categories.geographical.title'),
+      description: t('dashboard:categories.geographical.description'),
       route: '/dashboard/geographical',
       color: 'success' as const,
       icon: '🌍'
@@ -104,13 +103,13 @@ const MainDashboard: React.FC = () => {
 
       {/* Quick Actions */}
       <QuickActions
-        title="Quick Actions"
+        title={t('dashboard:quickActions.title')}
         actions={quickActions}
       />
 
       {/* Dashboard Categories */}
       <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
-        Dashboard Categories
+        {t('dashboard:categories.title')}
       </Typography>
       
       <Box sx={{ 
@@ -139,7 +138,7 @@ const MainDashboard: React.FC = () => {
         borderRadius: 2 
       }}>
         <Typography variant="h6" gutterBottom>
-          System Overview
+          {t('dashboard:systemOverview.title')}
         </Typography>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2 }}>
           <Box sx={{ textAlign: 'center' }}>
@@ -147,7 +146,7 @@ const MainDashboard: React.FC = () => {
               {user?.roles?.length || 0}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Assigned Roles
+              {t('dashboard:systemOverview.assignedRoles')}
             </Typography>
           </Box>
           <Box sx={{ textAlign: 'center' }}>
@@ -155,7 +154,7 @@ const MainDashboard: React.FC = () => {
               {user?.roles?.reduce((acc, role) => acc + role.permissions.length, 0) || 0}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Total Permissions
+              {t('dashboard:systemOverview.totalPermissions')}
             </Typography>
           </Box>
           <Box sx={{ textAlign: 'center' }}>
@@ -163,7 +162,7 @@ const MainDashboard: React.FC = () => {
               2
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Dashboard Categories
+              {t('dashboard:systemOverview.dashboardCategories')}
             </Typography>
           </Box>
         </Box>

@@ -1,4 +1,5 @@
 import { Box, Button, Card, CardContent, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 interface DashboardCardProps {
@@ -18,6 +19,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   icon,
   onClick
 }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -64,7 +66,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
             handleClick();
           }}
         >
-          Access
+          {t('dashboard:access')}
         </Button>
       </CardContent>
     </Card>

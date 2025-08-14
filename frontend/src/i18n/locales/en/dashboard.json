@@ -4,17 +4,74 @@
   "switchToDark": "Switch to dark mode",
   "switchToLight": "Switch to light mode",
   "logout": "Logout",
-  "manageUsers": "Manage Users",
-  "manageUsersDesc": "Create, edit, and manage user accounts",
-  "manageRoles": "Manage Roles",
-  "manageRolesDesc": "Configure roles and permissions",
-  "manageStates": "Manage States",
-  "manageStatesDesc": "Create and manage States for maps and data",
-  "manageMunicipalities": "Manage Municipalities",
-  "manageMunicipalitiesDesc": "Create and manage Municipalities within States",
   "access": "Access",
-  "noSectionsAvailable": "No Management Sections Available",
-  "noPermissionsMessage": "You don't have permissions to manage any sections. Please contact your administrator for access.",
   "yourPermissions": "Your Permissions",
-  "noRolesAssigned": "No roles assigned"
+  "noRolesAssigned": "No roles assigned",
+
+  "quickActions": {
+    "title": "Quick Actions",
+    "createUser": "Create User",
+    "manageStates": "Manage States",
+    "manageRoles": "Manage Roles"
+  },
+
+  "categories": {
+    "title": "Dashboard Categories",
+    "administrative": {
+      "title": "Administrative Dashboard",
+      "description": "Manage users, roles, and system administration"
+    },
+    "geographical": {
+      "title": "Geographical Dashboard",
+      "description": "Manage states, municipalities, and other geographical entities"
+    }
+  },
+
+  "systemOverview": {
+    "title": "System Overview",
+    "assignedRoles": "Assigned Roles",
+    "totalPermissions": "Total Permissions",
+    "dashboardCategories": "Dashboard Categories"
+  },
+
+  "administrative": {
+    "title": "Administrative Dashboard",
+    "backToMain": "Back to Main Dashboard",
+    "navigation": {
+      "users": "Users",
+      "roles": "Roles"
+    },
+    "noSections": "No Administrative Sections Available",
+    "noPermissions": "You don't have permissions to access administrative features."
+  },
+
+  "geographical": {
+    "title": "Geographical Dashboard",
+    "backToMain": "Back to Main Dashboard",
+    "navigation": {
+      "states": "States",
+      "municipalities": "Municipalities"
+    },
+    "noSections": "No Geographical Sections Available",
+    "noPermissions": "You don't have permissions to access geographical management features."
+  },
+
+  "management": {
+    "users": {
+      "title": "Manage Users",
+      "description": "Create, edit, and manage user accounts"
+    },
+    "roles": {
+      "title": "Manage Roles",
+      "description": "Configure roles and permissions"
+    },
+    "states": {
+      "title": "Manage States",
+      "description": "Create and manage States for maps and data"
+    },
+    "municipalities": {
+      "title": "Manage Municipalities",
+      "description": "Create and manage Municipalities within States"
+    }
+  }
 }

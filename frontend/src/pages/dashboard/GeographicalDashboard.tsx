@@ -1,34 +1,33 @@
 import { Box, Container, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-//import { useNavigate } from 'react-router-dom';
-import { DashboardCard, NavigationMenu } from '@/components/dashboard';
+import DashboardCard from '@/components/dashboard/DashboardCard';
+import NavigationMenu from '@/components/dashboard/NavigationMenu';
 import { usePermissions } from '@/hooks';
 
 const GeographicalDashboard: React.FC = () => {
   const { t } = useTranslation();
-//const navigate = useNavigate();
   const { 
     canManageStates, 
     canManageMunicipalities,
   } = usePermissions();
 
   const navigationItems = [
-    { label: 'States', route: '/states' },
-    { label: 'Municipalities', route: '/municipalities' },
+    { label: t('dashboard:geographical.navigation.states'), route: '/states' },
+    { label: t('dashboard:geographical.navigation.municipalities'), route: '/municipalities' },
   ];
 
   const managementSections = [
     ...(canManageStates ? [{
-      title: t('dashboard:manageStates'),
-      description: t('dashboard:manageStatesDesc'),
+      title: t('dashboard:management.states.title'),
+      description: t('dashboard:management.states.description'),
       route: '/states',
       color: 'success' as const,
       icon: '🏛️'
     }] : []),
     ...(canManageMunicipalities ? [{
-      title: t('dashboard:manageMunicipalities'),
-      description: t('dashboard:manageMunicipalitiesDesc'),
+      title: t('dashboard:management.municipalities.title'),
+      description: t('dashboard:management.municipalities.description'),
       route: '/municipalities',
       color: 'info' as const,
       icon: '🏘️'
@@ -38,10 +37,10 @@ const GeographicalDashboard: React.FC = () => {
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <NavigationMenu
-        title="Geographical Dashboard"
+        title={t('dashboard:geographical.title')}
         items={navigationItems}
         backRoute="/dashboard"
-        backLabel="Back to Main Dashboard"
+        backLabel={t('dashboard:geographical.backToMain')}
       />
 
       {managementSections.length > 0 ? (
@@ -64,10 +63,10 @@ const GeographicalDashboard: React.FC = () => {
       ) : (
         <Box sx={{ textAlign: 'center', mt: 8 }}>
           <Typography variant="h6" color="text.secondary" gutterBottom>
-            No Geographical Sections Available
+            {t('dashboard:geographical.noSections')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            You don't have permissions to access geographical management features.
+            {t('dashboard:geographical.noPermissions')}
           </Typography>
         </Box>
       )}
