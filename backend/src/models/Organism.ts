@@ -27,6 +27,9 @@ export default class Organism extends Model{
     @Column
     name!: string
 
+    @Column
+    icono?: string
+
     @CreatedAt
     createdAt!: Date
 

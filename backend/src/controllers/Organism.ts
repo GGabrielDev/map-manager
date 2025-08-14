@@ -96,7 +96,7 @@ export const getById = async (id: number): Promise<Organism | null> => {
 }
 
 // Create Organism
-export const createOrganism = async (name: string): Promise<Organism> => {
+export const createOrganism = async (name: string, icono:string): Promise<Organism> => {
     try {
         const existOrganism = await Organism.findOne({ where: { name } });
 
@@ -105,12 +105,13 @@ export const createOrganism = async (name: string): Promise<Organism> => {
         }
 
         const createOrganism = await Organism.create({
-            name
+            name,
+            icono
         });
 
         return createOrganism;
-
     } catch (error) {
+        console.log(error)
         throw new Error("Error al crear el organismo, intente nuevamente.");
     }
 }

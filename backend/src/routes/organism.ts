@@ -1,7 +1,12 @@
 import { NextFunction, Router, Request, Response } from "express";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 import { OrganismController } from "@/controllers/";
 import { requirePermission } from "@/middleware/authorization";
 import { Organism } from "@/models"
+
+const upload = multer({ dest: "temp/" });
 
 const router = Router();
 
@@ -61,22 +66,47 @@ router.get(
 router.post(
     "/",
     requirePermission("create_organism"),
+    upload.single("icono"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-        if (!req.body.name) {
-            res.status(400).json({ message: "Nombre de organismo requerido." });
-            return;
-        }
-        const newOrganism = await OrganismController.createOrganism(req.body.name);
-        res.status(201).json(newOrganism);
-    } catch (error) {
-        if (error instanceof Error) {
-            res.status(401).json({ message: error.message });
-        } else {
-            next(error);
+        try {
+            if (!req.body.name) {
+                res.status(400).json({ message: "Nombre de organismo requerido." });
+                return;
+            }
+            const name = req.body.name
+
+            if (!req.file) {
+                res.status(400).json({ message: "Icono de organismo requerido." });
+                return;
+            }
+
+            // Ruta de destino para la imagen
+            const ext = path.extname(req.file.originalname);
+            const newFileName = `${name}${ext}`;
+            const destDir = path.join(__dirname, "../img/organism");
+            const destPath = path.join(destDir, newFileName);
+
+            //Asegurar que la carpeta exista
+            if (!fs.existsSync(destDir)) {
+                fs.mkdirSync(destDir, { recursive: true });
+            }
+
+            //renombar y mover la imagen de la ruta temporal a la ruta destino
+            fs.renameSync(req.file.path, destPath);
+
+            //guardar la ruta local con el archivo "nuevo"
+            const icono = `src/img/organism/${newFileName}`;
+            const newOrganism = await OrganismController.createOrganism(name, icono);
+            res.status(201).json(newOrganism);
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(401).json({ message: error.message });
+            } else {
+                next(error);
+            }
         }
     }
-});
+)
 
 router.put(
     "/:id",
