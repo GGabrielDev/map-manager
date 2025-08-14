@@ -1,10 +1,8 @@
 import { NextFunction, Router, Request, Response } from "express";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
 import { OrganismController } from "@/controllers/";
 import { requirePermission } from "@/middleware/authorization";
 import { Organism } from "@/models"
+import multer from "multer";
 
 const upload = multer({ dest: "temp/" });
 
@@ -99,6 +97,7 @@ router.post(
 router.put(
     "/:id",
     requirePermission("edit_organism"),
+    upload.single("icono"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const updates: Partial<Organism> = {}
@@ -108,6 +107,12 @@ router.put(
             return;
         }
         if (req.body.name !== undefined) updates.name = req.body.name;
+        if (req.file !== undefined){
+            const file = req.file
+            const name = req.body.name
+            const icono = await OrganismController.validateImage(name, file);
+            updates.icono = icono;
+        }
 
         const updatedOrganism = await OrganismController.updateOrganism(updates);
         if (!updatedOrganism) {

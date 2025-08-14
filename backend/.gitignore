@@ -98,3 +98,6 @@ Thumbs.db
 
 # Test files
 test-results/
+
+# Files
+../static/
