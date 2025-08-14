@@ -10,6 +10,7 @@ import ParishRouter from '@/routes/parish'
 import OrganismRouter from '@/routes/organism'
 import ResponsibleRouter from '@/routes/responsible'
 import QuadrantRouter from "@/routes/quadrant";
+import Static from "@/routes/static"
 
 import { authenticateToken } from '@/middleware/authentication'
 
@@ -21,6 +22,7 @@ mainRouter.use(express.json())
 
 // Ruta de autenticación y autorización (sin permiso)
 mainRouter.use('/auth', AuthRouter)
+mainRouter.use('/static', Static)
 
 // Rutas de usuarios, roles y permisos (con permisos)
 mainRouter.use(authenticateToken)

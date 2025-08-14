@@ -1,6 +1,10 @@
 import { Op, OrderItem } from "sequelize";
 import { Organism, Responsible } from "@/models";
 
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
 interface PaginationOptions {
   page: number
   pageSize: number
@@ -151,5 +155,34 @@ export const deleteOrganism = async (id: number): Promise<boolean> => {
         return true;
     } catch (error) {
         throw new Error("Error al eliminar el organismo, intente nuevamente.");
+    }
+}
+
+
+export const validateImage = async (name: string, file: Express.Multer.File): Promise<string> => {
+    try {
+        const allowedTypes = ["image/jpeg", "image/png"];
+        if (!allowedTypes.includes(file.mimetype)) {
+            throw new Error("Tipo de archivo no permitido.");
+        }
+
+        const ext = path.extname(file.originalname);
+        const newFileName = `${name}${ext}`;
+        const destDir = path.join(__dirname, "../../../static/organism");
+        const destPath = path.join(destDir, newFileName);
+
+        //Asegurar que la carpeta exista
+        if (!fs.existsSync(destDir)) {
+            fs.mkdirSync(destDir, { recursive: true });
+        }
+
+        //renombar y mover la imagen de la ruta temporal a la ruta destino
+        fs.renameSync(file.path, destPath);
+
+        //guardar la ruta local con el archivo "nuevo"
+        const icono = `api/static/organisms/icono/${newFileName}`;
+        return icono;
+    } catch (error) {
+        throw new Error("Error al validar la imagen, intente nuevamente.");
     }
 }
