@@ -63,6 +63,31 @@ router.get(
     }
 });
 
+// Ruta para obtener la imagen del organismo
+router.get(
+  "/icono/:filename",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const filename = req.params.filename;
+
+      // Construir la ruta absoluta al archivo de imagen
+      const imagePath = path.join(__dirname, "../static/organism", filename);
+
+      // Verificar que el archivo exista
+      if (!fs.existsSync(imagePath)) {
+        res.status(404).json({ message: "Imagen no encontrada" });
+        return;
+      }
+
+      // Enviar el archivo de imagen
+      res.sendFile(imagePath);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+
 router.post(
     "/",
     requirePermission("create_organism"),
@@ -83,7 +108,7 @@ router.post(
             // Ruta de destino para la imagen
             const ext = path.extname(req.file.originalname);
             const newFileName = `${name}${ext}`;
-            const destDir = path.join(__dirname, "../img/organism");
+            const destDir = path.join(__dirname, "../static/organism");
             const destPath = path.join(destDir, newFileName);
 
             //Asegurar que la carpeta exista
@@ -95,7 +120,8 @@ router.post(
             fs.renameSync(req.file.path, destPath);
 
             //guardar la ruta local con el archivo "nuevo"
-            const icono = `src/img/organism/${newFileName}`;
+            const icono = `api/organisms/icono/${newFileName}`;
+            //const icono = `src/img/organism/${newFileName}`;
             const newOrganism = await OrganismController.createOrganism(name, icono);
             res.status(201).json(newOrganism);
         } catch (error) {
