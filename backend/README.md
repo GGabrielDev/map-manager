@@ -247,30 +247,36 @@ The server will start at `http://localhost:4000` (or your configured PORT).
 
 - `id`: integer, PK, auto-increment
 - `name`: string, required, unique
+- `icono`: string, optional (icon file path for map pin, 16x16 pixels)
 - `creationDate`: datetime, auto
 - `updatedOn`: datetime, auto
 - `deletionDate`: datetime, nullable (soft delete)
-- **Relationships**: Has many Points of Interest, has many Responsibles
+- **Relationships**: Has many Points of Interest, has many Responsibles, has many Quadrants
 - **Hooks**: Prevents deletion if points of interest or responsibles are assigned
+- **Special Features**:
+  - Icon image upload support (JPEG/PNG)
+  - Automatic image processing to 16x16 pixels using Sharp
+  - Storage in `static/organism` directory
+  - Allowed file type validation
 
 #### **Responsible**
 
 - `id`: integer, PK, auto-increment
-- `first_name`: string, required
-- `last_name`: string, required
+- `firstName`: string, required
+- `lastName`: string, required
 - `ci`: string, required (Venezuelan ID format: uppercase letter followed by numbers)
 - `phone`: string, required (Venezuelan phone number format validation)
-- `phone_backup`: string, optional (Venezuelan phone number format validation)
+- `phoneBackup`: string, optional (Venezuelan phone number format validation)
 - `email`: string, optional (email format validation)
 - `position`: string, required
-- `organism_id`: FK to Organism, optional
-- `quadrant_id`: FK to Quadrant, optional
-- `circuit_id`: FK to Communal Circuit, optional
-- `council_id`: FK to Communal Council, optional
+- `organismId`: FK to Organism, optional
+- `quadrantId`: FK to Quadrant, optional
+- `communalCircuitId`: FK to Communal Circuit, optional
 - `creationDate`: datetime, auto
 - `updatedOn`: datetime, auto
 - `deletionDate`: datetime, nullable (soft delete)
-- **Relationships**: Belongs to Organism (optional), Quadrant (optional), Communal Circuit (optional), Communal Council (optional)
+- **Relationships**: Belongs to Organism (optional), Quadrant (optional), Communal Circuit (optional)
+- **Filtering**: Supports filtering by `firstName`, `lastName`, and `organismName`
 - **Validation**:
   - Phone numbers must match Venezuelan format (regex: `^0[24]\d{2}-\d{7}$` for landlines or `^04(12|14|16|22|24|26)-\d{7}$` for mobile)
   - CI must start with uppercase letter followed by numbers
@@ -623,17 +629,23 @@ Authorization: Bearer <your-jwt-token>
 ##### **Organisms**
 
 - **`GET /api/organisms`** - List all organisms with pagination and filtering
-- **`POST /api/organisms`** - Create a new organism
+- **`POST /api/organisms`** - Create a new organism with icon upload (multipart/form-data)
+  - Fields: `name` (string), `icono` (file - JPEG/PNG, resized to 16x16 pixels)
 - **`GET /api/organisms/:id`** - Get specific organism details with associated points of interest and responsibles
-- **`PUT /api/organisms/:id`** - Update an organism
+- **`PUT /api/organisms/:id`** - Update an organism with optional icon upload (multipart/form-data)
+  - Fields: `name` (string, optional), `icono` (file, optional - JPEG/PNG, resized to 16x16 pixels)
 - **`DELETE /api/organisms/:id`** - Delete an organism (soft delete)
 
 ##### **Responsibles**
 
 - **`GET /api/responsibles`** - List responsibles with entity relationships and filtering
+  - Filters: `firstName`, `lastName`, `organismName`, pagination and sorting
 - **`POST /api/responsibles`** - Create a new responsible (validates Venezuelan phone number and CI format)
-- **`GET /api/responsibles/:id`** - Get specific responsible details
+  - Required fields: `firstName`, `lastName`, `ci`, `phone`, `position`
+  - Optional fields: `phoneBackup`, `email`, `organismId`
+- **`GET /api/responsibles/:id`** - Get specific responsible details with organism relationships
 - **`PUT /api/responsibles/:id`** - Update a responsible (validates phone number and CI format)
+  - Updatable fields: `firstName`, `lastName`, `ci`, `phone`, `phoneBackup`, `email`, `position`, `organismId`
 - **`DELETE /api/responsibles/:id`** - Delete a responsible (soft delete)
 
 ### Common Features

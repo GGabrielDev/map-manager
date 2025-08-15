@@ -247,30 +247,36 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 
 - `id`: entero, PK, auto-incremento
 - `name`: cadena, requerido, único
+- `icono`: cadena, opcional (ruta del archivo de icono para pin de mapa, 16x16 píxeles)
 - `creationDate`: fecha-hora, automático
 - `updatedOn`: fecha-hora, automático
 - `deletionDate`: fecha-hora, nullable (eliminación suave)
-- **Relaciones**: Tiene muchos Puntos de Interés, tiene muchos Responsables
+- **Relaciones**: Tiene muchos Puntos de Interés, tiene muchos Responsables, tiene muchos Cuadrantes
 - **Hooks**: Previene eliminación si hay puntos de interés o responsables asignados
+- **Características Especiales**:
+  - Soporte para carga de imágenes de iconos (JPEG/PNG)
+  - Procesamiento automático de imágenes a 16x16 píxeles usando Sharp
+  - Almacenamiento en directorio `static/organism`
+  - Validación de tipos de archivo permitidos
 
 #### **Responsable (Responsible)**
 
 - `id`: entero, PK, auto-incremento
-- `first_name`: cadena, requerido
-- `last_name`: cadena, requerido
+- `firstName`: cadena, requerido
+- `lastName`: cadena, requerido
 - `ci`: cadena, requerido (formato de cédula venezolana: letra mayúscula seguida de números)
 - `phone`: cadena, requerido (validación de formato de número telefónico venezolano)
-- `phone_backup`: cadena, opcional (validación de formato de número telefónico venezolano)
+- `phoneBackup`: cadena, opcional (validación de formato de número telefónico venezolano)
 - `email`: cadena, opcional (validación de formato de email)
 - `position`: cadena, requerido
-- `organism_id`: FK a Organismo, opcional
-- `quadrant_id`: FK a Cuadrante, opcional
-- `circuit_id`: FK a Circuito Comunal, opcional
-- `council_id`: FK a Consejo Comunal, opcional
+- `organismId`: FK a Organismo, opcional
+- `quadrantId`: FK a Cuadrante, opcional
+- `communalCircuitId`: FK a Circuito Comunal, opcional
 - `creationDate`: fecha-hora, automático
 - `updatedOn`: fecha-hora, automático
 - `deletionDate`: fecha-hora, nullable (eliminación suave)
-- **Relaciones**: Pertenece a Organismo (opcional), Cuadrante (opcional), Circuito Comunal (opcional), Consejo Comunal (opcional)
+- **Relaciones**: Pertenece a Organismo (opcional), Cuadrante (opcional), Circuito Comunal (opcional)
+- **Filtrado**: Soporta filtrado por `firstName`, `lastName`, y `organismName`
 - **Validación**:
   - Los números de teléfono deben coincidir con el formato venezolano (regex: `^0[24]\d{2}-\d{7}$` para fijos o `^04(12|14|16|22|24|26)-\d{7}$` para móviles)
   - La cédula debe comenzar con letra mayúscula seguida de números
@@ -623,17 +629,23 @@ Authorization: Bearer <tu-token-jwt>
 ##### **Organismos**
 
 - **`GET /api/organisms`** - Listar todos los organismos con paginación y filtrado
-- **`POST /api/organisms`** - Crear un nuevo organismo
+- **`POST /api/organisms`** - Crear un nuevo organismo con carga de icono (multipart/form-data)
+  - Campos: `name` (string), `icono` (file - JPEG/PNG, se redimensiona a 16x16 píxeles)
 - **`GET /api/organisms/:id`** - Obtener detalles específicos del organismo con puntos de interés y responsables asociados
-- **`PUT /api/organisms/:id`** - Actualizar un organismo
+- **`PUT /api/organisms/:id`** - Actualizar un organismo con carga opcional de icono (multipart/form-data)
+  - Campos: `name` (string, opcional), `icono` (file, opcional - JPEG/PNG, se redimensiona a 16x16 píxeles)
 - **`DELETE /api/organisms/:id`** - Eliminar un organismo (eliminación suave)
 
 ##### **Responsables**
 
 - **`GET /api/responsibles`** - Listar responsables con relaciones de entidades y filtrado
+  - Filtros: `firstName`, `lastName`, `organismName`, paginación y ordenamiento
 - **`POST /api/responsibles`** - Crear un nuevo responsable (valida formato de número telefónico venezolano y cédula)
-- **`GET /api/responsibles/:id`** - Obtener detalles específicos del responsable
+  - Campos requeridos: `firstName`, `lastName`, `ci`, `phone`, `position`
+  - Campos opcionales: `phoneBackup`, `email`, `organismId`
+- **`GET /api/responsibles/:id`** - Obtener detalles específicos del responsable con relaciones de organismo
 - **`PUT /api/responsibles/:id`** - Actualizar un responsable (valida formato de número telefónico y cédula)
+  - Campos actualizables: `firstName`, `lastName`, `ci`, `phone`, `phoneBackup`, `email`, `position`, `organismId`
 - **`DELETE /api/responsibles/:id`** - Eliminar un responsable (eliminación suave)
 
 ### Características Comunes

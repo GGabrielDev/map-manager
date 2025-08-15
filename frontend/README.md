@@ -245,16 +245,11 @@ frontend/
 │   │   │   ├── useStates.tsx        # States CRUD operations
 │   │   │   ├── useMunicipalities.tsx # Municipalities management
 │   │   │   ├── useParishes.tsx      # Parishes management
-│   │   │   ├── useQuadrants.tsx     # Quadrants with spatial data
-│   │   │   ├── useCircuits.tsx      # Communal circuits management
-│   │   │   ├── useCouncils.tsx      # Communal councils management
-│   │   │   ├── usePOI.tsx           # Points of interest management
-│   │   │   ├── useOrganisms.tsx     # Organisms management
-│   │   │   └── useResponsibles.tsx  # Responsible persons management
+│   │   │   ├── useUsers.tsx         # Users management
+│   │   │   └── useRoles.tsx         # Roles management
 │   │   ├── auth/                    # Authentication hooks
 │   │   │   ├── useAuth.tsx          # Authentication state
-│   │   │   ├── usePermissions.tsx   # Permission checking
-│   │   │   └── useRoles.tsx         # Role management
+│   │   │   └── usePermissions.tsx   # Permission checking
 │   │   └── ui/                      # UI-specific hooks
 │   │       ├── useNotifications.tsx # Toast notifications
 │   │       ├── useModal.tsx         # Modal management
@@ -271,10 +266,7 @@ frontend/
 │   │   ├── geographical/            # Geographical entity pages
 │   │   │   ├── StatesPage.tsx       # States management
 │   │   │   ├── MunicipalitiesPage.tsx # Municipalities management
-│   │   │   ├── ParishesPage.tsx     # Parishes management
-│   │   │   ├── QuadrantsPage.tsx    # Quadrants with map interface
-│   │   │   ├── CircuitsPage.tsx     # Communal circuits management
-│   │   │   └── CouncilsPage.tsx     # Communal councils management
+│   │   │   └── ParishesPage.tsx     # Parishes management
 │   │   ├── administrative/          # Administrative pages
 │   │   │   ├── OrganismsPage.tsx    # Organisms management
 │   │   │   ├── ResponsiblesPage.tsx # Responsible persons management
@@ -287,18 +279,14 @@ frontend/
 │   │       └── SpatialAnalytics.tsx # Spatial analysis and reporting
 │   ├── services/                    # API and external services
 │   │   ├── api/                     # Backend API integration
+│   │   │   ├── index.ts             # Centralized API exports and types
 │   │   │   ├── auth.ts              # Authentication endpoints
 │   │   │   ├── states.ts            # States API calls
 │   │   │   ├── municipalities.ts    # Municipalities API calls
 │   │   │   ├── parishes.ts          # Parishes API calls
-│   │   │   ├── quadrants.ts         # Quadrants with GeoJSON support
-│   │   │   ├── circuits.ts          # Communal circuits API calls
-│   │   │   ├── councils.ts          # Communal councils API calls
-│   │   │   ├── poi.ts               # Points of interest API calls
-│   │   │   ├── organisms.ts         # Organisms API calls
-│   │   │   ├── responsibles.ts      # Responsible persons API calls
 │   │   │   ├── users.ts             # Users API calls
-│   │   │   └── roles.ts             # Roles and permissions API calls
+│   │   │   ├── roles.ts             # Roles and permissions API calls
+│   │   │   └── permissions.ts       # Permissions API calls
 │   │   ├── spatial/                 # Spatial processing services
 │   │   │   ├── geoJsonProcessor.ts  # GeoJSON validation and processing
 │   │   │   ├── spatialQueries.ts    # Spatial relationship queries
@@ -413,18 +401,10 @@ Main Dashboard
 ├── Administrative Dashboard
 │   ├── Users Management
 │   └── Roles & Permissions
-├── Geographical Dashboard
-│   ├── States Management
-│   ├── Municipalities Management
-│   ├── Parishes Management
-│   ├── Quadrants Management (with polygon editing)
-│   ├── Circuits Management (with polygon editing)
-│   └── Councils Management (with polygon editing)
-└── Spatial Dashboard
-    ├── Map Editor
-    ├── Boundary Manager
-    ├── POI Manager (with point geometry)
-    └── Spatial Analytics
+└── Geographical Dashboard
+    ├── States Management
+    ├── Municipalities Management
+    └── Parishes Management
 ```
 
 ## Authentication & Authorization
@@ -692,3 +672,19 @@ interface RootState {
 - **XSS Protection**: Input sanitization for spatial data and coordinate inputs
 - **CSRF Protection**: Token-based validation for spatial data modifications
 - **Secure Map Tiles**: HTTPS
+
+## License
+
+Licence MIT - see package.json for details.
+
+---
+
+## Contribute
+
+1. Fork the repository.
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`).
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4. Push to the branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.
+
+For issues and feature requests, please use the GitHub issue tracker.

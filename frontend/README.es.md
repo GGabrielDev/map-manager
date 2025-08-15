@@ -245,16 +245,11 @@ frontend/
 │   │   │   ├── useStates.tsx        # Operaciones CRUD de estados
 │   │   │   ├── useMunicipalities.tsx # Gestión de municipios
 │   │   │   ├── useParishes.tsx      # Gestión de parroquias
-│   │   │   ├── useQuadrants.tsx     # Cuadrantes con datos espaciales
-│   │   │   ├── useCircuits.tsx      # Gestión de circuitos comunales
-│   │   │   ├── useCouncils.tsx      # Gestión de consejos comunales
-│   │   │   ├── usePOI.tsx           # Gestión de puntos de interés
-│   │   │   ├── useOrganisms.tsx     # Gestión de organismos
-│   │   │   └── useResponsibles.tsx  # Gestión de personas responsables
+│   │   │   ├── useUsers.tsx         # Gestión de usuarios
+│   │   │   └── useRoles.tsx         # Gestión de roles
 │   │   ├── auth/                    # Hooks de autenticación
 │   │   │   ├── useAuth.tsx          # Estado de autenticación
-│   │   │   ├── usePermissions.tsx   # Verificación de permisos
-│   │   │   └── useRoles.tsx         # Gestión de roles
+│   │   │   └── usePermissions.tsx   # Verificación de permisos
 │   │   └── ui/                      # Hooks específicos de UI
 │   │       ├── useNotifications.tsx # Notificaciones toast
 │   │       ├── useModal.tsx         # Gestión de modales
@@ -271,10 +266,7 @@ frontend/
 │   │   ├── geographical/            # Páginas de entidades geográficas
 │   │   │   ├── StatesPage.tsx       # Gestión de estados
 │   │   │   ├── MunicipalitiesPage.tsx # Gestión de municipios
-│   │   │   ├── ParishesPage.tsx     # Gestión de parroquias
-│   │   │   ├── QuadrantsPage.tsx    # Cuadrantes con interfaz de mapa
-│   │   │   ├── CircuitsPage.tsx     # Gestión de circuitos comunales
-│   │   │   └── CouncilsPage.tsx     # Gestión de consejos comunales
+│   │   │   └── ParishesPage.tsx     # Gestión de parroquias
 │   │   ├── administrative/          # Páginas administrativas
 │   │   │   ├── OrganismsPage.tsx    # Gestión de organismos
 │   │   │   ├── ResponsiblesPage.tsx # Gestión de personas responsables
@@ -287,18 +279,14 @@ frontend/
 │   │       └── SpatialAnalytics.tsx # Análisis espacial y reportes
 │   ├── services/                    # API y servicios externos
 │   │   ├── api/                     # Integración de API backend
+│   │   │   ├── index.ts             # Exportaciones centralizadas de API y tipos
 │   │   │   ├── auth.ts              # Endpoints de autenticación
 │   │   │   ├── states.ts            # Llamadas API de estados
 │   │   │   ├── municipalities.ts    # Llamadas API de municipios
 │   │   │   ├── parishes.ts          # Llamadas API de parroquias
-│   │   │   ├── quadrants.ts         # Cuadrantes con soporte GeoJSON
-│   │   │   ├── circuits.ts          # Llamadas API de circuitos comunales
-│   │   │   ├── councils.ts          # Llamadas API de consejos comunales
-│   │   │   ├── poi.ts               # Llamadas API de puntos de interés
-│   │   │   ├── organisms.ts         # Llamadas API de organismos
-│   │   │   ├── responsibles.ts      # Llamadas API de personas responsables
 │   │   │   ├── users.ts             # Llamadas API de usuarios
-│   │   │   └── roles.ts             # Llamadas API de roles y permisos
+│   │   │   ├── roles.ts             # Llamadas API de roles y permisos
+│   │   │   └── permissions.ts       # Llamadas API de permisos
 │   │   ├── spatial/                 # Servicios de procesamiento espacial
 │   │   │   ├── geoJsonProcessor.ts  # Validación y procesamiento GeoJSON
 │   │   │   ├── spatialQueries.ts    # Consultas de relaciones espaciales
@@ -413,18 +401,10 @@ Dashboard Principal
 ├── Dashboard Administrativo
 │   ├── Gestión de Usuarios
 │   └── Roles y Permisos
-├── Dashboard Geográfico
-│   ├── Gestión de Estados
-│   ├── Gestión de Municipios
-│   ├── Gestión de Parroquias
-│   ├── Gestión de Cuadrantes (con edición de polígonos)
-│   ├── Gestión de Circuitos (con edición de polígonos)
-│   └── Gestión de Consejos (con edición de polígonos)
-└── Dashboard Espacial
-    ├── Editor de Mapas
-    ├── Gestor de Límites
-    ├── Gestor de POI (con geometría de punto)
-    └── Análisis Espacial
+└── Dashboard Geográfico
+    ├── Gestión de Estados
+    ├── Gestión de Municipios
+    └── Gestión de Parroquias
 ```
 
 ## Autenticación y Autorización
