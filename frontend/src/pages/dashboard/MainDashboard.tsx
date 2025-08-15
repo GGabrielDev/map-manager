@@ -1,8 +1,10 @@
-import { Box, Button, Card, CardContent, Container, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Container, IconButton, Tooltip, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import DashboardCard from '@/components/dashboard/DashboardCard';
+import QuickActions from '@/components/dashboard/QuickActions';
 import LanguageSelector from '@/components/LanguageSelector';
 import { usePermissions } from '@/hooks';
 import type { AppDispatch, RootState } from '@/store';
@@ -10,7 +12,7 @@ import { logout } from '@/store/slices/authSlice';
 import { toggleTheme } from '@/store/slices/uiSlice';
 
 const MainDashboard: React.FC = () => {
-  const { t } = useTranslation(); // Initialize translation hook
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
@@ -19,8 +21,6 @@ const MainDashboard: React.FC = () => {
   const {
     canManageUsers,
     canManageRoles,
-    canManageStates,
-    canManageMunicipalities,
   } = usePermissions();
 
   const handleLogout = () => {
@@ -32,43 +32,41 @@ const MainDashboard: React.FC = () => {
     dispatch(toggleTheme());
   };
 
-  // Define the type for management sections
-  interface ManagementSection {
-    title: string;
-    description: string;
-    route: string;
-    color: 'primary' | 'secondary' | 'success' | 'info' | 'warning';
-  }
-
-  // Only include sections if user has the required permissions
-  const managementSections: ManagementSection[] = [
-    ...(canManageUsers ? [{
-      title: t('dashboard:manageUsers'), 
-      description: t('dashboard:manageUsersDesc'), 
-      route: '/users',
+  // Quick actions for common tasks
+  const quickActions = [
+    {
+      label: t('dashboard:quickActions.createUser'),
+      onClick: () => navigate('/users'),
       color: 'primary' as const,
-    }] : []),
-    ...(canManageRoles ? [{
-      title: t('dashboard:manageRoles'), 
-      description: t('dashboard:manageRolesDesc'), 
-      route: '/roles',
+      icon: '👤',
+      disabled: !canManageUsers
+    },
+    {
+      label: t('dashboard:quickActions.manageRoles'),
+      onClick: () => navigate('/roles'),
       color: 'secondary' as const,
-    }] : []),
-    ...(canManageStates ? [{
-      title: t('dashboard:manageStates'),
-      description: t('dashboard:manageStatesDesc'),
-      route: '/states',
-      color: 'success' as const,
-    }] : []),
-    ...(canManageMunicipalities ? [{
-      title: t('dashboard:manageMunicipalities'),
-      description: t('dashboard:manageMunicipalitiesDesc'),
-      route: '/municipalities',
-      color: 'info' as const,
-    }] : []),
+      icon: '🔐',
+      disabled: !canManageRoles
+    },
   ];
 
-  const accessibleSections = managementSections;
+  // Main dashboard categories
+  const dashboardSections = [
+    {
+      title: t('dashboard:categories.administrative.title'),
+      description: t('dashboard:categories.administrative.description'),
+      route: '/dashboard/administrative',
+      color: 'primary' as const,
+      icon: '⚙️'
+    },
+    {
+      title: t('dashboard:categories.geographical.title'),
+      description: t('dashboard:categories.geographical.description'),
+      route: '/dashboard/geographical',
+      color: 'success' as const,
+      icon: '🌍'
+    },
+  ];
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -76,10 +74,10 @@ const MainDashboard: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box>
           <Typography variant="h4" component="h1" gutterBottom>
-            {t('dashboard:title')} 
+            {t('dashboard:title')}
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            {t('dashboard:welcome', { username: user?.username || 'User ' })} 
+            {t('dashboard:welcome', { username: user?.username || 'User' })}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
@@ -90,64 +88,41 @@ const MainDashboard: React.FC = () => {
           </Tooltip>
           <LanguageSelector />
           <Button variant="outlined" onClick={handleLogout}>
-            {t('dashboard:logout')} 
+            {t('dashboard:logout')}
           </Button>
         </Box>
       </Box>
 
-      {/* Management Sections */}
-      {accessibleSections.length > 0 ? (
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 3 }}>
-          {accessibleSections.map((section) => (
-            <Card 
-              key={section.title}
-              sx={{ 
-                height: '100%', 
-                display: 'flex', 
-                flexDirection: 'column',
-                cursor: 'pointer',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 4,
-                }
-              }}
-              onClick={() => navigate(section.route)}
-            >
-              <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: 3 }}>
-                <Typography variant="h6" component="h2" gutterBottom>
-                  {section.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  {section.description}
-                </Typography>
-                <Button 
-                  variant="contained" 
-                  color={section.color}
-                  fullWidth
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(section.route);
-                  }}
-                >
-                  {t('dashboard:access')} 
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
-      ) : (
-        <Box sx={{ textAlign: 'center', mt: 8 }}>
-          <Typography variant="h6" color="text.secondary" gutterBottom>
-            {t('dashboard:noSectionsAvailable')} 
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {t('dashboard:noPermissionsMessage')} 
-          </Typography>
-        </Box>
-      )}
+      {/* Quick Actions */}
+      <QuickActions
+        title={t('dashboard:quickActions.title')}
+        actions={quickActions}
+      />
 
-      {/* User Info Section */}
+      {/* Dashboard Categories */}
+      <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
+        {t('dashboard:categories.title')}
+      </Typography>
+      
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
+        gap: 3,
+        mb: 4
+      }}>
+        {dashboardSections.map((section) => (
+          <DashboardCard
+            key={section.title}
+            title={section.title}
+            description={section.description}
+            route={section.route}
+            color={section.color}
+            icon={section.icon}
+          />
+        ))}
+      </Box>
+
+      {/* System Overview */}
       <Box sx={{ 
         mt: 6, 
         p: 3, 
@@ -155,7 +130,47 @@ const MainDashboard: React.FC = () => {
         borderRadius: 2 
       }}>
         <Typography variant="h6" gutterBottom>
-          {t('dashboard:yourPermissions')} 
+          {t('dashboard:systemOverview.title')}
+        </Typography>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2 }}>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h4" color="primary">
+              {user?.roles?.length || 0}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {t('dashboard:systemOverview.assignedRoles')}
+            </Typography>
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h4" color="success.main">
+              {user?.roles?.reduce((acc, role) => acc + role.permissions.length, 0) || 0}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {t('dashboard:systemOverview.totalPermissions')}
+            </Typography>
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h4" color="info.main">
+              2
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {t('dashboard:systemOverview.dashboardCategories')}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* User Permissions Details */}
+      <Box sx={{ 
+        mt: 4, 
+        p: 3, 
+        bgcolor: 'background.paper', 
+        borderRadius: 2,
+        border: 1,
+        borderColor: 'divider'
+      }}>
+        <Typography variant="h6" gutterBottom>
+          {t('dashboard:yourPermissions')}
         </Typography>
         {user?.roles && user.roles.length > 0 ? (
           <Box>
@@ -176,7 +191,7 @@ const MainDashboard: React.FC = () => {
           </Box>
         ) : (
           <Typography variant="body2" color="text.secondary">
-            {t('dashboard:noRolesAssigned')} 
+            {t('dashboard:noRolesAssigned')}
           </Typography>
         )}
       </Box>

@@ -1,7 +1,8 @@
-import { createAsyncThunk,createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import type { RootState } from '@/store';
-import type { AuthState, LoginCredentials,User } from '@/types';
+import { authApi } from '@/services/api';
+import type { RootState } from '@/store/index';
+import type { AuthState, LoginCredentials, User } from '@/types/auth';
 
 // Token cache key
 const TOKEN_CACHE_KEY = 'inventory-app-auth-token';
@@ -40,19 +41,13 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
-      const response = await fetch(import.meta.env.VITE_API_URL + '/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        return rejectWithValue(data.error);
-      }
-      return data.token;
+      const response = await authApi.login(credentials);
+      return response.token;
     } catch (error: Error | unknown) {
-      if (error instanceof Error) 
+      if (error instanceof Error) {
         return rejectWithValue(error.message);
+      }
+      return rejectWithValue('Login failed');
     }
   }
 );
@@ -62,29 +57,21 @@ export const fetchUser = createAsyncThunk<
   User,
   undefined, // No userId needed anymore
   { state: RootState; rejectValue: string }
-  >(
+>(
   'auth/fetchUser',
   async (_, { getState, rejectWithValue }) => {
     try {
       const token = getState().auth.token;
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/me`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        return rejectWithValue(data.error || `HTTP ${response.status}: ${response.statusText}`);
+      if (!token) {
+        return rejectWithValue('No token available');
       }
-      return data;
+
+      const user = await authApi.me(token);
+      return user;
     } catch (error: Error | unknown) {
-      if (error instanceof Error) 
+      if (error instanceof Error) {
         return rejectWithValue(error.message);
+      }
       return rejectWithValue('An unknown error occurred');
     }
   }
@@ -115,26 +102,13 @@ export const validateToken = createAsyncThunk<
         return rejectWithValue('Invalid token format');
       }
 
-      // Validate with backend by making a simple authenticated request
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/validate`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        return rejectWithValue(`Token validation failed: ${response.status}`);
-      }
-
-      return true;
+      // Validate with backend using the API service
+      const response = await authApi.validate(token);
+      return response.valid;
     } catch (error: Error | unknown) {
-      if (error instanceof Error) 
+      if (error instanceof Error) {
         return rejectWithValue(error.message);
+      }
       return rejectWithValue('Token validation failed');
     }
   }

@@ -1,8 +1,9 @@
-import { useCallback,useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { rolesApi } from '@/services/api';
 import type { RootState } from '@/store';
-import type { Role } from '@/types'
+import type { Role } from '@/types/auth';
 
 export const useRoleManagement = () => {
   const { token } = useSelector((state: RootState) => state.auth);
@@ -14,37 +15,29 @@ export const useRoleManagement = () => {
 
   // Fetch roles with useCallback to prevent unnecessary re-renders
   const fetchRoles = useCallback(async (currentPage = 1) => {
+    if (!token) return;
+
     setLoading(true);
     setError('');
     
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/roles?page=${currentPage}&pageSize=10`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await rolesApi.getRoles({
+        page: currentPage,
+        pageSize: 10,
+      }, token);
       
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch roles');
-      }
-      
-      // Backend returns { data, total, totalPages, currentPage }
-      setRoles(data.data || []);
-      setTotalPages(data.totalPages || 1);
+      setRoles(response.data || []);
+      setTotalPages(response.totalPages || 1);
+      setPage(response.currentPage || 1);
       
       // If current page is greater than total pages, reset to page 1
-      if (currentPage > data.totalPages && data.totalPages > 0) {
+      if (currentPage > response.totalPages && response.totalPages > 0) {
         setPage(1);
       }
     } catch (err) {
-      if (err instanceof Error)
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -52,54 +45,30 @@ export const useRoleManagement = () => {
 
   // Fetch individual role with permissions
   const fetchRoleById = useCallback(async (roleId: number): Promise<Role | null> => {
+    if (!token) return null;
+
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/roles/${roleId}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch role details');
-      }
-      
-      return data;
+      const role = await rolesApi.getRoleById(roleId, token);
+      return role;
     } catch (err) {
-      if (err instanceof Error)
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      }
       return null;
     }
   }, [token]);
 
   // Delete role
   const deleteRole = useCallback(async (roleId: number): Promise<boolean> => {
+    if (!token) return false;
+
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/roles/${roleId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to delete role');
-      }
-
+      await rolesApi.deleteRole(roleId, token);
       return true;
     } catch (err) {
-      if (err instanceof Error)
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      }
       return false;
     }
   }, [token]);

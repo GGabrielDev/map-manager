@@ -2,7 +2,7 @@
 
 ## Descripción General
 
-Este frontend es un sistema integral de administración geoespacial construido con **React**, **TypeScript**, **Vite**, y **Leaflet**. Proporciona una interfaz web interactiva para gestionar divisiones administrativas geográficas jerárquicas (Estados → Municipios → Parroquias) y sus subdivisiones espaciales (Cuadrantes y Circuitos Comunales), junto con Puntos de Interés que pueden asociarse espacialmente con estas entidades. El sistema está diseñado para trabajar perfectamente con **Leaflet** para visualización interactiva de mapas y la API del backend para gestión de datos geoespaciales, autenticación y control de acceso basado en roles.
+Este frontend es un sistema integral de administración geoespacial construido con **React**, **TypeScript**, **Vite** y **Leaflet**. Proporciona una interfaz web interactiva para gestionar divisiones administrativas geográficas jerárquicas (Estados → Municipios → Parroquias) y sus subdivisiones espaciales (Cuadrantes y Circuitos Comunales), junto con Puntos de Interés que pueden asociarse espacialmente con estas entidades. El sistema está diseñado para trabajar perfectamente con **Leaflet** para visualización interactiva de mapas y la API del backend para gestión de datos geoespaciales, autenticación y control de acceso basado en roles. Incluye interacción integral de datos basada en mapas, visualización de límites espaciales y gestión de datos geoespaciales en tiempo real.
 
 ### Características Principales
 
@@ -466,4 +466,246 @@ Dashboard Principal
 ### Visualización de Datos Espaciales
 
 - **Renderizado GeoJSON**: Renderizado dinámico de límites geográficos desde datos GeoJSON del backend
-- \*\*Edición de Lím
+- **Edición de Límites**: Edición interactiva de límites de cuadrantes y circuitos comunales
+- **Marcadores de Puntos de Interés**: Marcadores personalizados para diferentes tipos de puntos de interés
+- **Relaciones Espaciales**: Representación visual de asociaciones espaciales entre entidades
+- **Visualización de Flotas**: Visualización codificada por colores de datos de flota dentro de cuadrantes
+
+### Operaciones CRUD Basadas en Mapas
+
+- **Clic para Crear**: Crear nuevos puntos de interés haciendo clic en el mapa
+- **Arrastrar para Editar**: Mover puntos de interés arrastrando marcadores
+- **Dibujo de Límites**: Dibujar nuevos límites para cuadrantes y circuitos comunales
+- **Validación Espacial**: Validación en tiempo real de relaciones espaciales y superposiciones
+- **Asociación Automática**: Asignación automática de puntos a cuadrantes/circuitos basada en coordenadas
+
+## Integración de API
+
+### Comunicación con Backend
+
+- **Endpoints Espaciales**: Integración con endpoints GeoJSON del backend para datos espaciales
+- **Actualizaciones en Tiempo Real**: Integración WebSocket para actualizaciones de datos espaciales en tiempo real
+- **Operaciones por Lotes**: Manejo eficiente de operaciones de datos espaciales masivos
+- **Estrategia de Caché**: Caché inteligente de tiles de mapas y datos espaciales para rendimiento
+
+### Endpoints de API Espacial
+
+- **Endpoints GeoJSON**: Integración directa con `/api/quadrants/geojson` y `/api/communal-circuits/geojson`
+- **Consultas Espaciales**: Consultas de caja delimitadora para carga eficiente del viewport del mapa
+- **Validación de Coordenadas**: Validación del lado del servidor de coordenadas espaciales y límites
+- **Asociación Espacial**: Detección y actualizaciones automáticas de relaciones espaciales
+
+### Manejo de Errores
+
+- **Errores de Validación Espacial**: Manejo de errores de superposición de límites y geometría inválida
+- **Errores de Red**: Manejo elegante de fallos de carga de tiles de mapas
+- **Errores de Autenticación**: Manejo de expiración de tokens con preservación del estado del mapa
+- **Resolución de Conflictos Espaciales**: Resolución amigable de conflictos de datos espaciales
+
+### Formato de Respuesta de API
+
+```typescript
+// Respuesta de Datos Espaciales
+{
+  type: "FeatureCollection",
+  features: [
+    {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [[[lng, lat], ...]]
+      },
+      properties: {
+        id: number,
+        name: string,
+        entityType: "quadrant" | "circuit",
+        metadata: object
+      }
+    }
+  ]
+}
+
+// Respuesta de Error
+{
+  error: string,
+  code: "SPATIAL_VALIDATION_ERROR" | "BOUNDARY_OVERLAP" | "INVALID_GEOMETRY",
+  details: {
+    field: string,
+    coordinates?: [number, number]
+  }
+}
+```
+
+## Principios de Diseño UI/UX
+
+### Diseño Centrado en Mapas
+
+- **Interfaz de Mapa Interactiva**: Interfaz principal centrada alrededor del mapa Leaflet con controles intuitivos
+- **Contexto Espacial**: Todas las operaciones de gestión de datos proporcionan contexto espacial y visualización
+- **Mapas Responsivos para Móviles**: Interacciones de mapas optimizadas tanto para escritorio como dispositivos móviles
+- **Accesibilidad**: Cumplimiento WCAG con navegación por teclado para controles de mapas y soporte para lectores de pantalla
+
+### Integración con Material UI
+
+- **Componentes Optimizados para Mapas**: Componentes Material UI personalizados para interfaces de datos geoespaciales
+- **Tablas de Datos Espaciales**: Tablas mejoradas con visualización de coordenadas e integración de vista previa de mapas
+- **Controles de Mapa Personalizados**: Controles estilizados con Material UI integrados con interfaz de mapas Leaflet
+- **Layouts Responsivos**: Layouts adaptativos que priorizan la visibilidad del mapa en todos los tamaños de pantalla
+
+### Características UX Geoespaciales
+
+- **Retroalimentación Visual**: Retroalimentación visual en tiempo real para operaciones espaciales y edición de límites
+- **Información Contextual**: Tooltips al pasar el mouse y paneles de información para entidades geográficas
+- **Validación Espacial**: Indicadores visuales para validación de relaciones espaciales y conflictos
+- **Divulgación Progresiva**: Visualización jerárquica de datos desde estados hasta coordenadas específicas
+
+## Interfaz de Gestión de Flotas
+
+### Visualización de Flotas
+
+- **Visualización de Flotas de Cuadrantes**: Representación visual de datos de flota (vehículos pequeños, grandes, bicicletas) dentro de cuadrantes
+- **Indicadores de Estado**: Indicadores codificados por colores para estado de flota activa/inactiva
+- **Estadísticas de Flotas**: Widgets de dashboard mostrando distribución y utilización de flotas
+- **Actualizaciones en Tiempo Real**: Actualizaciones en vivo de cambios de estado de flota a través de la interfaz de mapas
+
+### Características de Gestión de Flotas
+
+- **Edición Interactiva de Flotas**: Edición directa de números de flota a través de la interfaz de mapas
+- **Análisis de Flotas**: Análisis estadístico y reportes de distribución de flotas
+- **Optimización de Flotas**: Herramientas visuales para optimizar la distribución de flotas entre cuadrantes
+- **Datos Históricos de Flotas**: Vista de línea de tiempo de cambios y tendencias de flotas
+
+## Gestión de Datos Espaciales
+
+### Gestión de Límites
+
+- **Edición Interactiva de Límites**: Dibujar, editar y validar límites geográficos directamente en el mapa
+- **Validación de Límites**: Validación en tiempo real de superposiciones de límites y relaciones espaciales
+- **Edición Multi-Capa**: Edición simultánea de múltiples capas geográficas
+- **Importación/Exportación de Límites**: Soporte para importar y exportar datos de límites en varios formatos
+
+### Gestión de Puntos de Interés
+
+- **Creación de POI Basada en Mapas**: Crear puntos de interés con clic directo en el mapa
+- **Asociación Espacial Automática**: Asignación automática de POIs a cuadrantes y circuitos basada en coordenadas
+- **Categorización de POI**: Categorización visual de diferentes tipos de puntos de interés
+- **Operaciones Masivas de POI**: Operaciones por lotes para gestionar múltiples puntos de interés
+
+## Gestión de Estado
+
+### Integración con Redux Toolkit
+
+- **Gestión de Estado Espacial**: Gestión de estado centralizada para datos de mapas, límites y relaciones espaciales
+- **Sincronización en Tiempo Real**: Sincronización de estado con actualizaciones de datos espaciales del backend
+- **Actualizaciones Optimistas**: Actualizaciones inmediatas de UI con capacidad de rollback para operaciones espaciales
+- **Caché Espacial**: Caché inteligente de datos espaciales para rendimiento mejorado
+
+### Estructura de Estado
+
+```typescript
+interface RootState {
+  auth: {
+    user: User | null;
+    token: string | null;
+    isAuthenticated: boolean;
+    permissions: string[];
+    spatialPermissions: SpatialPermission[];
+  };
+  map: {
+    center: [number, number];
+    zoom: number;
+    bounds: LatLngBounds;
+    activeLayer: string;
+    drawingMode: boolean;
+  };
+  spatial: {
+    quadrants: GeoJSONFeatureCollection;
+    circuits: GeoJSONFeatureCollection;
+    pointsOfInterest: PointOfInterest[];
+    selectedEntity: SpatialEntity | null;
+  };
+  entities: {
+    states: State[];
+    municipalities: Municipality[];
+    parishes: Parish[];
+    organisms: Organism[];
+    responsibles: Responsible[];
+  };
+  ui: {
+    activeModal: string | null;
+    notifications: Notification[];
+    loading: LoadingState;
+  };
+}
+```
+
+## Herramientas de Desarrollo
+
+### Calidad de Código
+
+- **TypeScript**: Verificación estricta de tipos con definiciones comprensivas de tipos de datos espaciales
+- **ESLint**: Reglas de linting avanzadas con reglas específicas de React-Leaflet y geoespaciales
+- **Prettier**: Formateo consistente de código en todo el proyecto
+- **Seguridad de Tipos Espaciales**: Definiciones TypeScript personalizadas para GeoJSON y sistemas de coordenadas
+
+### Experiencia de Desarrollo
+
+- **Reemplazo de Módulos en Caliente**: Actualizaciones instantáneas durante desarrollo con preservación del estado del mapa
+- **Fast Refresh**: React Fast Refresh para preservación del estado de componentes durante interacciones de mapas
+- **Alias de Rutas**: Rutas de importación limpias con mapeo de rutas TypeScript para utilidades espaciales
+- **Herramientas de Desarrollo de Mapas**: Herramientas de depuración de Leaflet e inspección de coordenadas
+
+## Optimización de Rendimiento
+
+### Rendimiento de Mapas
+
+- **Caché de Tiles**: Caché inteligente de tiles de mapas para capacidad offline
+- **Optimización de Datos Espaciales**: Carga y renderizado eficiente de grandes conjuntos de datos GeoJSON
+- **Carga Basada en Viewport**: Carga dinámica de datos espaciales basada en el viewport del mapa
+- **Gestión de Capas**: Renderizado optimizado de múltiples capas geográficas
+
+### Optimización de Build
+
+- **División de Código**: División de código basada en rutas y características para componentes de mapas
+- **Tree Shaking**: Eliminación de plugins de Leaflet y utilidades espaciales no utilizadas
+- **Optimización de Assets**: Optimización de iconos de mapas, marcadores y assets espaciales
+- **Análisis de Bundle**: Análisis de tamaños de bundle de librerías espaciales y optimización
+
+### Rendimiento en Tiempo de Ejecución
+
+- **Indexación Espacial**: Indexación espacial del lado del cliente para consultas rápidas de punto-en-polígono
+- **Eventos de Mapa Debounced**: Manejo optimizado de eventos de paneo, zoom y dibujo de mapas
+- **Renderizado Virtual**: Renderizado eficiente de grandes números de marcadores de mapas
+- **Gestión de Memoria**: Limpieza adecuada de instancias de mapas y datos espaciales
+
+## Características de Seguridad
+
+### Seguridad Espacial
+
+- **Validación de Límites**: Validación del lado del servidor de límites espaciales y coordenadas
+- **Control de Acceso Espacial**: Acceso basado en permisos a áreas geográficas y capacidades de edición
+- **Sanitización de Coordenadas**: Validación y sanitización de entradas de coordenadas
+- **Integridad de Datos Espaciales**: Protección contra GeoJSON malicioso e inyección de datos espaciales
+
+### Seguridad del Lado del Cliente
+
+- **Protección XSS**: Sanitización de entradas para datos espaciales y entradas de coordenadas
+- **Protección CSRF**: Validación basada en tokens para modificaciones de datos espaciales
+- **Tiles de Mapas Seguros**: Carga HTTPS de tiles de mapas y recursos espaciales
+- **Validación de Entrada**: Validación comprensiva de todas las entradas de datos espaciales
+
+## Licencia
+
+Licencia MIT - ver package.json para detalles.
+
+---
+
+## Contribuir
+
+1. Haz fork del repositorio
+2. Crea una rama de característica
+3. Haz tus cambios con pruebas
+4. Ejecuta `yarn lint` y `yarn test`
+5. Envía un pull request
+
+Para preguntas o problemas, por favor crea un issue en el repositorio.
