@@ -19,8 +19,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
+import { rolesApi, usersApi } from '@/services/api';
 import type { RootState } from '@/store';
-import type { Role, UserFormData, UserFormDialogProps } from '@/types';
+import type { Role, UserFormData, UserFormDialogProps } from '@/types/auth';
 
 const UserFormDialog: React.FC<UserFormDialogProps> = ({ 
   open,
@@ -59,22 +60,14 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
 
   // Fetch available roles with useCallback to prevent unnecessary re-renders
   const fetchRoles = useCallback(async () => {
-    if (!canGetRole) return;
+    if (!canGetRole || !token) return;
     
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/roles?page=1&pageSize=100`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (response.ok) {
-        setAvailableRoles(data.data || []);
-      }
+      const response = await rolesApi.getRoles({
+        page: 1,
+        pageSize: 100,
+      }, token);
+      setAvailableRoles(response.data || []);
     } catch (err) {
       console.error('Error fetching roles:', err);
     }
@@ -107,7 +100,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!canPerformAction) {
+    if (!canPerformAction || !token) {
       setError(t('users:components.form.accessDeniedUser', { action: user ? 'edit' : 'create' }));
       return;
     }
@@ -126,12 +119,6 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
     setError('');
 
     try {
-      const url = user 
-        ? `${import.meta.env.VITE_API_URL}/users/${user.id}`
-        : `${import.meta.env.VITE_API_URL}/users`;
-      
-      const method = user ? 'PUT' : 'POST';
-
       const payload: {
         username: string;
         roleIds: number[];
@@ -145,26 +132,26 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
       if (formData.password.trim() || !user) {
         payload.password = formData.password.trim();
       }
-      
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || (user ? t('users:components.form.failedToUpdateUser') : t('users:components.form.failedToCreateUser')));
+      if (user) {
+        // Update existing user
+        await usersApi.updateUser(user.id, payload, token);
+      } else {
+        // Create new user
+        await usersApi.createUser({
+          username: payload.username,
+          password: payload.password!,
+          roleIds: payload.roleIds
+        }, token);
       }
 
       onSuccess();
     } catch (err) {
-      if (err instanceof Error)
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError(user ? t('users:components.form.failedToUpdateUser') : t('users:components.form.failedToCreateUser'));
+      }
     } finally {
       setLoading(false);
     }

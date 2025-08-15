@@ -18,6 +18,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
+import { municipalitiesApi, statesApi } from '@/services/api';
 import type { RootState } from '@/store';
 import type { MunicipalityFormData, MunicipalityFormDialogProps, State } from '@/types/entities';
 
@@ -56,22 +57,14 @@ const MunicipalityFormDialog: React.FC<MunicipalityFormDialogProps> = ({
 
   // Fetch available states with useCallback to prevent unnecessary re-renders
   const fetchStates = useCallback(async () => {
-    if (!canGetState) return;
+    if (!canGetState || !token) return;
     
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/states?page=1&pageSize=100`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (response.ok) {
-        setAvailableStates(data.data || []);
-      }
+      const response = await statesApi.getStates({
+        page: 1,
+        pageSize: 100,
+      }, token);
+      setAvailableStates(response.data || []);
     } catch (err) {
       console.error('Error fetching states:', err);
     }
@@ -95,7 +88,7 @@ const MunicipalityFormDialog: React.FC<MunicipalityFormDialogProps> = ({
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!canPerformAction) {
+    if (!canPerformAction || !token) {
       setError(t('municipalities:components.form.accessDeniedMunicipality', { action: municipality ? 'edit' : 'create' }));
       return;
     }
@@ -115,35 +108,26 @@ const MunicipalityFormDialog: React.FC<MunicipalityFormDialogProps> = ({
     setError('');
 
     try {
-      const url = municipality 
-        ? `${import.meta.env.VITE_API_URL}/municipalities/${municipality.id}`
-        : `${import.meta.env.VITE_API_URL}/municipalities`;
-      
-      const method = municipality ? 'PUT' : 'POST';
-
-      const payload = municipality 
-        ? { name: formData.name.trim() }
-        : { name: formData.name.trim(), stateId: formData.stateId };
-      
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || (municipality ? t('municipalities:components.form.failedToUpdateMunicipality') : t('municipalities:components.form.failedToCreateMunicipality')));
+      if (municipality) {
+        // Update existing municipality
+        await municipalitiesApi.updateMunicipality(municipality.id, {
+          name: formData.name.trim()
+        }, token);
+      } else {
+        // Create new municipality
+        await municipalitiesApi.createMunicipality({
+          name: formData.name.trim(),
+          stateId: formData.stateId!
+        }, token);
       }
 
       onSuccess();
     } catch (err) {
-      if (err instanceof Error)
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError(municipality ? t('municipalities:components.form.failedToUpdateMunicipality') : t('municipalities:components.form.failedToCreateMunicipality'));
+      }
     } finally {
       setLoading(false);
     }

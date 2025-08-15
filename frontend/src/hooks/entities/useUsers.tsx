@@ -1,8 +1,9 @@
-import { useCallback,useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { usersApi } from '@/services/api';
 import type { RootState } from '@/store';
-import type { PaginatedResponse, User, UserFilterOptions } from '@/types';
+import type { User, UserFilterOptions } from '@/types/auth';
 
 export const useUserManagement = () => {
   const { token } = useSelector((state: RootState) => state.auth);
@@ -14,53 +15,35 @@ export const useUserManagement = () => {
 
   // Fetch users with useCallback to prevent unnecessary re-renders
   const fetchUsers = useCallback(async (options: Partial<UserFilterOptions> = {}) => {
+    if (!token) return;
+
     setLoading(true);
     setError('');
     
-    const params = new URLSearchParams({
-      page: (options.page || page).toString(),
-      pageSize: (options.pageSize || 10).toString(),
-    });
-
-    if (options.username) {
-      params.append('username', options.username);
-    }
-    if (options.sortBy) {
-      params.append('sortBy', options.sortBy);
-    }
-    if (options.sortOrder) {
-      params.append('sortOrder', options.sortOrder);
-    }
+    const filterOptions: UserFilterOptions = {
+      page: options.page || page,
+      pageSize: options.pageSize || 10,
+      username: options.username,
+      sortBy: options.sortBy,
+      sortOrder: options.sortOrder,
+    };
     
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users?${params.toString()}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await usersApi.getUsers(filterOptions, token);
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch users');
-      }
-      const data: PaginatedResponse<User> = await response.json();
-      
-      // Backend returns { data, total, totalPages, currentPage }
-      setUsers(data.data || []);
-      setTotalPages(data.totalPages || 1);
+      setUsers(response.data || []);
+      setTotalPages(response.totalPages || 1);
+      setPage(response.currentPage || 1);
       
       // If current page is greater than total pages, reset to page 1
       const currentPage = options.page || page;
-      if (currentPage > data.totalPages && data.totalPages > 0) {
+      if (currentPage > response.totalPages && response.totalPages > 0) {
         setPage(1);
       }
     } catch (err) {
-      if (err instanceof Error)
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -68,54 +51,30 @@ export const useUserManagement = () => {
 
   // Fetch individual user with roles
   const fetchUserById = useCallback(async (userId: number): Promise<User | null> => {
+    if (!token) return null;
+
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${userId}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch user details');
-      }
-      
-      return data;
+      const user = await usersApi.getUserById(userId, token);
+      return user;
     } catch (err) {
-      if (err instanceof Error)
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      }
       return null;
     }
   }, [token]);
 
   // Delete user
   const deleteUser = useCallback(async (userId: number): Promise<boolean> => {
+    if (!token) return false;
+
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${userId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to delete user');
-      }
-
+      await usersApi.deleteUser(userId, token);
       return true;
     } catch (err) {
-      if (err instanceof Error)
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      }
       return false;
     }
   }, [token]);
