@@ -7,5 +7,4 @@ export * as ParishController from './Parish';
 export * as OrganismController from './Organism'
 export * as ResponsibleController from './Responsible'
 export * as QuadrantController from './Quadrant'
-
-// TODO: Jhonnatan: Revisar la aplicacion de los controladores con paginacion
+export * as CommunalCircuitController from './CommunalCircuit'

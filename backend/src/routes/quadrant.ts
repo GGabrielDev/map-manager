@@ -36,12 +36,59 @@ router.get(
 });
 
 router.get(
+    "/geojson",
+    requirePermission("get_quadrant"),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+              const name = (req.query.name as Quadrant['name']) || undefined
+              const sortBy = QuadrantController.SortByOptions.includes(req.query.sortBy as string)
+                ? (req.query.sortBy as QuadrantController.QuadrantFilterOptions['sortBy'])
+                : undefined
+              const sortOrder = (req.query.sortOrder as 'ASC' | 'DESC') || 'ASC'
+
+        const quadrantGeoJson = await QuadrantController.allQuadrantsGeoJSON({
+            name,
+            sortBy,
+            sortOrder,
+        });
+        res.json(quadrantGeoJson);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(401).json({ message: error.message });
+        }else{
+            next(error);
+        }
+    }
+});
+
+router.get(
     "/:id",
     requirePermission("get_quadrant"),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const quadrantId = parseInt(req.params.id, 10)
         const quadrant = await QuadrantController.getById(quadrantId);
+        if (!quadrant) {
+            res.status(404).json({ message: "Cuadrante no encontrado." });
+            return;
+        }
+        res.json(quadrant);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(401).json({ message: error.message });
+        }else{
+            next(error);
+        }
+    }
+});
+
+router.get(
+    "/:id/geojson",
+    requirePermission("get_quadrant"),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const quadrantId = parseInt(req.params.id, 10)
+        const quadrant = await QuadrantController.getByIdGeoJson(quadrantId);
         if (!quadrant) {
             res.status(404).json({ message: "Cuadrante no encontrado." });
             return;

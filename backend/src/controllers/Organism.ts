@@ -1,6 +1,10 @@
 import { Op, OrderItem } from "sequelize";
 import { Organism, Responsible } from "@/models";
 
+import sharp from "sharp";
+import path from "path";
+import fs from "fs";
+
 interface PaginationOptions {
   page: number
   pageSize: number
@@ -96,7 +100,7 @@ export const getById = async (id: number): Promise<Organism | null> => {
 }
 
 // Create Organism
-export const createOrganism = async (name: string): Promise<Organism> => {
+export const createOrganism = async (name: string, icono:string): Promise<Organism> => {
     try {
         const existOrganism = await Organism.findOne({ where: { name } });
 
@@ -105,12 +109,13 @@ export const createOrganism = async (name: string): Promise<Organism> => {
         }
 
         const createOrganism = await Organism.create({
-            name
+            name,
+            icono
         });
 
         return createOrganism;
-
     } catch (error) {
+        console.log(error)
         throw new Error("Error al crear el organismo, intente nuevamente.");
     }
 }
@@ -150,5 +155,52 @@ export const deleteOrganism = async (id: number): Promise<boolean> => {
         return true;
     } catch (error) {
         throw new Error("Error al eliminar el organismo, intente nuevamente.");
+    }
+}
+
+
+
+//funciones no CRUD
+export const validateImage = async (name: string, file: Express.Multer.File): Promise<string> => {
+    try {
+        const allowedTypes = ["image/jpeg", "image/png"];
+        if (!allowedTypes.includes(file.mimetype)) {
+            throw new Error("Tipo de archivo no permitido.");
+        }
+
+        const ext = path.extname(file.originalname);
+        const newFileName = `${name}${ext}`;
+
+
+        const destDir = path.join(__dirname, "../../../static/organism");
+        const destPath = path.join(destDir, newFileName);
+
+        //Asegurar que la carpeta exista
+        if (!fs.existsSync(destDir)) {
+            fs.mkdirSync(destDir, { recursive: true });
+        }
+
+        // Leer metadatos para saber dimensiones originales
+        const metadata = await sharp(file.path).metadata();
+
+        if (metadata.width !== 16 || metadata.height !== 16) {
+            // Si no es 16x16, redimensionar manteniendo proporción, ajustando a 16x16 con fondo transparente
+            await sharp(file.path)
+                .resize(16, 16, {
+                    fit: 'contain',
+                    background: { r: 0, g: 0, b: 0, alpha: 0 }
+                })
+                .toFile(destPath);
+        } else {
+            // Si ya es 16x16, solo mover el archivo sin cambiarlo
+            fs.renameSync(file.path, destPath);
+        }
+
+        //guardar la ruta local con el archivo "nuevo"
+        const icono = `api/static/organisms/icono/${newFileName}`;
+
+        return icono;
+    } catch (error) {
+        throw new Error("Error al validar la imagen, intente nuevamente.");
     }
 }
