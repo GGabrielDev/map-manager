@@ -170,6 +170,8 @@ export const validateImage = async (name: string, file: Express.Multer.File): Pr
 
         const ext = path.extname(file.originalname);
         const newFileName = `${name}${ext}`;
+
+
         const destDir = path.join(__dirname, "../../../static/organism");
         const destPath = path.join(destDir, newFileName);
 
@@ -184,7 +186,7 @@ export const validateImage = async (name: string, file: Express.Multer.File): Pr
         if (metadata.width !== 16 || metadata.height !== 16) {
             // Si no es 16x16, redimensionar manteniendo proporción, ajustando a 16x16 con fondo transparente
             await sharp(file.path)
-                .resize(100, 100, {
+                .resize(16, 16, {
                     fit: 'contain',
                     background: { r: 0, g: 0, b: 0, alpha: 0 }
                 })
