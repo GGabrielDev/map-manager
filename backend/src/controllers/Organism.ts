@@ -197,7 +197,7 @@ export const validateImage = async (name: string, file: Express.Multer.File): Pr
         }
 
         //guardar la ruta local con el archivo "nuevo"
-        const icono = `api/static/organisms/icono/${newFileName}`;
+        const icono = `/static/organisms/icono/${newFileName}`;
 
         return icono;
     } catch (error) {
