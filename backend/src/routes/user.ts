@@ -45,10 +45,12 @@ router.get(
         try {
             const userId = parseInt(req.params.id, 10)
             const user = await UserController.getById(userId);
+            
             if (!user) {
                 res.status(404).json({ message: "Usuario no encontrado." });
                 return;
             }
+            
             res.json(user);
         } catch (error) {
             if (error instanceof Error) {
