@@ -50,7 +50,7 @@ export default class Resposible extends Model{
     @Column
     position!: string
 
-    //TODO: Faltan las relaciones con las tablas cuadrantes, circuito comunitario, comuna y consejo comunal ya que no fueron creados aun
+    //TODO: Faltan las relaciones con la tabla consejo comunal ya que no fue creada aun
     
     @ForeignKey(()=> Organism)
     @Column
