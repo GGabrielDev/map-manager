@@ -3,18 +3,30 @@ import { useTranslation } from 'react-i18next';
 
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import NavigationMenu from '@/components/dashboard/NavigationMenu';
-import { usePermissions } from '@/hooks';
+import { usePermissions } from '@/hooks/auth/usePermissions';
 
 const AdministrativeDashboard: React.FC = () => {
   const { t } = useTranslation();
-  const { canManageUsers, canManageRoles } = usePermissions();
+  const { hasPermission } = usePermissions();
+
+  const canManageUsers = hasPermission('get_user');
+  const canManageRoles = hasPermission('get_role');
+  const canManageOrganisms = hasPermission('get_organism');
 
   const navigationItems = [
+    { label: t('dashboard:administrative.navigation.organisms'), route: '/organisms' },
     { label: t('dashboard:administrative.navigation.users'), route: '/users' },
     { label: t('dashboard:administrative.navigation.roles'), route: '/roles' },
   ];
 
   const managementSections = [
+    ...(canManageOrganisms ? [{
+      title: t('dashboard:management.organisms.title'),
+      description: t('dashboard:management.organisms.description'),
+      route: '/organisms',
+      color: 'info' as const,
+      icon: '🏢'
+    }] : []),
     ...(canManageUsers ? [{
       title: t('dashboard:management.users.title'),
       description: t('dashboard:management.users.description'),

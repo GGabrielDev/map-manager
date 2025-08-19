@@ -1,0 +1,45 @@
+{
+  "title": "Organisms Management",
+  "searchAndActions": "Search and Actions",
+  "createOrganism": "Create Organism",
+  "searchByName": "Search by name",
+  "organismsList": "Organisms List",
+  "table": {
+    "icon": "Icon",
+    "name": "Name",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "actions": "Actions",
+    "editOrganism": "Edit Organism",
+    "deleteOrganism": "Delete Organism",
+    "noOrganisms": "No organisms found"
+  },
+  "components": {
+    "form": {
+      "createNewOrganism": "Create New Organism",
+      "editOrganism": "Edit Organism",
+      "name": "Name",
+      "icon": "Icon (Map Pin)",
+      "selectIcon": "Select icon file",
+      "iconHelp": "Upload a JPEG or PNG image. It will be automatically resized to 16x16 pixels for map pins.",
+      "iconPreview": "Icon Preview",
+      "iconRequired": "Icon is required for new organisms",
+      "nameRequired": "Name is required",
+      "createOrganism": "Create Organism",
+      "updateOrganism": "Update Organism",
+      "accessDenied": "Access Denied",
+      "accessDeniedMessage": "You don't have permission to {{action}} organisms",
+      "failedToCreate": "Failed to create organism",
+      "failedToUpdate": "Failed to update organism"
+    }
+  },
+  "messages": {
+    "createSuccess": "Organism created successfully",
+    "updateSuccess": "Organism updated successfully",
+    "deleteSuccess": "Organism deleted successfully"
+  },
+  "deleteConfirmation": {
+    "title": "Delete Organism",
+    "message": "Are you sure you want to delete this organism? This action cannot be undone."
+  }
+}

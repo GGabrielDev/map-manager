@@ -6,6 +6,7 @@ import enAuth from './locales/en/auth.json';
 import enCommon from './locales/en/common.json';
 import enDashboard from './locales/en/dashboard.json';
 import enMunicipalities from './locales/en/municipalities.json';
+import enOrganisms from './locales/en/organisms.json';
 import enParishes from './locales/en/parishes.json';
 import enRoles from './locales/en/roles.json';
 import enStates from './locales/en/states.json';
@@ -14,6 +15,7 @@ import esAuth from './locales/es/auth.json';
 import esCommon from './locales/es/common.json';
 import esDashboard from './locales/es/dashboard.json';
 import esMunicipalities from './locales/es/municipalities.json';
+import esOrganisms from './locales/es/organisms.json';
 import esParishes from './locales/es/parishes.json';
 import esRoles from './locales/es/roles.json';
 import esStates from './locales/es/states.json';
@@ -29,6 +31,7 @@ i18n
         common: enCommon,
         dashboard: enDashboard,
         municipalities: enMunicipalities,
+        organisms: enOrganisms,
         parishes: enParishes,
         roles: enRoles,
         states: enStates,
@@ -39,6 +42,7 @@ i18n
         common: esCommon,
         dashboard: esDashboard,
         municipalities: esMunicipalities,
+        organisms: esOrganisms,
         parishes: esParishes,
         roles: esRoles,
         states: esStates,

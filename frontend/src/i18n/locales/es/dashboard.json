@@ -37,6 +37,7 @@
     "title": "Tablero Administrativo",
     "backToMain": "Volver al Tablero Principal",
     "navigation": {
+      "organisms": "Organismos",
       "users": "Usuarios",
       "roles": "Roles"
     },
@@ -57,6 +58,10 @@
   },
 
   "management": {
+    "organisms": {
+      "title": "Gestionar Organismos",
+      "description": "Crear y gestionar organismos con iconos de pines de mapa"
+    },
     "users": {
       "title": "Gestionar Usuarios",
       "description": "Crear, editar y gestionar cuentas de usuario"

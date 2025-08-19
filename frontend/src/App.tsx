@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import ProtectedRoute from './components/common/ProtectedRoute';
+import ManageOrganisms from './pages/administrative/OrganismsPage';
 import ManageRoles from './pages/administrative/RolesPage';
 import ManageUsers from './pages/administrative/UsersPage';
 import LoginPage from './pages/auth/LoginPage';
@@ -45,6 +46,14 @@ const App: React.FC = () => {
       />
       
       {/* Administrative Routes */}
+      <Route 
+        path="/organisms" 
+        element={
+          <ProtectedRoute>
+            <ManageOrganisms />
+          </ProtectedRoute>
+        }
+      />
       <Route 
         path="/roles" 
         element={

@@ -118,3 +118,41 @@ export interface ParishFilterOptions {
   sortBy?: 'name' | 'creationDate' | 'updatedOn';
   sortOrder?: 'ASC' | 'DESC';
 }
+
+export interface Organism {
+  id: number;
+  name: string;
+  icono?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrganismFormDialogProps {
+  open: boolean;
+  organism: Organism | null;
+  onClose: () => void;
+  onSuccess: () => void;
+  canEdit: boolean;
+  canCreate: boolean;
+}
+
+export interface OrganismsTableProps {
+  organisms: Organism[];
+  canEditOrganism: boolean;
+  canDeleteOrganism: boolean;
+  onEdit: (organism: Organism) => void;
+  onDelete: (organismId: number) => void;
+}
+
+export interface OrganismFormData {
+  name: string;
+  icono?: File | null;
+}
+
+export interface OrganismFilterOptions {
+  page: number;
+  pageSize: number;
+  name?: string;
+  sortBy?: 'name' | 'creationDate' | 'updatedOn';
+  sortOrder?: 'ASC' | 'DESC';
+}

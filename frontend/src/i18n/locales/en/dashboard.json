@@ -37,6 +37,7 @@
     "title": "Administrative Dashboard",
     "backToMain": "Back to Main Dashboard",
     "navigation": {
+      "organisms": "Organisms",
       "users": "Users",
       "roles": "Roles"
     },
@@ -57,6 +58,10 @@
   },
 
   "management": {
+    "organisms": {
+      "title": "Manage Organisms",
+      "description": "Create and manage organisms with map pin icons"
+    },
     "users": {
       "title": "Manage Users",
       "description": "Create, edit, and manage user accounts"

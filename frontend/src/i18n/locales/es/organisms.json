@@ -1,0 +1,45 @@
+{
+  "title": "Gestión de Organismos",
+  "searchAndActions": "Búsqueda y Acciones",
+  "createOrganism": "Crear Organismo",
+  "searchByName": "Buscar por nombre",
+  "organismsList": "Lista de Organismos",
+  "table": {
+    "icon": "Icono",
+    "name": "Nombre",
+    "createdAt": "Creado el",
+    "updatedAt": "Actualizado el",
+    "actions": "Acciones",
+    "editOrganism": "Editar Organismo",
+    "deleteOrganism": "Eliminar Organismo",
+    "noOrganisms": "No se encontraron organismos"
+  },
+  "components": {
+    "form": {
+      "createNewOrganism": "Crear Nuevo Organismo",
+      "editOrganism": "Editar Organismo",
+      "name": "Nombre",
+      "icon": "Icono (Pin de Mapa)",
+      "selectIcon": "Seleccionar archivo de icono",
+      "iconHelp": "Sube una imagen JPEG o PNG. Se redimensionará automáticamente a 16x16 píxeles para pines de mapa.",
+      "iconPreview": "Vista Previa del Icono",
+      "iconRequired": "El icono es requerido para nuevos organismos",
+      "nameRequired": "El nombre es requerido",
+      "createOrganism": "Crear Organismo",
+      "updateOrganism": "Actualizar Organismo",
+      "accessDenied": "Acceso Denegado",
+      "accessDeniedMessage": "No tienes permisos para {{action}} organismos",
+      "failedToCreate": "Error al crear el organismo",
+      "failedToUpdate": "Error al actualizar el organismo"
+    }
+  },
+  "messages": {
+    "createSuccess": "Organismo creado exitosamente",
+    "updateSuccess": "Organismo actualizado exitosamente",
+    "deleteSuccess": "Organismo eliminado exitosamente"
+  },
+  "deleteConfirmation": {
+    "title": "Eliminar Organismo",
+    "message": "¿Estás seguro de que quieres eliminar este organismo? Esta acción no se puede deshacer."
+  }
+}

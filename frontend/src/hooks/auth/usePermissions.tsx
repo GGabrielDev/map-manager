@@ -54,12 +54,19 @@ export const usePermissions = () => {
   const canEditParish = hasPermission('edit_parish');
   const canDeleteParish = hasPermission('delete_parish');
 
+  // Organisms-specific permission checks
+  const canCreateOrganism = hasPermission('create_organism');
+  const canGetOrganism = hasPermission('get_organism');
+  const canEditOrganism = hasPermission('edit_organism');
+  const canDeleteOrganism = hasPermission('delete_organism');
+
   // Composite permission checks
   const canManageUsers = canCreateUser || canGetUser || canEditUser || canDeleteUser;
   const canManageRoles = canCreateRole || canGetRole || canEditRole || canDeleteRole;
   const canManageStates = canCreateState || canGetState || canEditState || canDeleteState;
   const canManageMunicipalities = canCreateMunicipality || canGetMunicipality || canEditMunicipality || canDeleteMunicipality;
   const canManageParishes = canCreateParish || canGetParish || canEditParish || canDeleteParish;
+  const canManageOrganisms = canCreateOrganism || canGetOrganism || canEditOrganism || canDeleteOrganism;
 
   return {
     hasPermission,
@@ -95,6 +102,12 @@ export const usePermissions = () => {
     canEditParish,
     canDeleteParish,
     canManageParishes,
+    // Organism permissions
+    canCreateOrganism,
+    canGetOrganism,
+    canEditOrganism,
+    canDeleteOrganism,
+    canManageOrganisms,
     // Permission permissions
     canGetPermission,
   };
