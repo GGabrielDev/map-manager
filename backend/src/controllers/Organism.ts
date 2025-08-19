@@ -1,7 +1,6 @@
 import { Op, OrderItem } from "sequelize";
 import { Organism, Responsible } from "@/models";
 
-import sharp from "sharp";
 import path from "path";
 import fs from "fs";
 
@@ -163,7 +162,7 @@ export const deleteOrganism = async (id: number): Promise<boolean> => {
 //funciones no CRUD
 export const validateImage = async (name: string, file: Express.Multer.File): Promise<string> => {
     try {
-        const allowedTypes = ["image/jpeg", "image/png"];
+        const allowedTypes = ["image/jpeg", "image/png", "image/svg+xml"];
         if (!allowedTypes.includes(file.mimetype)) {
             throw new Error("Tipo de archivo no permitido.");
         }
@@ -180,21 +179,8 @@ export const validateImage = async (name: string, file: Express.Multer.File): Pr
             fs.mkdirSync(destDir, { recursive: true });
         }
 
-        // Leer metadatos para saber dimensiones originales
-        const metadata = await sharp(file.path).metadata();
-
-        if (metadata.width !== 16 || metadata.height !== 16) {
-            // Si no es 16x16, redimensionar manteniendo proporción, ajustando a 16x16 con fondo transparente
-            await sharp(file.path)
-                .resize(16, 16, {
-                    fit: 'contain',
-                    background: { r: 0, g: 0, b: 0, alpha: 0 }
-                })
-                .toFile(destPath);
-        } else {
-            // Si ya es 16x16, solo mover el archivo sin cambiarlo
-            fs.renameSync(file.path, destPath);
-        }
+        // Mover el archivo sin cambiarlo
+        fs.renameSync(file.path, destPath);
 
         //guardar la ruta local con el archivo "nuevo"
         const icono = `api/static/organisms/icono/${newFileName}`;
