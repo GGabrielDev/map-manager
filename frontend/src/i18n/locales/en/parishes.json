@@ -1,0 +1,38 @@
+{
+  "page": {
+    "title": "Manage Parishes",
+    "subtitle": "Create and manage parishes within municipalities",
+    "createNewParish": "Create New Parish",
+    "noParishesFound": "No Parishes Found",
+    "getStarted": "Get started by creating your first parish.",
+    "noParishesConfigured": "No parishes are currently configured."
+  },
+  "components": {
+    "table": {
+      "name": "Parish Name",
+      "municipality": "Municipality",
+      "state": "State",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "form": {
+      "editParish": "Edit Parish",
+      "createNewParish": "Create New Parish",
+      "name": "Parish Name",
+      "municipality": "Municipality",
+      "selectMunicipality": "Select a Municipality",
+      "municipalityCannotBeChanged": "Municipality cannot be changed after creation",
+      "updateParish": "Update Parish",
+      "createParish": "Create Parish",
+      "missingName": "Parish name is required.",
+      "missingMunicipality": "Municipality selection is required.",
+      "failedToCreateParish": "Failed to create parish.",
+      "failedToUpdateParish": "Failed to update parish.",
+      "failedToDeleteParish": "Failed to delete parish.",
+      "accessDenied": "Access Denied",
+      "accessDeniedParish": "You do not have permission to {{action}} parishes.",
+      "confirmDelete": "Are you sure you want to delete this parish?",
+      "deleteWarning": "This action cannot be undone. The parish and all associated data will be permanently removed."
+    }
+  }
+}

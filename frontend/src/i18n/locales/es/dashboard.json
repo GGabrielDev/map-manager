@@ -4,17 +4,78 @@
   "switchToDark": "Cambiar a modo oscuro",
   "switchToLight": "Cambiar a modo claro",
   "logout": "Cerrar sesión",
-  "manageUsers": "Gestionar Usuarios",
-  "manageUsersDesc": "Crear, editar y gestionar cuentas de usuario",
-  "manageRoles": "Gestionar Roles",
-  "manageRolesDesc": "Configurar roles y permisos",
-  "manageStates": "Gestionar Estados",
-  "manageStatesDesc": "Crear y gestionar estados para mapas y datos",
-  "manageMunicipalities": "Gestionar Municipios",
-  "manageMunicipalitiesDesc": "Crear y gestionar Municipios dentro de los Estados",
   "access": "Acceder",
-  "noSectionsAvailable": "No hay secciones de gestión disponibles",
-  "noPermissionsMessage": "No tienes permisos para gestionar ninguna sección. Por favor, contacta a tu administrador para obtener acceso.",
   "yourPermissions": "Tus permisos",
-  "noRolesAssigned": "No hay roles asignados"
+  "noRolesAssigned": "No hay roles asignados",
+
+  "quickActions": {
+    "title": "Acciones Rápidas",
+    "createUser": "Gestionar Usuarios",
+    "manageRoles": "Gestionar Roles"
+  },
+
+  "categories": {
+    "title": "Categorías del Tablero",
+    "administrative": {
+      "title": "Tablero Administrativo",
+      "description": "Gestionar usuarios, roles y administración del sistema"
+    },
+    "geographical": {
+      "title": "Tablero Geográfico",
+      "description": "Gestionar estados, municipios y otras entidades geográficas"
+    }
+  },
+
+  "systemOverview": {
+    "title": "Resumen del Sistema",
+    "assignedRoles": "Roles Asignados",
+    "totalPermissions": "Permisos Totales",
+    "dashboardCategories": "Categorías del Tablero"
+  },
+
+  "administrative": {
+    "title": "Tablero Administrativo",
+    "backToMain": "Volver al Tablero Principal",
+    "navigation": {
+      "users": "Usuarios",
+      "roles": "Roles"
+    },
+    "noSections": "No hay secciones administrativas disponibles",
+    "noPermissions": "No tienes permisos para acceder a las funciones administrativas."
+  },
+
+  "geographical": {
+    "title": "Tablero Geográfico",
+    "backToMain": "Volver al Tablero Principal",
+    "navigation": {
+      "states": "Estados",
+      "municipalities": "Municipios",
+      "parishes": "Parroquias"
+    },
+    "noSections": "No hay secciones geográficas disponibles",
+    "noPermissions": "No tienes permisos para acceder a las funciones de gestión geográfica."
+  },
+
+  "management": {
+    "users": {
+      "title": "Gestionar Usuarios",
+      "description": "Crear, editar y gestionar cuentas de usuario"
+    },
+    "roles": {
+      "title": "Gestionar Roles",
+      "description": "Configurar roles y permisos"
+    },
+    "states": {
+      "title": "Gestionar Estados",
+      "description": "Crear y gestionar estados para mapas y datos"
+    },
+    "municipalities": {
+      "title": "Gestionar Municipios",
+      "description": "Crear y gestionar municipios dentro de los estados"
+    },
+    "parishes": {
+      "title": "Gestionar Parroquias",
+      "description": "Crear y gestionar parroquias dentro de los municipios"
+    }
+  }
 }

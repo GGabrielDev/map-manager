@@ -15,12 +15,13 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { useCallback, useEffect, useMemo,useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
+import { permissionsApi, rolesApi } from '@/services/api';
 import type { RootState } from '@/store';
-import type { Permission, RoleFormDialogProps } from '@/types';
+import type { Permission, RoleFormDialogProps } from '@/types/auth';
 
 const RoleFormDialog: React.FC<RoleFormDialogProps> = ({ 
   open,
@@ -59,22 +60,11 @@ const RoleFormDialog: React.FC<RoleFormDialogProps> = ({
 
   // Fetch available permissions with useCallback to prevent unnecessary re-renders
   const fetchPermissions = useCallback(async () => {
-    if (!canGetPermission) return;
+    if (!canGetPermission || !token) return;
     
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/permissions?page=1&pageSize=100`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (response.ok) {
-        setAvailablePermissions(data.data || []);
-      }
+      const permissions = await permissionsApi.getAllPermissions(token);
+      setAvailablePermissions(permissions);
     } catch (err) {
       console.error('Error fetching permissions:', err);
     }
@@ -107,7 +97,7 @@ const RoleFormDialog: React.FC<RoleFormDialogProps> = ({
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!canPerformAction) {
+    if (!canPerformAction || !token) {
       setError(t('roles:components.form.accessDenied'));
       return;
     }
@@ -121,35 +111,27 @@ const RoleFormDialog: React.FC<RoleFormDialogProps> = ({
     setError('');
 
     try {
-      const url = role 
-        ? `${import.meta.env.VITE_API_URL}/roles/${role.id}`
-        : `${import.meta.env.VITE_API_URL}/roles`;
-      
-      const method = role ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: formData.name.trim(),
-          description: formData.description.trim(),
-          permissionIds: formData.selectedPermissions,
-        }),
-      });
+      const payload = {
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        permissionIds: formData.selectedPermissions,
+      };
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || t('roles:components.form.failedToCreateRole'));
+      if (role) {
+        // Update existing role
+        await rolesApi.updateRole(role.id, payload, token);
+      } else {
+        // Create new role
+        await rolesApi.createRole(payload, token);
       }
 
       onSuccess();
     } catch (err) {
-      if (err instanceof Error)
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError(t('roles:components.form.failedToCreateRole'));
+      }
     } finally {
       setLoading(false);
     }
@@ -191,7 +173,7 @@ const RoleFormDialog: React.FC<RoleFormDialogProps> = ({
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>{t('close')}</Button>
+          <Button onClick={onClose}>{t('common:close')}</Button>
         </DialogActions>
       </Dialog>
     );
@@ -250,7 +232,7 @@ const RoleFormDialog: React.FC<RoleFormDialogProps> = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} disabled={loading}>
-            {t('cancel')}
+            {t('common:cancel')}
           </Button>
           <Button 
             type="submit" 

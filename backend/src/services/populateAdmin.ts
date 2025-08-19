@@ -2,9 +2,6 @@ import {
   Permission,
   Role,
   User,
-  State,
-  Municipality,
-  Parish
 } from '@/models'
 
 const entities = [
@@ -13,7 +10,11 @@ const entities = [
   'User',
   'State',
   'Municipality',
-  'Parish'
+  'Parish',
+  'Organism',
+  'Responsible',
+  'Quadrant',
+  'CommunalCircuit'
 ]
 
 const actions = ['create', 'get', 'edit', 'delete']

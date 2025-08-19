@@ -6,6 +6,12 @@ import PermissionRouter from '@/routes/permission'
 import AuthRouter from '@/routes/auth'
 import StateRouter from '@/routes/state'
 import MunicipalityRouter from '@/routes/municipality'
+import ParishRouter from '@/routes/parish'
+import OrganismRouter from '@/routes/organism'
+import ResponsibleRouter from '@/routes/responsible'
+import QuadrantRouter from "@/routes/quadrant";
+import Static from "@/routes/static"
+
 import { authenticateToken } from '@/middleware/authentication'
 
 // Initialize express app
@@ -16,6 +22,7 @@ mainRouter.use(express.json())
 
 // Ruta de autenticación y autorización (sin permiso)
 mainRouter.use('/auth', AuthRouter)
+mainRouter.use('/static', Static)
 
 // Rutas de usuarios, roles y permisos (con permisos)
 mainRouter.use(authenticateToken)
@@ -25,5 +32,10 @@ mainRouter.use('/permissions', PermissionRouter)
 mainRouter.use('/roles', RoleRouter)
 mainRouter.use('/states', StateRouter)
 mainRouter.use('/municipalities', MunicipalityRouter)
+mainRouter.use('/parishes', ParishRouter)
+mainRouter.use('/organisms', OrganismRouter)
+mainRouter.use('/responsibles', ResponsibleRouter)
+mainRouter.use('/quadrants', QuadrantRouter)
+
 
 export default mainRouter

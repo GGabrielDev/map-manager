@@ -1,0 +1,38 @@
+{
+  "page": {
+    "title": "Gestionar Parroquias",
+    "subtitle": "Crear y gestionar parroquias dentro de municipios",
+    "createNewParish": "Crear Nueva Parroquia",
+    "noParishesFound": "No se Encontraron Parroquias",
+    "getStarted": "Comienza creando tu primera parroquia.",
+    "noParishesConfigured": "No hay parroquias configuradas actualmente."
+  },
+  "components": {
+    "table": {
+      "name": "Nombre de Parroquia",
+      "municipality": "Municipio",
+      "state": "Estado",
+      "createdAt": "Fecha de Creación",
+      "actions": "Acciones"
+    },
+    "form": {
+      "editParish": "Editar Parroquia",
+      "createNewParish": "Crear Nueva Parroquia",
+      "name": "Nombre de Parroquia",
+      "municipality": "Municipio",
+      "selectMunicipality": "Seleccionar un Municipio",
+      "municipalityCannotBeChanged": "El municipio no puede cambiarse después de la creación",
+      "updateParish": "Actualizar Parroquia",
+      "createParish": "Crear Parroquia",
+      "missingName": "El nombre de la parroquia es requerido.",
+      "missingMunicipality": "La selección de municipio es requerida.",
+      "failedToCreateParish": "Error al crear la parroquia.",
+      "failedToUpdateParish": "Error al actualizar la parroquia.",
+      "failedToDeleteParish": "Error al eliminar la parroquia.",
+      "accessDenied": "Acceso Denegado",
+      "accessDeniedParish": "No tienes permisos para {{action}} parroquias.",
+      "confirmDelete": "¿Estás seguro de que quieres eliminar esta parroquia?",
+      "deleteWarning": "Esta acción no se puede deshacer. La parroquia y todos los datos asociados serán eliminados permanentemente."
+    }
+  }
+}

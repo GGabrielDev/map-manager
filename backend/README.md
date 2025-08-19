@@ -6,7 +6,7 @@ This backend is a comprehensive geospatial administration system built with **No
 
 ### Key Features
 
-- **Complete CRUD Operations** for geographical entities (states, municipalities, parishes, quadrants, communal circuits, points of interest), users, roles, and permissions
+- **Complete CRUD Operations** for geographical entities (states, municipalities, parishes, quadrants, communal circuits, communal councils, points of interest), users, roles, and permissions
 - **Spatial Data Management** with geometry boundaries and spatial indexing optimized for Leaflet integration
 - **Leaflet-Compatible GeoJSON Output** for seamless map visualization
 - **Automatic Spatial Association** of Points of Interest with Quadrants and Communal Circuits based on coordinates
@@ -182,7 +182,7 @@ The server will start at `http://localhost:4000` (or your configured PORT).
 - `name`: string, required, unique
 - `parish_id`: FK to Parish, required
 - `organism_id`: FK to Organism, required
-- `boundary`: geometry, required (spatial data defining the quadrant boundaries)
+- `boundary`: geometry(Polygon), required (spatial data defining the quadrant boundaries, must be a polygon)
 - `metadata`: JSON, optional (additional quadrant information)
 - `fleet`: JSON, required (fleet management data with structure below)
   - `small`: object with `active` (integer, default 0, non-negative) and `inactive` (integer, default 0, non-negative)
@@ -193,7 +193,7 @@ The server will start at `http://localhost:4000` (or your configured PORT).
 - `deletionDate`: datetime, nullable (soft delete)
 - **Relationships**: Belongs to Parish, belongs to Organism, has many Points of Interest, has many Responsibles
 - **Spatial Index**: Recommended on boundary field for performance
-- **Validation**: Fleet numbers must be non-negative integers
+- **Validation**: Fleet numbers must be non-negative integers, boundary must be a valid polygon
 
 #### **Communal Circuit**
 
@@ -202,47 +202,36 @@ The server will start at `http://localhost:4000` (or your configured PORT).
 - `parish_id`: FK to Parish, required
 - `address`: string, required (office address, different from geometry)
 - `code`: string, required (circuit identification code)
-- `boundary`: geometry, required (spatial data defining the circuit boundaries)
+- `boundary`: geometry(Polygon), required (spatial data defining the circuit boundaries, must be a polygon)
 - `metadata`: JSON, optional (additional circuit information)
 - `creationDate`: datetime, auto
 - `updatedOn`: datetime, auto
 - `deletionDate`: datetime, nullable (soft delete)
-- **Relationships**: Belongs to Parish, has many Points of Interest, has many Responsibles, has many Communes
+- **Relationships**: Belongs to Parish, has many Points of Interest, has many Responsibles, has many Communal Councils
 - **Spatial Index**: Recommended on boundary field for performance
-
-#### **Commune**
-
-- `id`: integer, PK, auto-increment
-- `name`: string, required, unique
-- `circuit_id`: FK to Communal Circuit, required
-- `address`: string, required (commune office address)
-- `code`: string, required (commune identification code)
-- `creationDate`: datetime, auto
-- `updatedOn`: datetime, auto
-- `deletionDate`: datetime, nullable (soft delete)
-- **Relationships**: Belongs to Communal Circuit, has many Responsibles, has many Communal Councils
-- **Hooks**: Prevents deletion if communal councils are assigned
+- **Validation**: Boundary must be a valid polygon
 
 #### **Communal Council**
 
 - `id`: integer, PK, auto-increment
 - `name`: string, required, unique
-- `commune_id`: FK to Commune, required
+- `communal_circuit_id`: FK to Communal Circuit, required
 - `address`: string, required (council office address)
 - `code`: string, required (council identification code)
+- `boundary`: geometry(Polygon), required (spatial data defining the council boundaries, must be a polygon)
 - `creationDate`: datetime, auto
 - `updatedOn`: datetime, auto
 - `deletionDate`: datetime, nullable (soft delete)
-- **Relationships**: Belongs to Commune, has many Responsibles
+- **Relationships**: Belongs to Communal Circuit, has many Responsibles
 - **Hooks**: Prevents deletion if responsibles are assigned
+- **Validation**: Boundary must be a valid polygon
 
 #### **Point of Interest**
 
 - `id`: integer, PK, auto-increment
 - `name`: string, required
 - `description`: string, optional
-- `coordinate_x`: float, required (longitude)
-- `coordinate_y`: float, required (latitude)
+- `geometry`: geometry(Point), required (spatial data defining the point location)
 - `circuit_communal_id`: FK to Communal Circuit, optional (auto-assigned based on coordinates)
 - `quadrant_id`: FK to Quadrant, optional (auto-assigned based on coordinates)
 - `organism_id`: FK to Organism, optional
@@ -252,6 +241,7 @@ The server will start at `http://localhost:4000` (or your configured PORT).
 - **Relationships**: Belongs to Quadrant (optional), Communal Circuit (optional), and Organism (optional)
 - **Business Logic**: Automatically associated with Quadrant and/or Communal Circuit if coordinates fall within their boundaries
 - **Hooks**: Spatial association logic on create/update
+- **Validation**: Geometry must be a valid point
 
 #### **Organism**
 
@@ -276,12 +266,11 @@ The server will start at `http://localhost:4000` (or your configured PORT).
 - `organism_id`: FK to Organism, optional
 - `quadrant_id`: FK to Quadrant, optional
 - `circuit_id`: FK to Communal Circuit, optional
-- `commune_id`: FK to Commune, optional
 - `council_id`: FK to Communal Council, optional
 - `creationDate`: datetime, auto
 - `updatedOn`: datetime, auto
 - `deletionDate`: datetime, nullable (soft delete)
-- **Relationships**: Belongs to Organism (optional), Quadrant (optional), Communal Circuit (optional), Commune (optional), Communal Council (optional)
+- **Relationships**: Belongs to Organism (optional), Quadrant (optional), Communal Circuit (optional), Communal Council (optional)
 - **Validation**:
   - Phone numbers must match Venezuelan format (regex: `^0[24]\d{2}-\d{7}$` for landlines or `^04(12|14|16|22|24|26)-\d{7}$` for mobile)
   - CI must start with uppercase letter followed by numbers
@@ -383,23 +372,13 @@ erDiagram
         datetime deletionDate
     }
 
-    COMMUNE {
-        int id PK
-        string name UK
-        int circuit_id FK
-        string address
-        string code
-        datetime creationDate
-        datetime updatedOn
-        datetime deletionDate
-    }
-
     COMMUNAL_COUNCIL {
         int id PK
         string name UK
-        int commune_id FK
+        int communal_circuit_id FK
         string address
         string code
+        geometry boundary
         datetime creationDate
         datetime updatedOn
         datetime deletionDate
@@ -409,8 +388,7 @@ erDiagram
         int id PK
         string name
         string description
-        float coordinate_x
-        float coordinate_y
+        geometry geometry
         int circuit_communal_id FK
         int quadrant_id FK
         int organism_id FK
@@ -439,7 +417,6 @@ erDiagram
         int organism_id FK
         int quadrant_id FK
         int circuit_id FK
-        int commune_id FK
         int council_id FK
         datetime creationDate
         datetime updatedOn
@@ -467,8 +444,7 @@ erDiagram
     MUNICIPALITY ||--o{ PARISH : "branches into"
     PARISH ||--o{ QUADRANT : "divides into"
     PARISH ||--o{ COMMUNAL_CIRCUIT : "organized into"
-    COMMUNAL_CIRCUIT ||--o{ COMMUNE : "contains"
-    COMMUNE ||--o{ COMMUNAL_COUNCIL : "contains"
+    COMMUNAL_CIRCUIT ||--o{ COMMUNAL_COUNCIL : "contains"
 
     %% Points of Interest Relationships
     QUADRANT ||--o{ POINT_OF_INTEREST : "includes"
@@ -480,7 +456,6 @@ erDiagram
     ORGANISM ||--o{ RESPONSIBLE : "has"
     QUADRANT ||--o{ RESPONSIBLE : "has"
     COMMUNAL_CIRCUIT ||--o{ RESPONSIBLE : "has"
-    COMMUNE ||--o{ RESPONSIBLE : "has"
     COMMUNAL_COUNCIL ||--o{ RESPONSIBLE : "has"
 ```
 
@@ -492,8 +467,7 @@ erDiagram
 - **Municipality** → **Parish** (one-to-many - municipalities branch into multiple parishes)
 - **Parish** → **Quadrant** (one-to-many - parishes divide into multiple quadrants)
 - **Parish** → **Communal Circuit** (one-to-many - parishes organize into multiple communal circuits)
-- **Communal Circuit** → **Commune** (one-to-many - circuits contain multiple communes)
-- **Commune** → **Communal Council** (one-to-many - communes contain multiple councils)
+- **Communal Circuit** → **Communal Council** (one-to-many - circuits contain multiple councils)
 - **Organism** → **Quadrant** (one-to-many - organisms manage multiple quadrants)
 - **Quadrant** → **Point of Interest** (one-to-many, optional - points may be within quadrant boundaries)
 - **Communal Circuit** → **Point of Interest** (one-to-many, optional - points may be within circuit boundaries)
@@ -501,13 +475,44 @@ erDiagram
 - **Organism** → **Responsible** (one-to-many, optional - organisms can have multiple responsible persons)
 - **Quadrant** → **Responsible** (one-to-many, optional - quadrants can have multiple responsible persons)
 - **Communal Circuit** → **Responsible** (one-to-many, optional - circuits can have multiple responsible persons)
-- **Commune** → **Responsible** (one-to-many, optional - communes can have multiple responsible persons)
 - **Communal Council** → **Responsible** (one-to-many, optional - councils can have multiple responsible persons)
 
 **Spatial Relationships:**
 
 - Points of Interest are automatically associated with Quadrants and Communal Circuits based on coordinate inclusion within their boundary geometries
 - Spatial indices on boundary fields optimize spatial query performance
+
+## Dashboard Structure
+
+The system now features a hierarchical dashboard structure:
+
+### **Main Dashboard**
+
+Central hub with overview and navigation to specialized dashboards
+
+### **Administrative Dashboard**
+
+- User management
+- Role and permission management
+- System administration
+
+### **Geographical Dashboard**
+
+- State management
+- Municipality management
+- Parish management
+- Quadrant management
+- Communal Circuit management
+- Communal Council management
+
+### **Spatial Dashboard**
+
+- Map editing interface
+- Boundary management
+- Spatial analytics and reporting
+- Point of Interest management
+
+Each dashboard category provides focused tools and interfaces for managing related entities, improving user experience and system organization.
 
 ## Authentication & Authorization
 
@@ -522,7 +527,7 @@ erDiagram
 
 - **Auto-Generated Permissions**: 4 actions × multiple entities
   - Actions: `create`, `get`, `edit`, `delete`
-  - Entities: `state`, `municipality`, `parish`, `quadrant`, `communal_circuit`, `commune`, `communal_council`, `point_of_interest`, `organism`, `responsible`, `permission`, `role`, `user`
+  - Entities: `state`, `municipality`, `parish`, `quadrant`, `communal_circuit`, `communal_council`, `point_of_interest`, `organism`, `responsible`, `permission`, `role`, `user`
 - **Admin Role**: Created automatically with all permissions
 - **Admin User**: Default credentials (username: `admin`, password: `admin`)
 
@@ -596,6 +601,14 @@ Authorization: Bearer <your-jwt-token>
 - **`PUT /api/communal-circuits/:id`** - Update a communal circuit (accepts GeoJSON geometry for boundary modifications)
 - **`DELETE /api/communal-circuits/:id`** - Delete a communal circuit (soft delete)
 
+##### **Communal Councils**
+
+- **`GET /api/communal-councils`** - List all communal councils with pagination and filtering
+- **`POST /api/communal-councils`** - Create a new communal council
+- **`GET /api/communal-councils/:id`** - Get specific council details with associated responsibles
+- **`PUT /api/communal-councils/:id`** - Update a communal council
+- **`DELETE /api/communal-councils/:id`** - Delete a communal council (soft delete)
+
 ##### **Points of Interest**
 
 - **`GET /api/points-of-interest`** - List points with spatial filtering options (by quadrant/circuit, bounding box)
@@ -614,22 +627,6 @@ Authorization: Bearer <your-jwt-token>
 - **`GET /api/organisms/:id`** - Get specific organism details with associated points of interest and responsibles
 - **`PUT /api/organisms/:id`** - Update an organism
 - **`DELETE /api/organisms/:id`** - Delete an organism (soft delete)
-
-##### **Communes**
-
-- **`GET /api/communes`** - List all communes with pagination and filtering
-- **`POST /api/communes`** - Create a new commune
-- **`GET /api/communes/:id`** - Get specific commune details with associated responsibles and councils
-- **`PUT /api/communes/:id`** - Update a commune
-- **`DELETE /api/communes/:id`** - Delete a commune (soft delete)
-
-##### **Communal Councils**
-
-- **`GET /api/communal-councils`** - List all communal councils with pagination and filtering
-- **`POST /api/communal-councils`** - Create a new communal council
-- **`GET /api/communal-councils/:id`** - Get specific council details with associated responsibles
-- **`PUT /api/communal-councils/:id`** - Update a communal council
-- **`DELETE /api/communal-councils/:id`** - Delete a communal council (soft delete)
 
 ##### **Responsibles**
 

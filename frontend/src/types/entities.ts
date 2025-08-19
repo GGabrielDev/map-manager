@@ -24,6 +24,7 @@ export interface Parish {
   municipalityId: number;
   createdAt: string;
   updatedAt: string;
+  municipality?: Municipality;
 }
 
 export interface StateFormDialogProps {
@@ -82,6 +83,38 @@ export interface MunicipalityFilterOptions {
   page: number;
   pageSize: number;
   name?: string;
+  sortBy?: 'name' | 'creationDate' | 'updatedOn';
+  sortOrder?: 'ASC' | 'DESC';
+}
+
+export interface ParishFormDialogProps {
+  open: boolean;
+  parish: Parish | null;
+  onClose: () => void;
+  onSuccess: () => void;
+  canEdit: boolean;
+  canCreate: boolean;
+  canGetMunicipality: boolean;
+}
+
+export interface ParishesTableProps {
+  parishes: Parish[];
+  canEditParish: boolean;
+  canDeleteParish: boolean;
+  onEdit: (parish: Parish) => void;
+  onDelete: (parishId: number) => void;
+}
+
+export interface ParishFormData {
+  name: string;
+  municipalityId: number | null;
+}
+
+export interface ParishFilterOptions {
+  page: number;
+  pageSize: number;
+  name?: string;
+  municipalityId?: number;
   sortBy?: 'name' | 'creationDate' | 'updatedOn';
   sortOrder?: 'ASC' | 'DESC';
 }

@@ -6,14 +6,14 @@ This frontend is a comprehensive geospatial administration system built with **R
 
 ### Key Features
 
-- **Interactive Map Interface** with Leaflet for visualizing and managing geographical boundaries, quadrants, communal circuits, and points of interest
-- **Complete CRUD Operations** via intuitive UI for geographical entities (states, municipalities, parishes, quadrants, communal circuits, points of interest), users, roles, and permissions
+- **Interactive Map Interface** with Leaflet for visualizing and managing geographical boundaries, quadrants, communal circuits, communal councils, and points of interest
+- **Complete CRUD Operations** via intuitive UI for geographical entities (states, municipalities, parishes, quadrants, communal circuits, communal councils, points of interest), users, roles, and permissions
 - **Spatial Data Visualization** with GeoJSON rendering, boundary editing, and spatial relationship display
 - **Real-time Map Interaction** for creating, editing, and managing spatial boundaries directly on the map
 - **Automatic Spatial Association** UI for Points of Interest with visual feedback when they fall within Quadrants or Communal Circuits
 - **Role-Based Access Control Interface** with permission-based UI rendering and feature access
 - **JWT Authentication** with secure token management and session handling
-- **Comprehensive Dashboard** with spatial analytics, fleet management, and administrative oversight
+- **Hierarchical Dashboard System** with specialized dashboards for different management categories
 - **Leaflet Integration** with custom controls, drawing tools, and spatial query interfaces
 - **Responsive Design** optimized for desktop map interaction and mobile field use
 - **TypeScript** for type safety and better development experience
@@ -136,6 +136,40 @@ The development server will start at `http://localhost:5173` with the interactiv
 - **`yarn lint`** - Run ESLint with auto-fix for JavaScript, JSX, TypeScript, and TSX files
 - **`yarn preview`** - Preview the production build locally
 
+## Dashboard Architecture
+
+The frontend now features a hierarchical dashboard structure that improves navigation and user experience:
+
+### **Main Dashboard**
+
+- **Central Hub**: Overview of system status and quick access to specialized dashboards
+- **Navigation Menu**: Easy access to all dashboard categories
+- **System Overview**: Key metrics and recent activity across all modules
+
+### **Administrative Dashboard**
+
+- **User Management**: Create, edit, and manage user accounts
+- **Role Management**: Configure roles and assign permissions
+- **Permission Management**: Fine-grained access control configuration
+- **System Settings**: Application configuration and preferences
+
+### **Geographical Dashboard**
+
+- **State Management**: Manage geographical states
+- **Municipality Management**: Handle municipalities within states
+- **Parish Management**: Organize parishes within municipalities
+- **Quadrant Management**: Define and manage quadrants with polygon boundaries
+- **Communal Circuit Management**: Manage communal circuits with polygon boundaries
+- **Communal Council Management**: Handle councils directly related to circuits with polygon boundaries
+
+### **Spatial Dashboard**
+
+- **Map Editor**: Full-screen interactive map editing interface
+- **Boundary Manager**: Tools for creating and editing spatial boundaries
+- **Point of Interest Manager**: Manage POIs with point geometry
+- **Spatial Analytics**: Analysis and reporting of spatial relationships
+- **Geometry Validation**: Real-time validation of spatial data
+
 ## Project Structure
 
 ```
@@ -169,7 +203,6 @@ frontend/
 │   │   │   ├── ParishForm.tsx       # Parish management
 │   │   │   ├── QuadrantForm.tsx     # Quadrant with spatial editing
 │   │   │   ├── CircuitForm.tsx      # Communal circuit management
-│   │   │   ├── CommuneForm.tsx      # Commune management
 │   │   │   ├── CouncilForm.tsx      # Communal council management
 │   │   │   ├── POIForm.tsx          # Point of interest with map picker
 │   │   │   ├── OrganismForm.tsx     # Organism management
@@ -182,7 +215,6 @@ frontend/
 │   │   │   ├── ParishesTable.tsx    # Parishes with spatial info
 │   │   │   ├── QuadrantsTable.tsx   # Quadrants with fleet data
 │   │   │   ├── CircuitsTable.tsx    # Communal circuits listing
-│   │   │   ├── CommunesTable.tsx    # Communes listing
 │   │   │   ├── CouncilsTable.tsx    # Communal councils listing
 │   │   │   ├── POITable.tsx         # Points of interest with coordinates
 │   │   │   ├── OrganismsTable.tsx   # Organisms listing
@@ -190,6 +222,10 @@ frontend/
 │   │   │   ├── UsersTable.tsx       # User management table
 │   │   │   └── RolesTable.tsx       # Roles and permissions table
 │   │   ├── dashboard/               # Dashboard components
+│   │   │   ├── MainDashboard.tsx    # Central dashboard hub
+│   │   │   ├── AdministrativeDashboard.tsx # User/Role management dashboard
+│   │   │   ├── GeographicalDashboard.tsx   # Geographical entities dashboard
+│   │   │   ├── SpatialDashboard.tsx # Spatial data management dashboard
 │   │   │   ├── SpatialOverview.tsx  # Map-based dashboard overview
 │   │   │   ├── FleetManagement.tsx  # Fleet statistics and management
 │   │   │   ├── EntityStats.tsx      # Geographical entity statistics
@@ -211,7 +247,6 @@ frontend/
 │   │   │   ├── useParishes.tsx      # Parishes management
 │   │   │   ├── useQuadrants.tsx     # Quadrants with spatial data
 │   │   │   ├── useCircuits.tsx      # Communal circuits management
-│   │   │   ├── useCommunes.tsx      # Communes management
 │   │   │   ├── useCouncils.tsx      # Communal councils management
 │   │   │   ├── usePOI.tsx           # Points of interest management
 │   │   │   ├── useOrganisms.tsx     # Organisms management
@@ -229,6 +264,8 @@ frontend/
 │   │   │   └── LoginPage.tsx        # User authentication
 │   │   ├── dashboard/               # Dashboard pages
 │   │   │   ├── MainDashboard.tsx    # Main dashboard with map overview
+│   │   │   ├── AdministrativeDashboard.tsx # Administrative management dashboard
+│   │   │   ├── GeographicalDashboard.tsx   # Geographical entities dashboard
 │   │   │   ├── SpatialDashboard.tsx # Spatial analytics dashboard
 │   │   │   └── FleetDashboard.tsx   # Fleet management dashboard
 │   │   ├── geographical/            # Geographical entity pages
@@ -237,9 +274,7 @@ frontend/
 │   │   │   ├── ParishesPage.tsx     # Parishes management
 │   │   │   ├── QuadrantsPage.tsx    # Quadrants with map interface
 │   │   │   ├── CircuitsPage.tsx     # Communal circuits management
-│   │   │   ├── CommunesPage.tsx     # Communes management
-│   │   │   ├── CouncilsPage.tsx     # Communal councils management
-│   │   │   └── POIPage.tsx          # Points of interest with map
+│   │   │   └── CouncilsPage.tsx     # Communal councils management
 │   │   ├── administrative/          # Administrative pages
 │   │   │   ├── OrganismsPage.tsx    # Organisms management
 │   │   │   ├── ResponsiblesPage.tsx # Responsible persons management
@@ -248,6 +283,7 @@ frontend/
 │   │   └── spatial/                 # Spatial-specific pages
 │   │       ├── MapEditor.tsx        # Full-screen map editing interface
 │   │       ├── BoundaryManager.tsx  # Boundary management interface
+│   │       ├── POIManager.tsx       # Point of Interest management
 │   │       └── SpatialAnalytics.tsx # Spatial analysis and reporting
 │   ├── services/                    # API and external services
 │   │   ├── api/                     # Backend API integration
@@ -257,7 +293,6 @@ frontend/
 │   │   │   ├── parishes.ts          # Parishes API calls
 │   │   │   ├── quadrants.ts         # Quadrants with GeoJSON support
 │   │   │   ├── circuits.ts          # Communal circuits API calls
-│   │   │   ├── communes.ts          # Communes API calls
 │   │   │   ├── councils.ts          # Communal councils API calls
 │   │   │   ├── poi.ts               # Points of interest API calls
 │   │   │   ├── organisms.ts         # Organisms API calls
@@ -320,6 +355,76 @@ frontend/
 ├── tsconfig.node.json               # TypeScript config for Node.js
 ├── vite.config.ts                   # Vite configuration with spatial optimizations
 └── yarn.lock                        # Yarn lock file
+```
+
+## Spatial Data Management
+
+### **Geometry Requirements**
+
+The system now enforces specific geometry types for different entities:
+
+#### **Polygon Entities** (must have polygon boundaries):
+
+- **Quadrants**: Administrative divisions with polygon boundaries
+- **Communal Circuits**: Circuit areas with polygon boundaries
+- **Communal Councils**: Council territories with polygon boundaries
+
+#### **Point Entities** (must have point geometry):
+
+- **Points of Interest**: Single coordinate locations with point geometry
+
+### **Spatial Forms and Validation**
+
+- **Polygon Editor**: Interactive polygon drawing and editing tools
+- **Point Picker**: Click-to-place point selection on map
+- **Real-time Validation**: Immediate feedback on geometry validity
+- **Spatial Relationship Checking**: Automatic validation of spatial containment
+
+### **Map-Based CRUD Operations**
+
+- **Draw-to-Create**: Draw polygons directly on map to create entities
+- **Click-to-Place**: Click on map to place points of interest
+- **Drag-to-Edit**: Interactive editing of existing boundaries
+- **Visual Feedback**: Real-time visual feedback during spatial operations
+
+## Key Architectural Changes
+
+### **Removed Features**
+
+- **Commune Management**: Removed until future implementation
+- **Commune-related forms and pages**: No longer available
+- **Commune API integration**: Removed from services
+
+### **Updated Relationships**
+
+- **Communal Councils**: Now directly related to Communal Circuits (not Communes)
+- **Spatial Hierarchy**: Simplified to Circuit → Council relationship
+
+### **Enhanced Spatial Features**
+
+- **Geometry Type Enforcement**: Strict validation of polygon vs point geometry
+- **Single Point Coordinate**: POIs now use single geometry field instead of separate x/y coordinates
+- **Improved Spatial Validation**: Better error handling and user feedback for spatial operations
+
+## Navigation Flow
+
+```
+Main Dashboard
+├── Administrative Dashboard
+│   ├── Users Management
+│   └── Roles & Permissions
+├── Geographical Dashboard
+│   ├── States Management
+│   ├── Municipalities Management
+│   ├── Parishes Management
+│   ├── Quadrants Management (with polygon editing)
+│   ├── Circuits Management (with polygon editing)
+│   └── Councils Management (with polygon editing)
+└── Spatial Dashboard
+    ├── Map Editor
+    ├── Boundary Manager
+    ├── POI Manager (with point geometry)
+    └── Spatial Analytics
 ```
 
 ## Authentication & Authorization
@@ -586,115 +691,4 @@ interface RootState {
 
 - **XSS Protection**: Input sanitization for spatial data and coordinate inputs
 - **CSRF Protection**: Token-based validation for spatial data modifications
-- **Secure Map Tiles**: HTTPS-only map tile loading and secure tile server configuration
-- **Spatial Permission Validation**: Client-side validation of spatial editing permissions
-
-## Testing Strategy
-
-### Spatial Testing
-
-- **Map Component Testing**: Testing of Leaflet map components and interactions
-- **Spatial Data Testing**: Validation of GeoJSON processing and spatial calculations
-- **Coordinate System Testing**: Testing of coordinate transformations and projections
-- **Boundary Validation Testing**: Testing of spatial relationship validation
-
-### Testing Tools
-
-- **Jest**: Unit testing with spatial utility function testing
-- **React Testing Library**: Component testing with map interaction simulation
-- **Leaflet Testing Utilities**: Custom utilities for testing map components
-- **Spatial Data Mocking**: Mock GeoJSON data for isolated testing
-
-## Deployment
-
-### Production Build
-
-```bash
-# Build for production with spatial optimizations
-yarn build
-
-# Preview production build with map functionality
-yarn preview
-```
-
-### Spatial Configuration
-
-- **Map Tile Configuration**: Production tile server configuration and API keys
-- **Coordinate System Setup**: Production coordinate system and projection configuration
-- **Spatial Data CDN**: Configuration for serving large spatial datasets via CDN
-- **Map Performance Tuning**: Production-optimized map rendering settings
-
-### Deployment Considerations
-
-- **Map Tile Servers**: Configuration of production map tile servers and fallbacks
-- **Spatial Data Storage**: CDN configuration for large GeoJSON files and spatial assets
-- **HTTPS Requirements**: Secure connections required for geolocation and map tiles
-- **Performance Monitoring**: Monitoring of map loading times and spatial query performance
-
-## Troubleshooting
-
-### Map-Specific Issues
-
-- **Map Not Loading**: Check tile server configuration and network connectivity
-- **Coordinate Issues**: Verify coordinate system and projection settings
-- **Boundary Rendering**: Check GeoJSON validity and coordinate order
-- **Performance Issues**: Monitor spatial data size and rendering complexity
-
-### Spatial Data Issues
-
-- **GeoJSON Validation**: Use online GeoJSON validators for boundary data
-- **Coordinate Precision**: Ensure appropriate coordinate precision for performance
-- **Spatial Relationships**: Verify spatial association logic and boundary overlaps
-- **Memory Usage**: Monitor memory usage with large spatial datasets
-
-## Contributing
-
-### Spatial Development Guidelines
-
-1. **Spatial Data Standards**: Follow GeoJSON standards and coordinate system conventions
-2. **Map Component Patterns**: Use established patterns for Leaflet React integration
-3. **Performance Considerations**: Consider performance impact of spatial operations
-4. **Coordinate System Awareness**: Understand coordinate systems and projections used
-
-### Code Standards
-
-- **Spatial TypeScript**: Use proper typing for GeoJSON and coordinate data
-- **Map Component Structure**: Follow established patterns for map component organization
-- **Spatial Utility Functions**: Create reusable utilities for common spatial operations
-- **Testing**: Include tests for spatial calculations and map interactions
-
-### Pull Request Guidelines
-
-- **Spatial Feature Documentation**: Document new spatial features and map interactions
-- **Map Screenshots**: Include screenshots of map-based features and changes
-- **Performance Impact**: Document performance impact of spatial data changes
-- **Coordinate System Compatibility**: Ensure compatibility with existing coordinate systems
-
-## Default Admin Account
-
-After setting up the backend and running `yarn db:populate`, you can log in with:
-
-- **Username**: `admin`
-- **Password**: `admin`
-
-**⚠️ Important**: Change the admin password immediately in production!
-
-## License
-
-MIT License - see package.json for details.
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with tests
-4. Run `yarn lint` and `yarn build`
-5. Submit a pull request
-
-For questions or issues, please create an issue in the repository.
-
----
-
-**⚠️ Important**: Ensure the backend API with PostGIS support is running before starting the frontend development server. The frontend requires the backend for authentication, spatial data management, and GeoJSON processing functionality.
+- **Secure Map Tiles**: HTTPS
