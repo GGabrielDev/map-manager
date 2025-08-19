@@ -1,31 +1,29 @@
-import { Request, Response, Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import { UserController } from "@/controllers";
 import { authenticateToken } from "@/middleware/authentication";
+
+import { HttpError } from "@/utils/error-utils"
 
 const router = Router();
 
 router.post(
     "/login",
-    async (req: Request, res: Response) => {
-        const { username, password } = req.body;
-
-        // validate request body
-        if(!username){
-            return res.status(400).json({ message: "Usuario requerido" });
-        }
-        if(!password){
-            return res.status(400).json({ message: "Contraseña requerida" });
-        }
-
+    async (req: Request, res: Response, next: NextFunction) => {
         try {
+            const { username, password } = req.body;
+    
+            // validate request body
+            if(!username){
+                throw new HttpError("Nombre de usuario requerido", 400, "missing_username", "auth");
+            }
+            if(!password){
+                throw new HttpError("Contraseña requerida", 400, "missing_password", "auth");
+            }
+    
             const token = await UserController.login(username, password);
             res.json({ token });
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({ message: error.message });
-            }else{
-                res.status(500).json({ message: "Error inesperado" });
-            }
+            next(error)
         }
     }
 )
@@ -41,29 +39,18 @@ router.get(
 router.get(
     "/me",
     authenticateToken,
-    async (req: Request, res: Response): Promise<void> => {
+    async (req: Request, res: Response, next): Promise<void> => {
         try {
             const id = req.userId;
 
             if (typeof id !== 'number') {
-                res.status(401).json({ message: "ID de usuario inválido." });
-                return;
+                throw new HttpError("ID de usuario no válido", 400, "Invalid_data", "auth");
             }
 
             const user = await UserController.getById(id);
-            
-            if (!user) {
-                res.status(404).json({ message: "Usuario no encontrado." });
-                return;
-            }
-
             res.json(user);
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: "Error inesperado" });
-            }
+            next(error)
         }
     }
 )

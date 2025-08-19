@@ -3,6 +3,8 @@ import express from 'express'
 
 import mainRouter from '@/routes/'
 
+import { errorHandler } from "@/middleware/errorHandler";
+
 // Initialize express app
 
 const app = express()
@@ -18,5 +20,7 @@ app.use(
 app.use(express.json())
 
 app.use('/api', mainRouter)
+
+app.use(errorHandler)
 
 export default app
