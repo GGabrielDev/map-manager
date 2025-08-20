@@ -390,9 +390,10 @@ erDiagram
         string name
         string description
         geometry geometry
+        int responsible_id FK
+        int organism_id FK
         int circuit_communal_id FK
         int quadrant_id FK
-        int organism_id FK
         datetime creationDate
         datetime updatedOn
         datetime deletionDate

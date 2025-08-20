@@ -10,10 +10,11 @@ import {
     Model,
     DataType,
     BelongsTo,
-    ForeignKey
+    ForeignKey,
+    HasMany
 } from "sequelize-typescript";
 
-import { Organism, Quadrant, CommunalCircuit } from ".";
+import { Organism, Quadrant, CommunalCircuit, PointOfInterest } from ".";
 
 @Table({tableName: 'Resposible'})
 export default class Resposible extends Model{
@@ -72,6 +73,9 @@ export default class Resposible extends Model{
 
     @DeletedAt
     deletedAt?: Date
+
+    @HasMany(()=> PointOfInterest)
+    pointsOfInterest: PointOfInterest[]
 
     @BelongsTo(()=> Organism)
     organism?: Organism
