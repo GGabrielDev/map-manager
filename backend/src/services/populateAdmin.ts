@@ -14,7 +14,8 @@ const entities = [
   'Organism',
   'Responsible',
   'Quadrant',
-  'CommunalCircuit'
+  'CommunalCircuit',
+  'PointOfInterest'
 ]
 
 const actions = ['create', 'get', 'edit', 'delete']

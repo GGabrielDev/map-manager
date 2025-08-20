@@ -151,14 +151,18 @@ router.post(
         responsiblePhoneBackup,
         responsibleEmail,
 
-        //datos de organismo en caso de crearlo directamente
-        organismName
       } = req.body;
 
-      
-
-      if (!name || !geometry) {
-        res.status(400).json({ error: "Campos obligatorios incompletos" });
+      if (!name) {
+        res.status(400).json({ error: "Nombre del punto de interes requerido." });
+        return;
+      }
+      if(!organismId){
+        res.status(400).json({ error: "ID del organismo requerido" });
+        return;
+      }
+      if(!geometry || typeof geometry !== 'object' || !geometry.type || !geometry.coordinates) {
+        res.status(400).json({ error: "Geometría requerida y debe ser un objeto válido" });
         return;
       }
 
@@ -175,15 +179,6 @@ router.post(
         );
 
         responsibleId = responsible.id;
-      }
-
-      // Crear organismo en caso de no existir
-      if(!organismId && req.file){
-        const fileIcono = req.file;
-        const icono = await OrganismController.validateImage(organismName, fileIcono)
-        const organism = await OrganismController.createOrganism(organismName, icono);
-
-        organismId = organism.id;
       }
 
       const newPoint = await PointOfInterestController.createPointOfInterest(
@@ -206,7 +201,7 @@ router.post(
 // Actualizar punto de interés
 router.put(
   "/:id",
-  requirePermission("update_pointofinterest"),
+  requirePermission("edit_pointofinterest"),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const updates: Partial<PointOfInterest> = {}

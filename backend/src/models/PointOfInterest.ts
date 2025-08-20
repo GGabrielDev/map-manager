@@ -50,7 +50,7 @@ export default class PointOfInterest extends Model {
   @Column(DataType.GEOMETRY("POINT"))
   geometry!: object;
 
-  @ForeignKey(() => Organism)
+  @ForeignKey(() => Responsible)
   @AllowNull(false)
   @Column(DataType.INTEGER)
   responsibleId!: number;
