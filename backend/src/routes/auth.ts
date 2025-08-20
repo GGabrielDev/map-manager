@@ -23,7 +23,7 @@ router.post(
             const token = await UserController.login(username, password);
             res.json({ token });
         } catch (error) {
-            next(error)
+            next(new HttpError("Error al iniciar sesión", 500, "login_failed", "auth"));
         }
     }
 )
