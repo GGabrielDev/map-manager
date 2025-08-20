@@ -14,7 +14,7 @@ import {
   Validate
 } from "sequelize-typescript";
 
-import { CommunalCircuit, Quadrant, Organism } from ".";  // Asegúrate de tener estas importaciones según tus modelos
+import { CommunalCircuit, Quadrant, Organism, Responsible } from ".";  // Asegúrate de tener estas importaciones según tus modelos
 
 @Table({tableName: 'point_of_interest'})
 export default class PointOfInterest extends Model {
@@ -50,6 +50,16 @@ export default class PointOfInterest extends Model {
   @Column(DataType.GEOMETRY("POINT"))
   geometry!: object;
 
+  @ForeignKey(() => Organism)
+  @AllowNull(false)
+  @Column(DataType.INTEGER)
+  responsibleId!: number;
+
+  @ForeignKey(() => Organism)
+  @AllowNull(false)
+  @Column(DataType.INTEGER)
+  organismId!: number;
+
   @ForeignKey(() => CommunalCircuit)
   @AllowNull(true)
   @Column(DataType.INTEGER)
@@ -60,10 +70,6 @@ export default class PointOfInterest extends Model {
   @Column(DataType.INTEGER)
   quadrantId?: number;
 
-  @ForeignKey(() => Organism)
-  @AllowNull(true)
-  @Column(DataType.INTEGER)
-  organismId?: number;
 
   // Fechas automáticas
   @CreatedAt
@@ -76,12 +82,16 @@ export default class PointOfInterest extends Model {
   deletionDate?: Date;
 
   // Relaciones
+  @BelongsTo(() => Responsible)
+  responsible!: Responsible;
+
+  @BelongsTo(() => Organism)
+  organism!: Organism;
+
   @BelongsTo(() => CommunalCircuit)
   communalCircuit?: CommunalCircuit;
 
   @BelongsTo(() => Quadrant)
   quadrant?: Quadrant;
 
-  @BelongsTo(() => Organism)
-  organism?: Organism;
 }
