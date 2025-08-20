@@ -86,6 +86,102 @@ export const allPointsOfInterest = async ({
   }
 };
 
+// todos los puntos de interes pero con respuesta geojson
+export const allPointsOfInterestGeoJSON = async ({
+  name,
+  communalCircuitId,
+  quadrantId,
+  bbox, // bounding box: [minLng, minLat, maxLng, maxLat]
+  sortBy,
+  sortOrder = 'ASC'
+}: {
+  name?: string;
+  communalCircuitId?: number;
+  quadrantId?: number;
+  bbox?: [number, number, number, number];
+  sortBy?: 'name' | 'creationDate' | 'updatedOn';
+  sortOrder?: 'ASC' | 'DESC';
+}) => {
+  try {
+    const andConditions: any[] = [];
+
+    if (name) {
+      andConditions.push({ name: { [Op.iLike]: `%${name}%` } });
+    }
+
+    if (communalCircuitId) {
+      andConditions.push({ communalCircuitId });
+    }
+
+    if (quadrantId) {
+      andConditions.push({ quadrantId });
+    }
+
+    // Condición para bbox (bounding box) usando PostGIS ST_MakeEnvelope
+    if (bbox && bbox.length === 4) {
+      const [minLng, minLat, maxLng, maxLat] = bbox;
+
+      // Sequelize.literal para filtro espacial con ST_Within y ST_MakeEnvelope
+      andConditions.push(
+        Sequelize.literal(`ST_Within(geometry, ST_MakeEnvelope(${minLng}, ${minLat}, ${maxLng}, ${maxLat}, 4326))`)
+      );
+    }
+
+    const where = andConditions.length ? { [Op.and]: andConditions } : undefined;
+
+    let order: OrderItem[] | undefined = undefined;
+    if (sortBy) {
+      const column =
+        sortBy === 'creationDate' ? 'creationDate' :
+        sortBy === 'updatedOn' ? 'updatedOn' :
+        'name';
+      order = [[column, sortOrder]];
+    }
+
+    const data = await PointOfInterest.findAll({
+      where,
+      order,
+      include: [
+        { association: 'responsible', required: false },
+        { association: 'organism', required: false },
+        { association: 'communalCircuit', required: false },
+        { association: 'quadrant', required: false },
+      ],
+      attributes: {
+        include: [[Sequelize.literal(`ST_AsGeoJSON("geometry")::json`), 'geometry']]
+      }
+    });
+
+    const features = data.map(point => ({
+      type: "Feature",
+      geometry: point.get('geometry'),
+      properties: {
+        id: point.id,
+        name: point.name,
+        description: point.description,
+        responsibleId: point.responsibleId,
+        organismId: point.organismId,
+        communalCircuitId: point.communalCircuitId,
+        quadrantId: point.quadrantId,
+        creationDate: point.creationDate,
+        updatedOn: point.updatedOn,
+        deletionDate: point.deletionDate,
+        responsible: point.responsible,
+        organism: point.organism,
+        communalCircuit: point.communalCircuit,
+        quadrant: point.quadrant,
+      }
+    }));
+
+    return {
+      type: "FeatureCollection",
+      features
+    };
+  } catch (error) {
+    throw new Error("Error al obtener los puntos de interés en formato GeoJSON.");
+  }
+};
+
 // Obtener punto de interés por ID
 export const getPointOfInterestById = async (id: number): Promise<PointOfInterest | null> => {
   try {
@@ -149,6 +245,52 @@ export const createPointOfInterest = async (
     }
   }
 };
+
+//obtener el punto de interés por ID como un geojson
+export const getPointOfInterestGeoJSONById = async (id: number) => {
+  try {
+    const point = await PointOfInterest.findOne({
+      where: { id },
+      include: [
+        { association: 'responsible', required: false },
+        { association: 'organism', required: false },
+        { association: 'communalCircuit', required: false },
+        { association: 'quadrant', required: false },
+      ],
+      attributes: {
+        include: [[Sequelize.literal(`ST_AsGeoJSON("geometry")::json`), 'geometry']]
+      }
+    });
+
+    if (!point) {
+      throw new Error("Punto de interés no encontrado");
+    }
+
+    return {
+      type: "Feature",
+      geometry: point.get('geometry'),
+      properties: {
+        id: point.id,
+        name: point.name,
+        description: point.description,
+        responsibleId: point.responsibleId,
+        organismId: point.organismId,
+        communalCircuitId: point.communalCircuitId,
+        quadrantId: point.quadrantId,
+        creationDate: point.creationDate,
+        updatedOn: point.updatedOn,
+        deletionDate: point.deletionDate,
+        responsible: point.responsible,
+        organism: point.organism,
+        communalCircuit: point.communalCircuit,
+        quadrant: point.quadrant,
+      }
+    };
+  } catch (error) {
+    throw new Error("Error al obtener el punto de interés en formato GeoJSON.");
+  }
+};
+
 
 // Actualizar punto de interés
 export const updatePointOfInterest = async (updates: Partial<PointOfInterest>): Promise<PointOfInterest | null> => {

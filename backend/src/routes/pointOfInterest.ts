@@ -37,6 +37,47 @@ router.get(
   }
 );
 
+//obtener todos los puntos de interes en un feature colletion
+router.get(
+  "/geojson",
+  requirePermission("get_pointofinterest"),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const name = (req.query.name as string) || undefined;
+      const communalCircuitId = req.query.communalCircuitId ? Number(req.query.communalCircuitId) : undefined;
+      const quadrantId = req.query.quadrantId ? Number(req.query.quadrantId) : undefined;
+
+      // Para bbox asumimos que llega como string "minLng,minLat,maxLng,maxLat"
+      let bbox: [number, number, number, number] | undefined = undefined;
+      if (req.query.bbox) {
+        const arr = (req.query.bbox as string).split(",").map(Number);
+        if (arr.length === 4 && arr.every(n => !isNaN(n))) {
+          bbox = [arr[0], arr[1], arr[2], arr[3]];
+        }
+      }
+
+      const sortBy = PointOfInterestController.SortByOptions.includes(req.query.sortBy as string)
+        ? (req.query.sortBy as 'name' | 'creationDate' | 'updatedOn')
+        : undefined;
+
+      const sortOrder = (req.query.sortOrder === 'DESC') ? 'DESC' : 'ASC';
+
+      const geojson = await PointOfInterestController.allPointsOfInterestGeoJSON({
+        name,
+        communalCircuitId,
+        quadrantId,
+        bbox,
+        sortBy,
+        sortOrder,
+      });
+
+      res.json(geojson);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 // Obtener punto de interés por ID
 router.get(
   "/:id",
@@ -58,6 +99,32 @@ router.get(
     }
   }
 );
+
+//obtener punto de interes por ID en geojson
+router.get(
+  "/:id/geojson",
+  requirePermission("get_pointofinterest"),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = Number(req.params.id);
+      if (isNaN(id)) {
+        res.status(400).json({ message: "ID inválido" });
+        return;
+      }
+
+      const pointGeoJSON = await PointOfInterestController.getPointOfInterestGeoJSONById(id);
+      if (!pointGeoJSON) {
+        res.status(404).json({ message: "Punto de interés no encontrado" });
+        return;
+      }
+
+      res.json(pointGeoJSON);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 
 // Crear nuevo punto de interés
 router.post(
@@ -115,7 +182,7 @@ router.post(
         const fileIcono = req.file;
         const icono = await OrganismController.validateImage(organismName, fileIcono)
         const organism = await OrganismController.createOrganism(organismName, icono);
-        
+
         organismId = organism.id;
       }
 
