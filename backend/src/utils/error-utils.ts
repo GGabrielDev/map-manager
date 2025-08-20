@@ -1,13 +1,15 @@
 export class HttpError extends Error{
     statusCode: number
     errorType: any
-    origin: string
+    details: {
+        [key: string]: any
+    }
 
-    constructor(message: string, statusCode: number, errorType: any, origin: string) {
+    constructor(message: string, statusCode: number, errorType: any, details: { [key: string]: any }) {
         super(message);
         this.statusCode = statusCode;
         this.errorType = errorType;
-        this.origin = origin;
-         Error.captureStackTrace?.(this, this.constructor);
+        this.details = details;
+        Error.captureStackTrace?.(this, this.constructor);
     }
 }

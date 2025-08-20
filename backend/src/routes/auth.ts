@@ -14,16 +14,20 @@ router.post(
     
             // validate request body
             if(!username){
-                throw new HttpError("Nombre de usuario requerido", 400, "missing_username", "auth");
+                throw new HttpError("Nombre de usuario requerido", 400, "missing_username", {field: "username"});
             }
             if(!password){
-                throw new HttpError("Contraseña requerida", 400, "missing_password", "auth");
+                throw new HttpError("Contraseña requerida", 400, "missing_password", {field: "password"});
             }
     
             const token = await UserController.login(username, password);
             res.json({ token });
         } catch (error) {
-            next(new HttpError("Error al iniciar sesión", 500, "login_failed", "auth"));
+            if (error instanceof HttpError) {
+                next(error);
+            } else {
+                next(new HttpError("Error al iniciar sesión", 500, "login_failed", {field: "Error en el archivo: auth"}));
+            }
         }
     }
 )
@@ -31,8 +35,12 @@ router.post(
 router.get(
     "/validate",
     authenticateToken,
-    async (_, res: Response): Promise<void> => {
-        res.json({valid: true})
+    async (_, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            res.json({valid: true})
+        } catch (error) {
+            next(new HttpError("Error al validar token", 500, "token_validation_failed", {field: "Error en el archivo: auth"}));
+        }
     }
 )
 
@@ -44,13 +52,21 @@ router.get(
             const id = req.userId;
 
             if (typeof id !== 'number') {
-                throw new HttpError("ID de usuario no válido", 400, "Invalid_data", "auth");
+                throw new HttpError("ID de usuario no válido", 400, "Invalid_data", {field: "id"});
             }
 
             const user = await UserController.getById(id);
             res.json(user);
         } catch (error) {
-            next(error)
+            if (error instanceof HttpError) {
+                next(error);
+            } else {
+                if (error instanceof HttpError) {
+                    next(error);
+                }else{
+                    next(new HttpError("Error al obtener usuario", 500, "user_fetch_failed", {field: "Error en el archivo: auth"}));
+                }
+            }
         }
     }
 )
