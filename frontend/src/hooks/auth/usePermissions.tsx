@@ -54,12 +54,42 @@ export const usePermissions = () => {
   const canEditParish = hasPermission('edit_parish');
   const canDeleteParish = hasPermission('delete_parish');
 
-  // Organisms-specific permission checks
+  // Organism-specific permission checks
   const canCreateOrganism = hasPermission('create_organism');
   const canGetOrganism = hasPermission('get_organism');
   const canEditOrganism = hasPermission('edit_organism');
   const canDeleteOrganism = hasPermission('delete_organism');
 
+  // Responsible-specific permission checks
+  const canCreateResponsible = hasPermission('create_responsible');
+  const canGetResponsible = hasPermission('get_responsible');
+  const canEditResponsible = hasPermission('edit_responsible');
+  const canDeleteResponsible = hasPermission('delete_responsible');
+
+  // Quadrant-specific permission checks
+  const canCreateQuadrant = hasPermission('create_quadrant');
+  const canGetQuadrant = hasPermission('get_quadrant');
+  const canEditQuadrant = hasPermission('edit_quadrant');
+  const canDeleteQuadrant = hasPermission('delete_quadrant');
+
+  // CommunalCircuit-specific permission checks
+  const canCreateCommunalCircuit = hasPermission('create_communalcircuit');
+  const canGetCommunalCircuit = hasPermission('get_communalcircuit');
+  const canEditCommunalCircuit = hasPermission('edit_communalcircuit');
+  const canDeleteCommunalCircuit = hasPermission('delete_communalcircuit');
+
+  // PointOfInterest-specific permission checks
+  const canCreatePointOfInterest = hasPermission('create_pointofinterest');
+  const canGetPointOfInterest = hasPermission('get_pointofinterest');
+  const canEditPointOfInterest = hasPermission('edit_pointofinterest');
+  const canDeletePointOfInterest = hasPermission('delete_pointofinterest');
+
+  // Spatial-related permission checks
+  const canCreateAnySpatial = canCreateCommunalCircuit || canCreateQuadrant || canCreatePointOfInterest;
+  const canGetAnySpatial = canGetCommunalCircuit || canGetQuadrant || canGetPointOfInterest;
+  const canEditAnySpatial = canEditCommunalCircuit || canEditQuadrant || canEditPointOfInterest;
+  const canDeleteAnySpatial = canDeleteCommunalCircuit || canDeleteQuadrant || canDeletePointOfInterest;
+  
   // Composite permission checks
   const canManageUsers = canCreateUser || canGetUser || canEditUser || canDeleteUser;
   const canManageRoles = canCreateRole || canGetRole || canEditRole || canDeleteRole;
@@ -67,6 +97,11 @@ export const usePermissions = () => {
   const canManageMunicipalities = canCreateMunicipality || canGetMunicipality || canEditMunicipality || canDeleteMunicipality;
   const canManageParishes = canCreateParish || canGetParish || canEditParish || canDeleteParish;
   const canManageOrganisms = canCreateOrganism || canGetOrganism || canEditOrganism || canDeleteOrganism;
+  const canManageResponsibles = canCreateResponsible || canGetResponsible || canEditResponsible || canDeleteResponsible;
+  const canManageQuadrants = canCreateQuadrant || canGetQuadrant || canEditQuadrant || canDeleteQuadrant;
+  const canManageCommunalCircuits = canCreateCommunalCircuit || canGetCommunalCircuit || canEditCommunalCircuit || canDeleteCommunalCircuit;
+  const canManagePointOfInterests = canCreatePointOfInterest || canGetPointOfInterest || canEditPointOfInterest || canDeletePointOfInterest;
+  const canManageAnySpatial = canGetAnySpatial || canEditAnySpatial || canDeleteAnySpatial || canCreateAnySpatial;
 
   return {
     hasPermission,
@@ -108,6 +143,36 @@ export const usePermissions = () => {
     canEditOrganism,
     canDeleteOrganism,
     canManageOrganisms,
+    // Responsible permissions
+    canCreateResponsible,
+    canGetResponsible,
+    canEditResponsible,
+    canDeleteResponsible,
+    canManageResponsibles,
+    // Quadrant permissions
+    canCreateQuadrant,
+    canGetQuadrant,
+    canEditQuadrant,
+    canDeleteQuadrant,
+    canManageQuadrants,
+    // CommunalCircuit permissions
+    canCreateCommunalCircuit,
+    canGetCommunalCircuit,
+    canEditCommunalCircuit,
+    canDeleteCommunalCircuit,
+    canManageCommunalCircuits,
+    // PointOfInterest permissions
+    canCreatePointOfInterest,
+    canGetPointOfInterest,
+    canEditPointOfInterest,
+    canDeletePointOfInterest,
+    canManagePointOfInterests,
+    // Spatial permissions
+    canGetAnySpatial,
+    canEditAnySpatial,
+    canDeleteAnySpatial,
+    canCreateAnySpatial,
+    canManageAnySpatial,
     // Permission permissions
     canGetPermission,
   };
