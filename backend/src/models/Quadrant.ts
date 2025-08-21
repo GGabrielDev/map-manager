@@ -16,7 +16,7 @@ import {
     Validate
  } from "sequelize-typescript";
 
- import { Parish, Organism, Responsible } from ".";
+ import { Parish, Organism, Responsible, PointOfInterest } from ".";
 
  @Table({ 
   tableName: 'Quadrant',
@@ -83,6 +83,9 @@ import {
 
    @HasMany(()=> Responsible)
    responsible!: Responsible
+
+   @HasMany(() => PointOfInterest)
+   pointsOfInterest!: PointOfInterest[]
 
    @BelongsTo(() => Parish)
    parish!: Parish

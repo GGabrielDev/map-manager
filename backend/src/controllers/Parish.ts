@@ -1,6 +1,8 @@
 import { Parish, Municipality, Quadrant } from "@/models";
 import { Op, OrderItem } from "sequelize";
 
+import { HttpError } from "@/utils/error-utils";
+
 interface PaginationOpstions{
     page: number
     pageSize: number
