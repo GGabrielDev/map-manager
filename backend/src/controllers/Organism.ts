@@ -1,6 +1,8 @@
 import { Op, OrderItem } from "sequelize";
 import { Organism, Responsible } from "@/models";
 
+import { HttpError } from "@/utils/error-utils";
+
 import path from "path";
 import fs from "fs";
 
@@ -67,6 +69,10 @@ export const allOrganism = async ({
             include: [Responsible]
         });
 
+        if(!data){
+            throw new HttpError("No se encontraron organismos.", 404, "organism_not_found", {field: "id"});
+        }
+
         const total = await Organism.count({ where })
 
         return {
@@ -88,13 +94,17 @@ export const getById = async (id: number): Promise<Organism | null> => {
             include: [Responsible]
         });
 
-        if (!Organism) {
-            throw new Error("Organismo no encontrado.");
+        if (!organism) {
+            throw new HttpError("Organismo no encontrado.", 404, "organism_not_found", {field: "id"});
         }
 
         return organism;
     } catch (error) {
-        throw new Error("Error al obtener el organismo, intente nuevamente.");
+        if (error instanceof HttpError) {
+            throw error
+        } else {
+            throw new HttpError("Error al obtener el organismo, intente nuevamente.", 500, "organism_fetch_failed", {field: "Error en el archivo: organism"});
+        }
     }
 }
 
@@ -104,7 +114,7 @@ export const createOrganism = async (name: string, icono:string): Promise<Organi
         const existOrganism = await Organism.findOne({ where: { name } });
 
         if (existOrganism) {
-            throw new Error("El organismo ya existe.");
+            throw new HttpError("El organismo ya existe.", 400, "organism_already_exists", {field: "name"});
         }
 
         const createOrganism = await Organism.create({
@@ -112,10 +122,17 @@ export const createOrganism = async (name: string, icono:string): Promise<Organi
             icono
         });
 
+        if (!createOrganism) {
+            throw new HttpError("Error al crear el organismo, intente nuevamente.", 500, "organism_creation_failed", {field: "Error en el archivo: organism"});
+        }
+
         return createOrganism;
     } catch (error) {
-        console.log(error)
-        throw new Error("Error al crear el organismo, intente nuevamente.");
+        if (error instanceof HttpError) {
+            throw error;
+        }else{
+            throw new HttpError("Error al crear el organismo, intente nuevamente.", 500, "organism_creation_failed", {field: "Error en el archivo: organism"});
+        }
     }
 }
 
@@ -125,14 +142,17 @@ export const updateOrganism = async (updates: Partial<Organism>): Promise<Organi
         const updateOrganism = await Organism.findOne({ where: { id: updates.id } });
 
         if (!updateOrganism) {
-            throw new Error("Organismo no encontrado.");
+            throw new HttpError("Organismo no encontrado.", 404, "organism_not_found", {field: "id"});
         }
 
         await updateOrganism.update(updates);
-
         return updateOrganism;
     } catch (error) {
-        throw new Error("Error al actualizar el organismo, intente nuevamente.");
+        if (error instanceof HttpError) {
+            throw error;
+        } else {
+            throw new HttpError("Error al actualizar el organismo, intente nuevamente.", 500, "organism_update_failed", {field: "Error en el archivo: organism"});
+        }
     }
 }
 
@@ -147,13 +167,17 @@ export const deleteOrganism = async (id: number): Promise<boolean> => {
 
         const countResponsible = await Responsible.count({ where: { organismId: id } });
         if (countResponsible > 0) {
-            throw new Error("No se puede eliminar el organismo, ya que tiene responsables asociadas.");
+            throw new HttpError("No se puede eliminar el organismo, ya que tiene responsables asociadas.", 400, "organism_has_responsibles", {field: "id"});
         }
 
         await organism.destroy();
         return true;
     } catch (error) {
-        throw new Error("Error al eliminar el organismo, intente nuevamente.");
+        if (error instanceof HttpError) {
+            throw error;
+        }else{
+            throw new HttpError("Error al eliminar el organismo, intente nuevamente.", 500, "organism_deletion_failed", {field: "Error en el archivo: organism"});
+        }
     }
 }
 
@@ -164,7 +188,7 @@ export const validateImage = async (name: string, file: Express.Multer.File): Pr
     try {
         const allowedTypes = ["image/jpeg", "image/png", "image/svg+xml"];
         if (!allowedTypes.includes(file.mimetype)) {
-            throw new Error("Tipo de archivo no permitido.");
+            throw new HttpError("Tipo de archivo no permitido.", 400, "invalid_file_type", {field: "file"});
         }
 
         const ext = path.extname(file.originalname);
@@ -187,6 +211,10 @@ export const validateImage = async (name: string, file: Express.Multer.File): Pr
 
         return icono;
     } catch (error) {
-        throw new Error("Error al validar la imagen, intente nuevamente.");
+        if (error instanceof HttpError) {
+            throw error;
+        }else{
+            throw new HttpError("Error al validar la imagen.", 500, "image_validation_failed", {field: "file"});
+        }
     }
 }
