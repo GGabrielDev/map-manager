@@ -8,6 +8,7 @@ export { default as Organism } from './Organism'
 export { default as Responsible } from './Resposible'
 export { default as Quadrant} from './Quadrant'
 export { default as CommunalCircuit } from './CommunalCircuit'
+export { default as PointOfInterest } from './PointOfInterest'
 
 // TypeScript: `import * as` gets all named exports from this file
 import * as models from './index' // This is safe because TypeScript's module system resolves this after the exports above

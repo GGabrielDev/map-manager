@@ -10,10 +10,11 @@ import {
     Model,
     DataType,
     BelongsTo,
-    ForeignKey
+    ForeignKey,
+    HasMany
 } from "sequelize-typescript";
 
-import { Organism, Quadrant, CommunalCircuit } from ".";
+import { Organism, Quadrant, CommunalCircuit, PointOfInterest } from ".";
 
 @Table({tableName: 'Resposible'})
 export default class Resposible extends Model{
@@ -50,7 +51,7 @@ export default class Resposible extends Model{
     @Column
     position!: string
 
-    //TODO: Faltan las relaciones con las tablas cuadrantes, circuito comunitario, comuna y consejo comunal ya que no fueron creados aun
+    //TODO: Faltan las relaciones con la tabla consejo comunal ya que no fue creada aun
     
     @ForeignKey(()=> Organism)
     @Column
@@ -72,6 +73,9 @@ export default class Resposible extends Model{
 
     @DeletedAt
     deletedAt?: Date
+
+    @HasMany(()=> PointOfInterest)
+    pointsOfInterest: PointOfInterest[]
 
     @BelongsTo(()=> Organism)
     organism?: Organism

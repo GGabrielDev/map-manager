@@ -11,6 +11,8 @@ import OrganismRouter from '@/routes/organism'
 import ResponsibleRouter from '@/routes/responsible'
 import QuadrantRouter from "@/routes/quadrant";
 import Static from "@/routes/static"
+import CommunalCircuitRouter from "@/routes/communalCircuit"
+import PointOfInterestRouter from "@/routes/pointOfInterest"
 
 import { authenticateToken } from '@/middleware/authentication'
 
@@ -36,6 +38,8 @@ mainRouter.use('/parishes', ParishRouter)
 mainRouter.use('/organisms', OrganismRouter)
 mainRouter.use('/responsibles', ResponsibleRouter)
 mainRouter.use('/quadrants', QuadrantRouter)
+mainRouter.use('/communal-circuits', CommunalCircuitRouter)
+mainRouter.use('/points-of-interest', PointOfInterestRouter)
 
 
 export default mainRouter

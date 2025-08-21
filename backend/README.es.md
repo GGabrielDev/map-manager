@@ -232,9 +232,10 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 - `name`: cadena, requerido
 - `description`: cadena, opcional
 - `geometry`: geometría(Punto), requerido (datos espaciales que definen la ubicación del punto)
+- `organism_id`: FK a Organismo
+- `responsible_id`: FK a Responsable
 - `circuit_communal_id`: FK a Circuito Comunal, opcional (auto-asignado basado en coordenadas)
 - `quadrant_id`: FK a Cuadrante, opcional (auto-asignado basado en coordenadas)
-- `organism_id`: FK a Organismo, opcional
 - `creationDate`: fecha-hora, automático
 - `updatedOn`: fecha-hora, automático
 - `deletionDate`: fecha-hora, nullable (eliminación suave)
@@ -395,9 +396,10 @@ erDiagram
         string name
         string description
         geometry geometry
+        int responsible_id FK
+        int organism_id FK
         int circuit_communal_id FK
         int quadrant_id FK
-        int organism_id FK
         datetime creationDate
         datetime updatedOn
         datetime deletionDate
