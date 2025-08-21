@@ -1,7 +1,9 @@
 import { CommunalCircuit, Parish } from "@/models";
 import { Op, OrderItem, Sequelize } from "sequelize";
 
-interface PaginationOpstions{
+import { HttpError } from "@/utils/error-utils"
+
+interface PaginationOptions{
     page: number
     pageSize: number
 }
@@ -9,7 +11,7 @@ interface PaginationOpstions{
 export const SortByOptions = ['name', 'creationDate', 'updateDate']
 export const SortOrderOptions = ['ASC', 'DESC']
 
-export interface CommunalCircuitFilterOptions extends PaginationOpstions {
+export interface CommunalCircuitFilterOptions extends PaginationOptions {
     name?: string
     parishName?: string
     sortBy?: (typeof SortByOptions)[number]
@@ -96,7 +98,7 @@ export const allCommunalCircuits = async({
             currentPage: page
         }
     } catch (error) {
-        throw new Error("Error al obtener los circuitos comunales, intente nuevamente.");
+        throw new HttpError("Error al obtener los circuitos comunales.", 500, "get_communalcircuit_failed", {field: "Error en el archivo: CommunalCircuit"});
     }
 }
 
@@ -167,30 +169,42 @@ export const allCommunalCircuitsGeoJSON = async ({
     };
 
   } catch (error) {
-    throw new Error("Error al obtener los circuitos comunales en formato GeoJSON.");
+    throw new HttpError("Error al obtener los circuitos comunales en formato GeoJSON.", 500, "get_communalcircuit_geojson_failed", {field: "Error en el archivo: CommunalCircuit"});
   }
 }
 
 // get communal circuit by ID
 export const getById = async (id: number):Promise<CommunalCircuit | null> =>{
     try {
+        if (!id) {
+            throw new HttpError("ID de circuito comunal requerido", 400, "Missing_id", {field: "id"});
+        }
+
         const communalCircuit = await CommunalCircuit.findOne({
             where: {id}
         })
 
         if (!communalCircuit) {
-            throw new Error("Circuito comunales no encontrado");
+            throw new HttpError("Circuito comunal no encontrado", 404, "Not_found", {field: "id"});
         }
 
         return communalCircuit;
     } catch (error) {
-        throw new Error("Error al obtener circuito comunales, intente nuevamente.")
+        if (error instanceof HttpError) {
+            throw error;
+        }else{
+            throw new HttpError("Error al obtener el circuito comunal.", 500, "get_communalcircuit_failed", {field: "Error en el archivo: CommunalCircuit"});
+        }
     }    
 }
 
 // get communal circuit GeoJson by ID
 export const getByIdGeoJson = async (id: number):Promise<CommunalCircuit | null> =>{
     try {
+        if (!id) {
+            throw new HttpError("ID de circuito comunal requerido", 400, "Missing_id", {field: "id"});
+        }
+
         const communalCircuit = await CommunalCircuit.findOne({
             where: {id},
             include: [
@@ -204,12 +218,16 @@ export const getByIdGeoJson = async (id: number):Promise<CommunalCircuit | null>
         })
 
         if (!communalCircuit) {
-            throw new Error("Circuito comunal no encontrado");
+            throw new HttpError("Circuito comunal no encontrado", 404, "Not_found", {field: "id"});
         }
 
         return communalCircuit;
     } catch (error) {
-        throw new Error("Error al obtener circuito comunal, intente nuevamente.")
+        if (error instanceof HttpError) {
+            throw error;
+        }else{
+            throw new HttpError("Error al obtener circuito comunal, intente nuevamente.", 500, "get_communalcircuit_failed", {field: "Error en el archivo: CommunalCircuit"});
+        }
     }    
 }
 
@@ -226,7 +244,7 @@ export const createQuadrant = async (
         const existCommunalCircuit = await CommunalCircuit.findOne({where: {name, parishId,}})
 
         if (existCommunalCircuit) {
-            throw new Error("El circuito comunal ya existe.")
+            throw new HttpError("El circuito comunal ya existe.", 400, "communalcircuit_already_exists", {field: "name parishId"});
         }
 
         const createCommunalCircuit = await CommunalCircuit.create({
@@ -240,7 +258,11 @@ export const createQuadrant = async (
 
         return createCommunalCircuit;
     } catch (error) {
-        throw new Error("Error al crear el circuito comunal, intente nuevamente.")
+        if (error instanceof HttpError) {
+            throw error;
+        }else{
+            throw new HttpError("Error al crear el circuito comunal, intente nuevamente.", 500, "create_communalcircuit_failed", {field: "Error en el archivo: CommunalCircuit"});
+        }
     }
 }
 
@@ -249,19 +271,24 @@ export const updateComunalCircuit = async(updates: Partial<CommunalCircuit>): Pr
     try {
         const existParish = await Parish.findOne({where: {id: updates.parishId}})
         if (!existParish) {
-            throw new Error("El ID de la parroquia no existe.")
+            throw new HttpError("El ID de la parroquia no existe.", 404, "Not_found", {field: "parishId"});
         }
 
         const updateToCommunalCircuit = await CommunalCircuit.findOne({where:{id: updates.id}})
+
         if (!updateToCommunalCircuit) {
-            throw new Error("Cicuito comunal no encontrado");
+            throw new HttpError("Circuito comunal no encontrado.", 404, "Not_found", {field: "id"});
         }
 
         await updateToCommunalCircuit.update(updates)
 
         return updateToCommunalCircuit;
     } catch (error) {
-        throw new Error("Error al actualizar el circuito comunal.")
+        if (error instanceof HttpError) {
+            throw error;
+        }else{
+            throw new HttpError("Error al actualizar el circuito comunal, intente nuevamente.", 500, "update_communalcircuit_failed", {field: "Error en el archivo: CommunalCircuit"});
+        }
     }
 }
 
@@ -277,6 +304,6 @@ export const deleteCommunalCircuit = async (id:number): Promise<boolean> =>{
         await communalCircuit.destroy()
         return true;
     } catch (error) {
-        throw new Error("Error al eliminar el circuito comunal")
+        throw new HttpError("Error al eliminar el circuito comunal", 500, "delete_communalcircuit_failed", {field: "Error en el archivo: CommunalCircuit"});
     }
 }
