@@ -45,7 +45,7 @@ router.get(
         const municipalityId = parseInt(req.params.id, 10)
 
         if(!municipalityId){
-            throw new HttpError("ID de municipio requerido", 400, "missing_municipality_id", {field: "id"});
+            throw new HttpError("ID de municipio requerido.", 400, "missing_municipality_id", {field: "id"});
         }
 
         const municipality = await MunicipalityController.getById(municipalityId);

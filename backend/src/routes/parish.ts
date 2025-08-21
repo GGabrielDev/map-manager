@@ -3,6 +3,8 @@ import { ParishController } from "@/controllers";
 import { requirePermission } from "@/middleware/authorization";
 import { Parish } from "@/models";
 
+import { HttpError } from "@/utils/error-utils";
+
 const router = Router();
 
 router.get(
@@ -27,10 +29,10 @@ router.get(
             })
             res.json(parishes)
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({message: error.message})
-            }else{
+            if (error instanceof HttpError) {
                 next(error)
+            }else{
+                next(new HttpError("Error al obtener las parroquias.", 500, "parish_fetch_failed", {field: "Error en el archivo: parish"}));
             }
         }
     }
@@ -42,17 +44,17 @@ router.get(
     async(req: Request, res: Response, next: NextFunction): Promise <void> =>{
         try {
             const parishId = parseInt(req.params.id, 10)
-            const parish = await ParishController.getById(parishId)
-            if (!parish) {
-                res.status(404).json({message: "Parroquia no encontrada"})
-                return;
+            if(!parishId){
+                throw new HttpError("ID de parroquia requerido.", 400, "missing_parish_id", {field: "id"});
             }
+
+            const parish = await ParishController.getById(parishId)
             res.json(parish);
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({message: error.message})
-            } else {
+            if (error instanceof HttpError) {
                 next(error)
+            } else {
+                next(new HttpError("Error al obtener la parroquia.", 500, "parish_fetch_failed", {field: "Error en el archivo: parish"}));
             }
         }
     }
@@ -65,21 +67,19 @@ router.post(
         try {
             const {name, municipalityId} = req.body
             if (!name) {
-                res.status(400).json({message: "Nombre de la parroquia requerido"})
-                return;
+                throw new HttpError("Nombre de la parroquia requerido.", 400, "missing_parish_name", {field: "name"});
             }
             if (!municipalityId) {
-                res.status(400).json({message: "ID del municipio requerido"})
-                return;
+                throw new HttpError("ID del municipio requerido.", 400, "missing_municipality_id", {field: "municipalityId"});
             }
 
             const newParish = await ParishController.createParish(name, municipalityId)
             res.status(201).json(newParish)
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({message: error.message})
-            } else {
+            if (error instanceof HttpError) {
                 next(error)
+            } else {
+                next(new HttpError("Error al crear la parroquia.", 500, "parish_creation_failed", {field: "Error en el archivo: parish"}));
             }
         }
     }
@@ -93,23 +93,18 @@ router.put(
             const updates: Partial<Parish> = {}
             updates.id= Number(req.params.id)
             if (!updates.id) {
-                res.status(400).json({ message: "ID de la parroquia requerido." })
-                return;
+                throw new HttpError("ID de parroquia requerido.", 400, "missing_parish_id", {field: "id"});
             }
             if (req.body.name !== undefined) updates.name = req.body.name;
             if (req.body.municipalityId !== undefined) updates.municipalityId = req.body.municipalityId
 
             const updateParish = await ParishController.updateParish(updates)
-            if (!updateParish) {
-                res.status(404).json({ message: "Parroquia no encontrada." })
-                return;
-            }
             res.json(updateParish)
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({message: error.message})
-            } else {
+            if (error instanceof HttpError) {
                 next(error)
+            } else {
+                next(new HttpError("Error al actualizar la parroquia.", 500, "parish_update_failed", {field: "Error en el archivo: parish"}));
             }
         }
     }
@@ -122,18 +117,16 @@ router.delete(
         try {
             const id = Number(req.params.id)
             if (!id) {
-                res.status(400).json({ message: "ID de parroquia requerido" })
-                return;
+                throw new HttpError("ID de parroquia requerido.", 400, "missing_parish_id", {field: "id"});
             }
 
             await ParishController.deleteParish(id);
             res.status(204).send()
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({ message: error.message })
-                return;
-            } else {
+            if (error instanceof HttpError) {
                 next(error)
+            } else {
+                next(new HttpError("Error al eliminar la parroquia.", 500, "parish_deletion_failed", {field: "Error en el archivo: parish"}));
             }
         }
     }
