@@ -89,12 +89,12 @@ export const allCommunalCircuits = async({
             }
         })
 
-        const total = await Parish.count({where})
+        const total = await CommunalCircuit.count({where})
 
         return {
             data,
             total,
-            totalPage: Math.ceil(total / pageSize,),
+            totalPage: Math.ceil(total / pageSize),
             currentPage: page
         }
     } catch (error) {
@@ -255,6 +255,10 @@ export const createQuadrant = async (
             boundary,
             metadata
         })
+
+        if (!createCommunalCircuit) {
+            throw new HttpError("Error al crear el circuito comunal, intente nuevamente.", 500, "create_communalcircuit_failed", {field: "Error en el archivo: CommunalCircuit"});
+        }
 
         return createCommunalCircuit;
     } catch (error) {
