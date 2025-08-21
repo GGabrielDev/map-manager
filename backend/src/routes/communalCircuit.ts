@@ -3,6 +3,8 @@ import { CommunalCircuitController } from "@/controllers";
 import { requirePermission } from "@/middleware/authorization";
 import { CommunalCircuit } from "@/models";
 
+import { HttpError } from "@/utils/error-utils";
+
 const router = Router();
 
 router.get(
@@ -29,7 +31,7 @@ router.get(
             });
             res.json(quadrant);
         } catch (error) {
-            next(error);
+            next(new HttpError("Error al obtener los circuitos comunales.", 500, "get_communalcircuit_failed", {field: "Error en el archivo: communalCircuit"}));
         }
     }
 );
@@ -54,7 +56,7 @@ router.get(
             });
             res.json(geojson);
         } catch (error) {
-            next(error);
+            next(new HttpError("Error al obtener los circuitos comunales en formato GeoJSON.", 500, "get_communalcircuit_geojson_failed", {field: "Error en el archivo: communalCircuit"}));
         }
     }
 );
@@ -65,18 +67,17 @@ router.get(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const id = parseInt(req.params.id, 10);
-            if (isNaN(id)) {
-                res.status(400).json({ message: "ID de circuito comunal inválido." });
-                return;
+            if (!id) {
+                throw new HttpError("ID de circuito comunal requerido", 400, "Missing_id", {field: "id"});
             }
             const circuit = await CommunalCircuitController.getById(id);
-            if (!circuit) {
-                res.status(404).json({ message: "Circuito comunal no encontrado." });
-                return;
-            }
             res.json(circuit);
         } catch (error) {
-            next(error);
+            if(error instanceof HttpError) {
+                next(error);
+            }else{
+                next(new HttpError("Error al obtener el circuito comunal", 500, "get_communalcircuit_by_id_failed", {field: "Error en el archivo: communalCircuit"}));
+            }
         }
     }
 );
@@ -87,18 +88,17 @@ router.get(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const id = parseInt(req.params.id, 10);
-            if (isNaN(id)) {
-                res.status(400).json({ message: "ID de circuito comunal inválido." });
-                return;
+            if (!id) {
+                throw new HttpError("ID del circuito comunal requerido", 400, "Missing_id", {field: "id"});
             }
             const circuitGeoJson = await CommunalCircuitController.getByIdGeoJson(id);
-            if (!circuitGeoJson) {
-                res.status(404).json({ message: "Circuito comunal no encontrado." });
-                return;
-            }
             res.json(circuitGeoJson);
         } catch (error) {
-            next(error);
+            if (error instanceof HttpError) {
+                next(error);
+            } else {
+                next(new HttpError("Error al obtener el circuito comunal en formato GeoJSON.", 500, "get_communalcircuit_geojson_failed", {field: "Error en el archivo: communalCircuit"}));
+            }
         }
     }
 );
@@ -110,30 +110,29 @@ router.post(
         try {
             const { name, parishId, addres, code, boundary, metadata } = req.body;
             if (!name) {
-                res.status(400).json({ message: "Nombre del circuito comunal requerido." });
-                return;
+                throw new HttpError("Nombre del circuito comunal requerido.", 400, "Missing_name", {field: "name"});
             }
             if (!parishId) {
-                res.status(400).json({ message: "ID de la parroquia requerido." });
-                return;
+                throw new HttpError("ID de la parroquia requerido.", 400, "Missing_parishId", {field: "parishId"});
             }
             if (!addres) {
-                res.status(400).json({ message: "Dirección requerida." });
-                return;
+                throw new HttpError("Dirección requerida.", 400, "Missing_address", {field: "address"});
             }
             if (!code) {
-                res.status(400).json({ message: "Código requerido." });
-                return;
+                throw new HttpError("Código requerido.", 400, "Missing_code", {field: "code"});
             }
             if (!boundary) {
-                res.status(400).json({ message: "Límite geográfico (boundary) requerido." });
-                return;
+                throw new HttpError("Límite geográfico (boundary) requerido.", 400, "Missing_boundary", {field: "boundary"});
             }
 
             const newCircuit = await CommunalCircuitController.createQuadrant(name, parishId, addres, code, boundary, metadata);
             res.status(201).json(newCircuit);
         } catch (error) {
-            next(error);
+            if (error instanceof HttpError) {
+                next(error);
+            } else {
+                next(new HttpError("Error al crear el circuito comunal.", 500, "create_communalcircuit_failed", {field: "Error en el archivo: communalCircuit"}));
+            }
         }
     }
 );
@@ -145,8 +144,7 @@ router.put(
         try {
             const updates: Partial<CommunalCircuit> = { id: Number(req.params.id) };
             if (!updates.id) {
-                res.status(400).json({ message: "ID de circuito comunal requerido e inválido." });
-                return;
+                throw new HttpError("ID de circuito comunal requerido.", 400, "Missing_id", {field: "id"});
             }
 
             if (req.body.name !== undefined) updates.name = req.body.name;
@@ -157,13 +155,13 @@ router.put(
             if (req.body.metadata !== undefined) updates.metadata = req.body.metadata;
 
             const updatedCircuit = await CommunalCircuitController.updateComunalCircuit(updates);
-            if (!updatedCircuit) {
-                res.status(404).json({ message: "Circuito comunal no encontrado." });
-                return;
-            }
             res.json(updatedCircuit);
         } catch (error) {
-            next(error);
+            if (error instanceof HttpError) {
+                next(error);
+            } else {
+                next(new HttpError("Error al actualizar el circuito comunal.", 500, "update_communalcircuit_failed", {field: "Error en el archivo: communalCircuit"}));
+            }
         }
     }
 );
@@ -175,17 +173,16 @@ router.delete(
         try {
             const id = Number(req.params.id);
             if (!id) {
-                res.status(400).json({ message: "ID de circuito comunal requerido." });
-                return;
+                throw new HttpError("ID de circuito comunal requerido.", 400, "Missing_id", {field: "id"});
             }
             const deleted = await CommunalCircuitController.deleteCommunalCircuit(id);
-            if (!deleted) {
-                res.status(404).json({ message: "Circuito comunal no encontrado." });
-                return;
-            }
             res.status(204).send();
         } catch (error) {
-            next(error);
+            if (error instanceof HttpError) {
+                next(error);
+            } else {
+                next(new HttpError("Error al eliminar el circuito comunal.", 500, "delete_communalcircuit_failed", {field: "Error en el archivo: communalCircuit"}));
+            }
         }
     }
 );
