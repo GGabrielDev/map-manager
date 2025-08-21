@@ -3,6 +3,8 @@ import { MunicipalityController } from "@/controllers/";
 import { requirePermission } from "@/middleware/authorization";
 import { Municipality } from "@/models"
 
+import { HttpError } from "@/utils/error-utils";
+
 const router = Router();
 
 router.get(
@@ -27,10 +29,10 @@ router.get(
         });
         res.json(municipalities);
     } catch (error) {
-        if (error instanceof Error) {
-            res.status(401).json({ message: error.message });
-        }else{
+        if (error instanceof HttpError) {
             next(error);
+        }else{
+            next(new HttpError("Error al obtener municipios", 500, "municipality_fetch_failed", {field: "Error en el archivo: municipality"}));
         }
     }
 });
@@ -41,17 +43,18 @@ router.get(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const municipalityId = parseInt(req.params.id, 10)
-        const municipality = await MunicipalityController.getById(municipalityId);
-        if (!municipality) {
-            res.status(404).json({ message: "Municipio no encontrado." });
-            return;
+
+        if(!municipalityId){
+            throw new HttpError("ID de municipio requerido", 400, "missing_municipality_id", {field: "id"});
         }
+
+        const municipality = await MunicipalityController.getById(municipalityId);
         res.json(municipality);
     } catch (error) {
-        if (error instanceof Error) {
-            res.status(401).json({ message: error.message });
-        }else{
+        if (error instanceof HttpError) {
             next(error);
+        }else{
+            next(new HttpError("Error al obtener municipio", 500, "municipality_fetch_failed", {field: "Error en el archivo: municipality"}));
         }
     }
 });
@@ -62,21 +65,22 @@ router.post(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const {name, stateId}= req.body;
+
             if (!name) {
-                res.status(400).json({ message: "Nombre de municipio requerido." });
-                return;
+                throw new HttpError("Nombre de municipio requerido.", 400, "Missing_name", {field: "name"});
             }
+
             if (!stateId) {
-                res.status(400).json({ message: "Id de estado requerido." });
-                return;
+                throw new HttpError("Id de estado requerido.", 400, "Missing_state_id", {field: "stateId"});
             }
+
             const newMunicipality = await MunicipalityController.createMunicipality(name, stateId);
             res.status(201).json(newMunicipality);
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({ message: error.message });
-            } else {
+            if (error instanceof HttpError) {
                 next(error);
+            } else {
+                next(new HttpError("Error al crear municipio", 500, "municipality_creation_failed", {field: "Error en el archivo: municipality"}));
             }
         }
     }
@@ -90,23 +94,19 @@ router.put(
         const updates: Partial<Municipality> = {}
         updates.id = Number(req.params.id);
         if (!updates.id){
-            res.status(400).json({ message: "ID de municipio requerido." });
-            return;
+            throw new HttpError("ID de municipio requerido", 400, "missing_municipality_id", {field: "id"});
         }
+
         if (req.body.name !== undefined) updates.name = req.body.name;
         if (req.body.stateId !== undefined) updates.stateId = req.body.stateId
 
         const updateMunicipality = await MunicipalityController.updateMunicipality(updates);
-        if (!updateMunicipality) {
-            res.status(404).json({ message: "Municipio no encontrado." });
-            return;
-        }
         res.json(updateMunicipality);
     } catch (error) {
-        if (error instanceof Error) {
-            res.status(401).json({ message: error.message });
-        } else {
+        if (error instanceof HttpError) {
             next(error);
+        } else {
+            next(new HttpError("Error al actualizar municipio", 500, "municipality_update_failed", {field: "Error en el archivo: municipality"}));
         }
     }
 });
@@ -118,17 +118,16 @@ router.delete(
     try {
         const id = Number(req.params.id);
         if (!id) {
-            res.status(400).json({ message: "ID de municipio requerido." });
-            return;
+            throw new HttpError("ID de municipio requerido", 400, "missing_municipality_id", {field: "id"});
         }
 
         await MunicipalityController.deleteMunicipality(id);
         res.status(204).send()
     } catch (error) {
-        if (error instanceof Error) {
-            res.status(401).json({ message: error.message });
-        } else {
+        if (error instanceof HttpError) {
             next(error);
+        } else {
+            next(new HttpError("Error al eliminar municipio", 500, "municipality_deletion_failed", {field: "Error en el archivo: municipality"}));
         }
     }
 });

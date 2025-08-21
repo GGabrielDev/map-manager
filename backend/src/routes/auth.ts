@@ -61,11 +61,7 @@ router.get(
             if (error instanceof HttpError) {
                 next(error);
             } else {
-                if (error instanceof HttpError) {
-                    next(error);
-                }else{
-                    next(new HttpError("Error al obtener usuario", 500, "user_fetch_failed", {field: "Error en el archivo: auth"}));
-                }
+                next(new HttpError("Error al obtener usuario", 500, "user_fetch_failed", {field: "Error en el archivo: auth"}));
             }
         }
     }
