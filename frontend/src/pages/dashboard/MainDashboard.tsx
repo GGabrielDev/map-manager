@@ -21,6 +21,7 @@ const MainDashboard: React.FC = () => {
   const {
     canManageUsers,
     canManageRoles,
+    canManageAnySpatial,
   } = usePermissions();
 
   const handleLogout = () => {
@@ -52,6 +53,13 @@ const MainDashboard: React.FC = () => {
 
   // Main dashboard categories
   const dashboardSections = [
+    ...(canManageAnySpatial ? [{
+      title: t('dashboard:categories.map.title', 'Map'),
+      description: t('dashboard:categories.map.description', 'View and manage spatial entities on the map.'),
+      route: '/dashboard/map',
+      color: 'info' as const,
+      icon: '🗺️'
+    }] : []),
     {
       title: t('dashboard:categories.administrative.title'),
       description: t('dashboard:categories.administrative.description'),

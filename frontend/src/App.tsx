@@ -11,12 +11,12 @@ import MainDashboard from './pages/dashboard/MainDashboard';
 import ManageMunicipalities from './pages/geographical/MunicipalitiesPage';
 import ManageParishes from './pages/geographical/ParishesPage';
 import ManageStates from './pages/geographical/StatesPage';
+import MapEditor from './pages/spatial/MapEditor';
 
 const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      
       {/* Main Dashboard */}
       <Route 
         path="/dashboard" 
@@ -26,7 +26,6 @@ const App: React.FC = () => {
           </ProtectedRoute>
         }
       />
-      
       {/* Specialized Dashboards */}
       <Route 
         path="/dashboard/administrative" 
@@ -44,7 +43,15 @@ const App: React.FC = () => {
           </ProtectedRoute>
         }
       />
-      
+      {/* Map Editor Route */}
+      <Route 
+        path="/map" 
+        element={
+          <ProtectedRoute>
+            <MapEditor />
+          </ProtectedRoute>
+        }
+      />
       {/* Administrative Routes */}
       <Route 
         path="/organisms" 
@@ -70,7 +77,6 @@ const App: React.FC = () => {
           </ProtectedRoute>
         }
       />
-      
       {/* Geographical Routes */}
       <Route 
         path="/states" 
@@ -96,10 +102,8 @@ const App: React.FC = () => {
           </ProtectedRoute>
         }
       />
-      
       <Route path="*" element={<Navigate to="/dashboard" />} />
     </Routes>
   );
 };
-
 export default App;
