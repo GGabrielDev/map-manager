@@ -111,6 +111,7 @@ export const allQuadrant = async({
             currentPage: page
         }
     } catch (error) {
+        console.log(error)
         throw new Error("Error al obtener los cuadrantes, intente nuevamente.");
     }
 }
@@ -260,10 +261,10 @@ export const getByIdGeoJson = async (id: number)=>{
 //create quadrant
 export const createQuadrant = async (
     name: string,
-    parishId: number,
-    organismId: number,
     boundary: object,
-    fleet: {
+    parishId?: number,
+    organismId?: number,
+    fleet?: {
         small: {active: number; inactive: number};
         big: {active: number; inactive: number};
         bike: {active: number; inactive: number};
@@ -279,9 +280,9 @@ export const createQuadrant = async (
 
         const createQuadrant = await Quadrant.create({
             name,
+            boundary,
             parishId,
             organismId,
-            boundary,
             fleet,
             metadata
         })

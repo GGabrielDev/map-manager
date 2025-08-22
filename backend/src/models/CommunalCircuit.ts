@@ -15,7 +15,7 @@ import {
     HasMany
 } from "sequelize-typescript";
 
- import { Parish, Responsible } from ".";
+ import { Parish, Responsible, Quadrant } from ".";
 
  @Table({ 
     tableName: "CommunalCircuit",
@@ -38,7 +38,7 @@ import {
 
     @ForeignKey(() => Parish)
     @Column(DataType.INTEGER)
-    parishId!: number
+    parishId?: number
 
     @AllowNull(false)
     @Column
@@ -68,6 +68,9 @@ import {
     @HasMany(()=>Responsible)
     responsible!: Responsible
 
-    @BelongsTo(()=>Parish)
-    parish!: Parish
+    @BelongsTo(() => Quadrant)
+    quadrant?: Quadrant
+
+    @BelongsTo(() => Parish)
+    parish?: Parish
  }

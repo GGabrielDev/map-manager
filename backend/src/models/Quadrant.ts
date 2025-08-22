@@ -8,6 +8,7 @@ import {
     DeletedAt,
     ForeignKey,
     HasMany,
+    HasOne,
     Model,
     PrimaryKey,
     Table,
@@ -16,7 +17,7 @@ import {
     Validate
  } from "sequelize-typescript";
 
- import { Parish, Organism, Responsible, PointOfInterest } from ".";
+ import { Parish, Organism, Responsible, PointOfInterest, CommunalCircuit } from ".";
 
  @Table({ 
   tableName: 'Quadrant',
@@ -39,11 +40,11 @@ import {
 
    @ForeignKey(() => Parish)
    @Column(DataType.INTEGER)
-   parishId!: number
+   parishId?: number
 
    @ForeignKey(() => Organism)
    @Column(DataType.INTEGER)
-   organismId!: number
+   organismId?: number
 
    @Column(DataType.GEOMETRY('POLYGON'))
    boundary!: object
@@ -52,7 +53,7 @@ import {
    @Column(DataType.JSON)
    metadata?: object;
 
-   @AllowNull(false)
+   @AllowNull(true)
    @Validate({
     fleetNegative(value: any){
       ['small', 'big', 'bike'].forEach(type => {
@@ -65,12 +66,26 @@ import {
       });
     }
   })
-  @Column(DataType.JSON)
-   fleet!: {
+  @Column({
+    type: DataType.JSON,
+    defaultValue: {
+      small: { active: 0, inactive: 0 },
+      big: { active: 0, inactive: 0 },
+      bike: { active: 0, inactive: 0 }
+    }
+  })
+   fleet?: {
      small: { active: number, inactive: number },
      big: { active: number, inactive: number },
      bike: { active: number, inactive: number }
    };
+
+   @AllowNull(false)
+   @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false
+   })
+   active!: boolean;
 
    @CreatedAt
    createdAt!: Date
@@ -80,6 +95,9 @@ import {
 
    @DeletedAt
    deletionDate?: Date
+
+   @HasOne(() => CommunalCircuit )
+   communalCircuit!: CommunalCircuit
 
    @HasMany(()=> Responsible)
    responsible!: Responsible
