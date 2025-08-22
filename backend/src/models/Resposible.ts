@@ -33,6 +33,14 @@ export default class Resposible extends Model{
     lastName!: string
 
     @AllowNull(false)
+    @Validate({
+        isValidCI(value: string) {
+            const ciRegex = /^[A-Z]\d+$/;
+            if (!ciRegex.test(value)) {
+            throw new Error("ci debe comenzar con letra mayúscula seguida de números");
+            }
+        }
+    })
     @Column
     ci!: string
 
