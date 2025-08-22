@@ -71,6 +71,15 @@ export default class Resposible extends Model{
     phoneBackup?: string
 
     @AllowNull(true)
+    @Validate({
+        isValidEmail(value: string) {
+            if (value === null || value === undefined || value === "") return; // campo opcional
+            const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+            if (!emailRegex.test(value)) {
+            throw new Error("email debe tener un formato válido");
+            }
+        },
+    })
     @Column
     email?: string
 
