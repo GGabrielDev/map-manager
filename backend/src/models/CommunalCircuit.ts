@@ -42,7 +42,7 @@ import {
 
     @ForeignKey(() => Quadrant)
     @Column(DataType.INTEGER)
-    quadrantId1!: number
+    quadrantId!: number
 
     @AllowNull(false)
     @Column

@@ -375,7 +375,8 @@ erDiagram
     COMMUNAL_CIRCUIT {
         int id PK
         string name UK
-        int parish_id FK
+        int parishId FK
+        int quadrantId
         string address
         string code
         geometry boundary
