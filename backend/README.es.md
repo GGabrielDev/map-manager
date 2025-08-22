@@ -344,7 +344,7 @@ erDiagram
     MUNICIPALITY {
         int id PK
         string name UK
-        int state_id FK
+        int stateId FK
         datetime creationDate
         datetime updatedOn
         datetime deletionDate
