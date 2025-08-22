@@ -1,39 +1,91 @@
-import { Box, Container, Typography } from '@mui/material';
+import 'leaflet/dist/leaflet.css';
+
+import { Box, Button, Paper, styled, Typography } from '@mui/material';
+import type { LatLngExpression } from 'leaflet';
+import L from 'leaflet';
+// Fix for default markers
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import { useTranslation } from 'react-i18next';
+import { MapContainer, TileLayer } from 'react-leaflet';
+import { useNavigate } from 'react-router-dom';
 
 import { usePermissions } from '@/hooks';
 
+// Properly typed icon fix
+const DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+const FullscreenMapContainer = styled(Box)(() => ({
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  zIndex: 1,
+}));
+
+const Overlay = styled(Box)(() => ({
+  position: 'absolute',
+  zIndex: 10,
+  bottom: 0,
+  left: 0,
+  width: '100vw',
+  pointerEvents: 'none',
+}));
+
+const OverlayContent = styled(Box)(({ theme }) => ({
+  pointerEvents: 'auto',
+  margin: theme.spacing(4),
+}));
+
 const MapEditor: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { canManageAnySpatial } = usePermissions();
+
+  const centerCoords: LatLngExpression = [8.345380014941664, -62.690057677741386];
 
   if (!canManageAnySpatial) {
     return (
-      <Container maxWidth="md" sx={{ mt: 6 }}>
-        <Typography variant="h5" color="error" align="center">
-          {t('dashboard:permissionDenied', 'You do not have permission to view the map.')}
-        </Typography>
-      </Container>
+      <Overlay>
+        <Paper sx={{ pointerEvents: 'auto', m: 4 }} elevation={3}>
+          <Typography variant="h5" color="error" align="center">
+            {t('dashboard:permissionDenied', 'You do not have permission to view the map.')}
+          </Typography>
+        </Paper>
+      </Overlay>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ textAlign: 'center', mt: 8 }}>
-        <Typography variant="h4" gutterBottom>
-          {t('dashboard:map.title', 'Map Editor')}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          {t('dashboard:map.description', 'Watch and edit spatial entities directly on the map.')}
-        </Typography>
-        {/* Map component will go here */}
-        <Box sx={{ mt: 6, height: 400, bgcolor: 'grey.100', borderRadius: 2, border: '1px dashed #bbb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Typography variant="h6" color="text.secondary">
-            [Map Placeholder]
-          </Typography>
-        </Box>
-      </Box>
-    </Container>
+    <>
+      <FullscreenMapContainer>
+        <MapContainer center={centerCoords} zoom={12} style={{ width: '100vw', height: '100vh' }}>
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+        </MapContainer>
+      </FullscreenMapContainer>
+      <Overlay>
+        <OverlayContent>
+          <Button
+            variant='contained'
+            onClick={() => navigate('/dashboard')}
+          >
+            ⬅️ {t('common:backToDashboard')}
+          </Button>
+        </OverlayContent>
+      </Overlay>
+    </>
   );
 };
 

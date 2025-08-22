@@ -56,7 +56,7 @@ const MainDashboard: React.FC = () => {
     ...(canManageAnySpatial ? [{
       title: t('dashboard:categories.map.title', 'Map'),
       description: t('dashboard:categories.map.description', 'View and manage spatial entities on the map.'),
-      route: '/dashboard/map',
+      route: '/map',
       color: 'info' as const,
       icon: '🗺️'
     }] : []),
