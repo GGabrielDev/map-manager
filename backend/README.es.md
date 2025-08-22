@@ -376,11 +376,12 @@ erDiagram
         int id PK
         string name UK
         int parishId FK
-        int quadrantId
+        int quadrantId FK
         string address
         string code
         geometry boundary
         json metadata
+        boolean active
         datetime creationDate
         datetime updatedOn
         datetime deletionDate
