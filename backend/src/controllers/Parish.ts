@@ -8,7 +8,7 @@ interface PaginationOpstions{
     pageSize: number
 }
 
-export const SortByOptions = ['name', 'creationDate', 'updateDate']
+export const SortByOptions = ['name', 'creationDate', 'updatedOne']
 export const SortOrderOptions = ['ASC', 'DESC']
 
 export interface ParishFilterOptions extends PaginationOpstions {
@@ -52,8 +52,8 @@ export const allParish = async({
             const column =
             sortBy === 'creationDate'
             ? 'creationDate'
-            :sortBy === 'updateOn'
-                ? 'updateOn'
+            :sortBy === 'updatedOn'
+                ? 'updatedOn'
                 : 'name'
             order = [[column, sortOrder]]
         }

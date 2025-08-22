@@ -69,7 +69,7 @@ export default class Resposible extends Model{
     createdAt!: Date
 
     @UpdatedAt
-    updatedAt!: Date
+    updatedOn!: Date
 
     @DeletedAt
     deletedAt?: Date

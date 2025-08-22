@@ -91,7 +91,7 @@ import {
    createdAt!: Date
 
    @UpdatedAt
-   updatedAt!: Date
+   updatedOn!: Date
 
    @DeletedAt
    deletionDate?: Date

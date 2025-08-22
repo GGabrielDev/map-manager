@@ -49,6 +49,7 @@ Este backend es un sistema integral de administración geoespacial construido co
 - **Node.js** (v16 o superior)
 - Gestor de paquetes **Yarn**
 - **PostgreSQL** (para producción) o **SQLite** (para pruebas)
+- Archivo **KML** con los datos de cudrantes y circuitos comunales a cargar
 
 ### Variables de Entorno
 
@@ -93,7 +94,13 @@ NODE_ENV=development         # o 'production' o 'test'
    yarn db:populate
    ```
 
-4. **Iniciar el servidor de desarrollo:**
+4. **Poblar la base de datos con los datos de cuadrantes y circuitos comunales:**
+
+   ```bash
+   yarn db:geojson
+   ```
+
+5. **Iniciar el servidor de desarrollo:**
    ```bash
    yarn dev
    ```
@@ -106,6 +113,7 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 - **`yarn start`** - Iniciar servidor de producción
 - **`yarn db:populate`** - Sembrar base de datos con usuario administrador y todos los permisos
 - **`yarn db:clear`** - Limpiar todos los datos de la base de datos
+- **`yanr db:geojson`** - Sembrar base de datos con datos de coordenadas de cuadrantes y circuitos comunales
 - **`yarn test`** - Ejecutar suite de pruebas Jest con salida detallada
 - **`yarn lint`** - Ejecutar ESLint con auto-corrección para archivos TypeScript
 
@@ -169,7 +177,7 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 
 - `id`: entero, PK, auto-incremento
 - `name`: cadena, requerido, único
-- `municipality_id`: FK a Municipio, requerido
+- `municipalityId`: FK a Municipio, requerido
 - `creationDate`: fecha-hora, automático
 - `updatedOn`: fecha-hora, automático
 - `deletionDate`: fecha-hora, nullable (eliminación suave)
@@ -180,18 +188,19 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 
 - `id`: entero, PK, auto-incremento
 - `name`: cadena, requerido, único
-- `parish_id`: FK a Parroquia, requerido
-- `organism_id`: FK a Organismo, requerido
+- `parishId`: FK a Parroquia, opcional
+- `organismId`: FK a Organismo, opcional
 - `boundary`: geometría(Polígono), requerido (datos espaciales que definen los límites del cuadrante, debe ser un polígono)
 - `metadata`: JSON, opcional (información adicional del cuadrante)
 - `fleet`: JSON, requerido (datos de gestión de flota con estructura abajo)
   - `small`: objeto con `active` (entero, por defecto 0, no negativo) e `inactive` (entero, por defecto 0, no negativo)
   - `big`: objeto con `active` (entero, por defecto 0, no negativo) e `inactive` (entero, por defecto 0, no negativo)
   - `bike`: objeto con `active` (entero, por defecto 0, no negativo) e `inactive` (entero, por defecto 0, no negativo)
+- `active`: booleando, valor por defecto **false** (Indica si el cuadrante fue actualizado con el resto de datos)
 - `creationDate`: fecha-hora, automático
 - `updatedOn`: fecha-hora, automático
 - `deletionDate`: fecha-hora, nullable (eliminación suave)
-- **Relaciones**: Pertenece a Parroquia, pertenece a Organismo, tiene muchos Puntos de Interés, tiene muchos Responsables
+- **Relaciones**: Pertenece a Parroquia, pertenece a Organismo, tiene muchos Puntos de Interés, tiene muchos Responsables, tiene un circuito comunal
 - **Índice Espacial**: Recomendado en el campo boundary para rendimiento
 - **Validación**: Los números de flota deben ser enteros no negativos, boundary debe ser un polígono válido
 
@@ -199,15 +208,17 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 
 - `id`: entero, PK, auto-incremento
 - `name`: cadena, requerido, único
-- `parish_id`: FK a Parroquia, requerido
+- `parishId`: FK a Parroquia, opcional
+- `quadrantId`: FK a Cuadrante, requerido
 - `address`: cadena, requerido (dirección de oficina, diferente de la geometría)
 - `code`: cadena, requerido (código de identificación del circuito)
 - `boundary`: geometría(Polígono), requerido (datos espaciales que definen los límites del circuito, debe ser un polígono)
 - `metadata`: JSON, opcional (información adicional del circuito)
+- `active`: booleando, valor por defecto **false** (Indica si el circuito comunal fue actualizado con el resto de datos)
 - `creationDate`: fecha-hora, automático
 - `updatedOn`: fecha-hora, automático
 - `deletionDate`: fecha-hora, nullable (eliminación suave)
-- **Relaciones**: Pertenece a Parroquia, tiene muchos Puntos de Interés, tiene muchos Responsables, tiene muchos Consejos Comunales
+- **Relaciones**: Pertenece a Parroquia, pertenece a quadrante, tiene muchos Puntos de Interés, tiene muchos Responsables, tiene muchos Consejos Comunales
 - **Índice Espacial**: Recomendado en el campo boundary para rendimiento
 - **Validación**: Boundary debe ser un polígono válido
 
@@ -232,10 +243,10 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 - `name`: cadena, requerido
 - `description`: cadena, opcional
 - `geometry`: geometría(Punto), requerido (datos espaciales que definen la ubicación del punto)
-- `organism_id`: FK a Organismo
-- `responsible_id`: FK a Responsable
-- `circuit_communal_id`: FK a Circuito Comunal, opcional (auto-asignado basado en coordenadas)
-- `quadrant_id`: FK a Cuadrante, opcional (auto-asignado basado en coordenadas)
+- `organismId`: FK a Organismo
+- `responsibleId`: FK a Responsable
+- `communalCircuitId`: FK a Circuito Comunal, opcional (auto-asignado basado en coordenadas)
+- `quadrantId`: FK a Cuadrante, opcional (auto-asignado basado en coordenadas)
 - `creationDate`: fecha-hora, automático
 - `updatedOn`: fecha-hora, automático
 - `deletionDate`: fecha-hora, nullable (eliminación suave)

@@ -56,7 +56,7 @@ export const allOrganism = async ({
             sortBy === 'creationDate'
                 ? 'creationDate'
                 :sortBy === 'updatedOn'
-                    ? 'updateOn'
+                    ? 'updatedOn'
                     : 'name'
             order = [[column, sortOrder]]
         }

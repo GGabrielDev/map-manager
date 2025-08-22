@@ -70,7 +70,6 @@ export default class PointOfInterest extends Model {
   @Column(DataType.INTEGER)
   quadrantId?: number;
 
-
   // Fechas automáticas
   @CreatedAt
   creationDate!: Date;

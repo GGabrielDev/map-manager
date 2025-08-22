@@ -40,13 +40,17 @@ import {
     @Column(DataType.INTEGER)
     parishId?: number
 
-    @AllowNull(false)
-    @Column
-    addres!: string
+    @ForeignKey(() => Quadrant)
+    @Column(DataType.INTEGER)
+    quadrantId1!: number
 
     @AllowNull(false)
     @Column
-    code!: string
+    addres?: string
+
+    @AllowNull(false)
+    @Column
+    code?: string
 
     @AllowNull(false)
     @Column(DataType.GEOMETRY('POLYGON'))
@@ -56,11 +60,18 @@ import {
     @Column(DataType.JSON)
     metadata?: object;
 
+    @AllowNull(false)
+    @Column({
+        type: DataType.BOOLEAN,
+        defaultValue: false
+    })
+    active!: boolean;
+
     @CreatedAt
     createdAt!: Date
     
     @UpdatedAt
-    updatedAt!: Date
+    updatedOn!: Date
     
     @DeletedAt
     deletionDate?: Date

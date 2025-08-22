@@ -6,7 +6,7 @@ interface PaginationOpstions{
     pageSize: number
 }
 
-export const SortByOptions = ['name', 'creationDate', 'updateDate']
+export const SortByOptions = ['name', 'creationDate', 'updatedOn']
 export const SortOrderOptions = ['ASC', 'DESC']
 
 export interface QuadrantFilterOptions extends PaginationOpstions {
@@ -79,8 +79,8 @@ export const allQuadrant = async({
             const column =
             sortBy === 'creationDate'
             ? 'creationDate'
-            :sortBy === 'updateOn'
-                ? 'updateOn'
+            :sortBy === 'updatedOn'
+                ? 'updatedOn'
                 : 'name'
             order = [[column, sortOrder]]
         }

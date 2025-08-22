@@ -34,7 +34,7 @@ export default class Organism extends Model{
     createdAt!: Date
 
     @UpdatedAt
-    updatedAt!: Date
+    updatedOn!: Date
 
     @DeletedAt
     deletedAt?: Date

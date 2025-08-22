@@ -8,7 +8,7 @@ interface PaginationOptions{
     pageSize: number
 }
 
-export const SortByOptions = ['name', 'creationDate', 'updateDate']
+export const SortByOptions = ['name', 'creationDate', 'updatedOne']
 export const SortOrderOptions = ['ASC', 'DESC']
 
 export interface CommunalCircuitFilterOptions extends PaginationOptions {
@@ -157,7 +157,7 @@ export const allCommunalCircuitsGeoJSON = async ({
         code: communalCircuit.code,
         metadata: communalCircuit.metadata,
         createdAt: communalCircuit.createdAt,
-        updatedAt: communalCircuit.updatedAt,
+        updatedAt: communalCircuit.updatedOn,
         deletionDate: communalCircuit.deletionDate,
         parish: communalCircuit.parish
       }
