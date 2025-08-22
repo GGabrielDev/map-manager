@@ -1,0 +1,7 @@
+{
+  "layers": {
+    "default": "Estandard",
+    "dark": "Modo oscuro",
+    "satellite": "Satélite"
+  }
+}
