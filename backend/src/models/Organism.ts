@@ -13,7 +13,7 @@ import {
     HasMany
 } from "sequelize-typescript";
 
-import { Quadrant, Responsible } from ".";
+import { Quadrant, Responsible, PointOfInterest } from ".";
 
 @Table({tableName: 'Organism'})
 export default class Organism extends Model{
@@ -44,4 +44,7 @@ export default class Organism extends Model{
 
     @HasMany(()=> Quadrant)
     quadrant: Quadrant[]
+
+    @HasMany(()=> PointOfInterest)
+    PointOfInterests: PointOfInterest[]
 }

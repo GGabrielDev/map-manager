@@ -1,5 +1,5 @@
 import { Op, OrderItem } from "sequelize";
-import { Organism, Responsible } from "@/models";
+import { Organism, Responsible, Quadrant, PointOfInterest } from "@/models";
 
 import { HttpError } from "@/utils/error-utils";
 
@@ -166,8 +166,11 @@ export const deleteOrganism = async (id: number): Promise<boolean> => {
         }
 
         const countResponsible = await Responsible.count({ where: { organismId: id } });
-        if (countResponsible > 0) {
-            throw new HttpError("No se puede eliminar el organismo, ya que tiene responsables asociadas.", 400, "organism_has_responsibles", {field: "id"});
+        const countQuadrants = await Quadrant.count({ where: { organismId: id } });
+        const countPointsOfInterest = await PointOfInterest.count({ where: { organismId: id } });
+
+        if (countQuadrants > 0 || countPointsOfInterest > 0 || countResponsible > 0) {
+            throw new HttpError("No se puede eliminar el organismo, ya que tiene cuadrantes, responsables o puntos de interés asociados.", 400, "organism_has_associations", {field: "id"});
         }
 
         await organism.destroy();

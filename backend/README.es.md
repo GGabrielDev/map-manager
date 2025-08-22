@@ -250,7 +250,7 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 - `creationDate`: fecha-hora, automático
 - `updatedOn`: fecha-hora, automático
 - `deletionDate`: fecha-hora, nullable (eliminación suave)
-- **Relaciones**: Pertenece a Cuadrante (opcional), Circuito Comunal (opcional), y Organismo (opcional)
+- **Relaciones**: Pertenece a Cuadrante (opcional), Circuito Comunal (opcional), Organismo (obligatorio) y Responsable (obligatorio)
 - **Lógica de Negocio**: Automáticamente asociado con Cuadrante y/o Circuito Comunal si las coordenadas caen dentro de sus límites
 - **Hooks**: Lógica de asociación espacial en crear/actualizar
 - **Validación**: Geometry debe ser un punto válido
@@ -259,11 +259,12 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 
 - `id`: entero, PK, auto-incremento
 - `name`: cadena, requerido, único
+- `icono`: cadena, opcional
 - `creationDate`: fecha-hora, automático
 - `updatedOn`: fecha-hora, automático
 - `deletionDate`: fecha-hora, nullable (eliminación suave)
-- **Relaciones**: Tiene muchos Puntos de Interés, tiene muchos Responsables
-- **Hooks**: Previene eliminación si hay puntos de interés o responsables asignados
+- **Relaciones**: Tiene muchos Puntos de Interés, tiene muchos Responsables, tiene muchos cuadrantes
+- **Hooks**: Previene eliminación si hay puntos de interés, cuadrantes o responsables asignados
 
 #### **Responsable (Responsible)**
 
@@ -282,7 +283,7 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 - `creationDate`: fecha-hora, automático
 - `updatedOn`: fecha-hora, automático
 - `deletionDate`: fecha-hora, nullable (eliminación suave)
-- **Relaciones**: Pertenece a Organismo (opcional), Cuadrante (opcional), Circuito Comunal (opcional), Consejo Comunal (opcional)
+- **Relaciones**: Pertenece a Organismo (opcional), Cuadrante (opcional), Circuito Comunal (opcional), Consejo Comunal (opcional), tiene puntos de interes
 - **Validación**:
   - Los números de teléfono deben coincidir con el formato venezolano (regex: `^0[24]\d{2}-\d{7}$` para fijos o `^04(12|14|16|22|24|26)-\d{7}$` para móviles)
   - La cédula debe comenzar con letra mayúscula seguida de números
