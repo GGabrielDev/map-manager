@@ -11,7 +11,8 @@ import {
     DataType,
     BelongsTo,
     ForeignKey,
-    HasMany
+    HasMany,
+    Validate
 } from "sequelize-typescript";
 
 import { Organism, Quadrant, CommunalCircuit, PointOfInterest } from ".";
@@ -36,10 +37,28 @@ export default class Resposible extends Model{
     ci!: string
 
     @AllowNull(false)
+    @Validate({
+        isValidPhone(value: string) {
+            const fixedPhone = /^0\d{2}-\d{7}$/;
+            const mobilePhone = /^04(12|14|16|22|24|26)-\d{7}$/;
+            if (!fixedPhone.test(value) && !mobilePhone.test(value)) {
+                throw new Error("phone debe ser un número fijo o móvil venezolano válido");
+            }
+        },
+  })
     @Column
     phone!: string
 
     @AllowNull(true)
+    @Validate({
+        isValidPhone(value: string) {
+            const fixedPhone = /^0\d{2}-\d{7}$/;
+            const mobilePhone = /^04(12|14|16|22|24|26)-\d{7}$/;
+            if (!fixedPhone.test(value) && !mobilePhone.test(value)) {
+                throw new Error("phone debe ser un número fijo o móvil venezolano válido");
+            }
+        },
+    })
     @Column
     phoneBackup?: string
 

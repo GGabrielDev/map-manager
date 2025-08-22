@@ -166,7 +166,7 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 
 - `id`: entero, PK, auto-incremento
 - `name`: cadena, requerido, único
-- `state_id`: FK a Estado, requerido
+- `stateId`: FK a Estado, requerido
 - `creationDate`: fecha-hora, automático
 - `updatedOn`: fecha-hora, automático
 - `deletionDate`: fecha-hora, nullable (eliminación suave)
@@ -226,7 +226,7 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 
 - `id`: entero, PK, auto-incremento
 - `name`: cadena, requerido, único
-- `communal_circuit_id`: FK a Circuito Comunal, requerido
+- `communalCircuitId`: FK a Circuito Comunal, requerido
 - `address`: cadena, requerido (dirección de oficina del consejo)
 - `code`: cadena, requerido (código de identificación del consejo)
 - `boundary`: geometría(Polígono), requerido (datos espaciales que definen los límites del consejo, debe ser un polígono)
@@ -269,17 +269,17 @@ El servidor se iniciará en `http://localhost:4000` (o tu PORT configurado).
 #### **Responsable (Responsible)**
 
 - `id`: entero, PK, auto-incremento
-- `first_name`: cadena, requerido
-- `last_name`: cadena, requerido
+- `firstName`: cadena, requerido
+- `lastName`: cadena, requerido
 - `ci`: cadena, requerido (formato de cédula venezolana: letra mayúscula seguida de números)
 - `phone`: cadena, requerido (validación de formato de número telefónico venezolano)
-- `phone_backup`: cadena, opcional (validación de formato de número telefónico venezolano)
+- `phoneBackup`: cadena, opcional (validación de formato de número telefónico venezolano)
 - `email`: cadena, opcional (validación de formato de email)
 - `position`: cadena, requerido
-- `organism_id`: FK a Organismo, opcional
-- `quadrant_id`: FK a Cuadrante, opcional
-- `circuit_id`: FK a Circuito Comunal, opcional
-- `council_id`: FK a Consejo Comunal, opcional
+- `organismId`: FK a Organismo, opcional
+- `quadrantId`: FK a Cuadrante, opcional
+- `communalCircuitId`: FK a Circuito Comunal, opcional
+- `communalCouncilId`: FK a Consejo Comunal, opcional
 - `creationDate`: fecha-hora, automático
 - `updatedOn`: fecha-hora, automático
 - `deletionDate`: fecha-hora, nullable (eliminación suave)
